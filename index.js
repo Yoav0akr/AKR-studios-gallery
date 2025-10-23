@@ -119,7 +119,7 @@ let globalArchivos = [];
   console.log("Datos cargados de Mongo:", globalArchivos);
 
   if (!globalArchivos || globalArchivos.length === 0) {
-    fotos.innerHTML = "<p>SI VES ESTE MENSAJE CAMBIA DE PC O CONECTATE BIEN A INTERNET PUT@.</p>";
+    fotos.innerHTML = `<p id="noRES">SI VES ESTE MENSAJE CAMBIA DE PC O CONECTATE BIEN A INTERNET PUT@.</p>`;
     return;
   }
 
