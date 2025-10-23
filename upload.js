@@ -21,7 +21,7 @@ async function guardarEnMongo(nombre, url, por, categ) {
     categ
   };
 
-  const res = await fetch("./api/db.js", {
+  const res = await fetch("/api/db", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -32,4 +32,5 @@ async function guardarEnMongo(nombre, url, por, categ) {
   alert("se ha guardado")
 
 }
+
 
