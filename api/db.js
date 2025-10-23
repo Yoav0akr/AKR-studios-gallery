@@ -1,47 +1,62 @@
 import mongoose from "mongoose";
- const MONGODB_URI = process.env.MONGODB_URI;
 
+// 🔹 Asegúrate de que la URI exista
+const MONGODB_URI = process.env.MONGODB_URI;
+if (!MONGODB_URI) {
+  throw new Error(
+    "Por favor define MONGODB_URI en las variables de entorno de Vercel"
+  );
+}
 
-
+// 🔹 Cache global para evitar reconexiones en Vercel
 let cached = global.mongoose;
 if (!cached) cached = global.mongoose = { conn: null, promise: null };
 
 export default async function handler(req, res) {
-  if (!cached.conn) {
-    if (!cached.promise) {
-      cached.promise = mongoose.connect(MONGODB_URI, {
-        bufferCommands: false,
-      }).then((mongoose) => mongoose);
-    }
-    cached.conn = await cached.promise;
-  }
-
-  const conn = cached.conn;
-
-  // --- Esquema adaptado a tu estructura ---
-  const ImagenSchema = new mongoose.Schema({
-    id: Number,
-    nombre: String,
-    ub: String,          // URL de la imagen (local o Cloudinary)
-    por: String,         // autor o estudio
-    categ: [String],     // lista de categorías
-  });
-
-  const Imagen = conn.models.Imagen || conn.model("Imagen", ImagenSchema);
-
-  switch (req.method) {
-    case "GET": {
-      const imagenes = await Imagen.find().sort({ id: 1 });
-      return res.status(200).json(imagenes);
+  try {
+    // 🔹 Conexión a MongoDB
+    if (!cached.conn) {
+      if (!cached.promise) {
+        cached.promise = mongoose.connect(MONGODB_URI, {
+          bufferCommands: false,
+          useNewUrlParser: true,
+          useUnifiedTopology: true,
+        }).then((mongoose) => mongoose);
+      }
+      cached.conn = await cached.promise;
     }
 
-    case "POST": {
-      const nueva = await Imagen.create(req.body);
-      return res.status(201).json(nueva);
-    }
+    const conn = cached.conn;
 
-    default:
-      res.setHeader("Allow", ["GET", "POST"]);
-      return res.status(405).end(`Método ${req.method} no permitido`);
+    // --- Esquema ---
+    const ImagenSchema = new mongoose.Schema({
+      id: Number,
+      nombre: String,
+      ub: String,
+      por: String,
+      categ: [String],
+    });
+
+    const Imagen = conn.models.Imagen || conn.model("Imagen", ImagenSchema);
+
+    // --- Manejo de métodos ---
+    switch (req.method) {
+      case "GET": {
+        const imagenes = await Imagen.find().sort({ id: 1 });
+        return res.status(200).json(imagenes);
+      }
+
+      case "POST": {
+        const nueva = await Imagen.create(req.body);
+        return res.status(201).json(nueva);
+      }
+
+      default:
+        res.setHeader("Allow", ["GET", "POST"]);
+        return res.status(405).json({ error: `Método ${req.method} no permitido` });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Error conectando a MongoDB" });
   }
 }
