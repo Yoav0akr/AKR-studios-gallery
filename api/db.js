@@ -46,10 +46,17 @@ export default async function handler(req, res) {
         return res.status(200).json(imagenes);
       }
 
-      case "POST": {
-        const nueva = await Imagen.create(req.body);
-        return res.status(201).json(nueva);
-      }
+    case "POST": {
+  try {
+    // parsear body si viene como string
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    const nueva = await Imagen.create(body);
+    return res.status(201).json(nueva);
+  } catch (error) {
+    console.error("Error creando documento:", error);
+    return res.status(400).json({ error: "Datos inválidos o error de MongoDB" });
+  }
+}
 
       default:
         res.setHeader("Allow", ["GET", "POST"]);
