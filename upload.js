@@ -1,9 +1,7 @@
-
-
-const  EntradaNombre = document.getElementById("nombre_imput");
+const EntradaNombre = document.getElementById("nombre_imput");
 const EentradaDeparte = document.getElementById("por-imput");
 const EntradaCategs = document.querySelector("#categs");
-const EntradaGuardar = document.querySelector("#manchego")
+const EntradaGuardar = document.querySelector("#manchego");
 
 function queso() {
   const texto = EntradaCategs.value.toLowerCase().trim();
@@ -11,25 +9,17 @@ function queso() {
 
   const nombre = EntradaNombre.value.trim();
   const por = EentradaDeparte.value.trim();
-  const url = null; // o la URL de Cloudinary si ya la tienes
+  const url = null; // si luego usas Cloudinary, reemplaza con la URL
 
   guardarEnMongo(nombre, url, por, array);
 }
 
-
-EntradaGuardar.addEventListener("click", queso)
+EntradaGuardar.addEventListener("click", queso);
 
 async function guardarEnMongo(nombre, url, por, categ) {
-  const data = {
-    id: Date.now(),
-    nombre,
-    ub: url,
-    por,
-    categ
-  };
+  const data = { id: Date.now(), nombre, ub: url, por, categ };
 
   try {
-    // 🔹 Solo un fetch al endpoint correcto
     const res = await fetch("/api/db", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -46,5 +36,3 @@ async function guardarEnMongo(nombre, url, por, categ) {
     alert("No se pudo guardar. Revisa la consola.");
   }
 }
-
-
