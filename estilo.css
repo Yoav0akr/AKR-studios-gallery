@@ -25,7 +25,7 @@ a {
     border: 3px solid #146d70;
     border-radius: 2em;
     align-content: space-between;
-    gap :1.5rem;
+    gap: 1.5rem;
 }
 
 h2 {
@@ -38,11 +38,13 @@ h2 {
 }
 
 .visualizador {
+    text-align: center;
+    padding-top: 25%;
     border: 3px solid #0a6b01;
     background: #011104;
     border-radius: 1rem;
     width: 50%;
-    max-height:50 ;
+    max-height: 50;
     padding: 1 em;
 
 
@@ -87,13 +89,15 @@ button {
     width: 100%;
 }
 
-button :hover{
+button :hover {
     background-color: #060016
 }
-p{
+
+p {
     margin-bottom: 0.43em;
     margin-top: 0.2rem;
 }
+
 .queso {
     border: 3px solid #240181;
     background: #05011d;
@@ -144,7 +148,7 @@ ul {
 
 li {
     margin-bottom: -0.9em;
-     max-width:75%;
+    max-width: 75%;
 }
 
 p {
@@ -152,7 +156,7 @@ p {
 
 }
 
-#noRES{
+#noRES {
     width: 100%;
     text-align: center;
     font-size: 5em;
