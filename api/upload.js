@@ -1,4 +1,4 @@
-import formidable from "formidable";
+import { formidable } from "formidable";
 import cloudinary from "cloudinary";
 
 cloudinary.v2.config({
@@ -15,7 +15,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const form = new formidable.IncomingForm();
+    const form = formidable();
 
     form.parse(req, async (err, fields, files) => {
       if (err) {
