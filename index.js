@@ -1,7 +1,26 @@
 //import { archivos } from './bd.js';
-import { archivos } from './bd2.js';
-const archivitos = archivos;
 
+
+// Función para llamar los archivos (tu lógica original)
+async function cargarDesdeMongo() {
+  try {
+    const res = await fetch("/api/db", {
+      method: "GET"
+    });
+
+    if (!res.ok) throw new Error(`Error ${res.status}`);
+
+    const archivitos = await res.json();
+    console.log("cargado:", res.json());
+    alert("Se ha cargado correctamente");
+    return res.json();
+  } catch (err) {
+    console.error("Error al guardar en Mongo:", err);
+    alert("No se pudo guardar. Revisa la consola.");
+  }
+}
+
+const archivitos = cargarDesdeMongo()
 
 
 const fotos = document.querySelector("#imagenes-contenedor");
@@ -9,8 +28,8 @@ const cats = document.getElementsByName("cats")[0];
 const show = document.getElementById("show");
 
 //cludinary
-const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME ;
-const CLOUDINARY_URL=`https://res.cloudinary.com/${CLOUD_NAME}/image/list/galeria.json`;
+const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
+const CLOUDINARY_URL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/galeria.json`;
 
 function cargarimagenes(cosas) {
   fotos.innerHTML = "";
