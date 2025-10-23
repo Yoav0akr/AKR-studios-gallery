@@ -1,36 +1,28 @@
-//import { archivos } from './bd.js';
-
-
-// Función para llamar los archivos (tu lógica original)
+// Función para llamar los archivos
 async function cargarDesdeMongo() {
   try {
-    const res = await fetch("/api/db", {method: "GET" });
+    const res = await fetch("/api/db", { method: "GET" });
 
     if (!res.ok) throw new Error(`Error ${res.status}`);
 
     const archivitos = await res.json();
-console.log("Cargado correctamente:", archivitos.length, "documentos");    alert("Se ha cargado correctamente");
+    console.log("Cargado correctamente:", archivitos.length, "documentos");
+    // alert("Se ha cargado correctamente"); // opcional
 
     return archivitos;
   } catch (err) {
     console.error("Error al cargar desde Mongo:", err);
-    alert("No se pudo cargar. Revisa la consola.");
+    // alert("No se pudo cargar. Revisa la consola."); // opcional
     return [];
   }
 }
 
-
-const archivitos = await cargarDesdeMongo()
-
-
 const fotos = document.querySelector("#imagenes-contenedor");
 const cats = document.getElementsByName("cats")[0];
 const show = document.getElementById("show");
+const buscador = document.querySelector("#buscador");
 
-//cludinary
-const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME;
-const CLOUDINARY_URL = `https://res.cloudinary.com/${CLOUD_NAME}/image/list/galeria.json`;
-
+// Función para renderizar imágenes
 function cargarimagenes(cosas) {
   fotos.innerHTML = "";
   cosas.forEach(nombre => {
@@ -44,7 +36,7 @@ function cargarimagenes(cosas) {
           <li><p>Categoría: ${nombre.categ}</p></li>
         </ul>
         <h3 class="producto-titulo">${nombre.nombre}</h3>
-        <button class="descargarBtn" id="${nombre.id}">Descargar</button>
+        <button class="descargarBtn" id="${nombre.id || nombre._id}">Descargar</button>
       </div>
     `;
     fotos.append(div);
@@ -52,7 +44,7 @@ function cargarimagenes(cosas) {
   actualizarBotonesDescargar();
 }
 
-// ======== CATEGORÍAS =========
+// Categorías
 function loadCats(categorias) {
   cats.innerHTML = `<option value="nombre">name</option><option value="por">contribuidor</option>`;
   categorias.forEach(categ => {
@@ -63,7 +55,7 @@ function loadCats(categorias) {
   });
 }
 
-// ======== DESCARGA =========
+// Descarga
 function actualizarBotonesDescargar() {
   const BotonesDescargar = document.querySelectorAll(".descargarBtn");
   BotonesDescargar.forEach(boton => {
@@ -75,10 +67,7 @@ function download(e) {
   const idboton = e.currentTarget.id;
   const archivo = globalArchivos.find(item => item._id === idboton || item.id === Number(idboton));
 
-  if (!archivo) {
-    console.warn("Archivo no encontrado para el botón:", idboton);
-    return;
-  }
+  if (!archivo) return console.warn("Archivo no encontrado para el botón:", idboton);
 
   const enlace = document.createElement("a");
   enlace.href = archivo.ub;
@@ -88,27 +77,21 @@ function download(e) {
   document.body.removeChild(enlace);
 }
 
-// ======== FILTRADO =========
+// Filtrado
 function filtrarYMostrar() {
   const texto = buscador.value.toLowerCase().trim();
   const tipoBusqueda = cats.value;
   let filtrados = globalArchivos;
 
   if (tipoBusqueda === "nombre") {
-    filtrados = globalArchivos.filter(item =>
-      item.nombre.toLowerCase().includes(texto)
-    );
+    filtrados = globalArchivos.filter(item => item.nombre.toLowerCase().includes(texto));
   } else if (tipoBusqueda === "por") {
-    filtrados = globalArchivos.filter(item =>
-      item.por.toLowerCase().includes(texto)
-    );
+    filtrados = globalArchivos.filter(item => item.por.toLowerCase().includes(texto));
   } else {
     buscador.value = "";
     filtrados = globalArchivos.filter(item => {
-      const categ = Array.isArray(item.categ)
-        ? item.categ.map(c => c.toLowerCase())
-        : [String(item.categ).toLowerCase()];
-      return categ.includes(tipoBusqueda);
+      const categ = Array.isArray(item.categ) ? item.categ.map(c => c.toLowerCase()) : [String(item.categ).toLowerCase()];
+      return categ.includes(tipoBusqueda.toLowerCase());
     });
   }
 
@@ -128,18 +111,19 @@ function filtrarYMostrar() {
 buscador.addEventListener("input", filtrarYMostrar);
 cats.addEventListener("change", filtrarYMostrar);
 
-// ======== INICIALIZACIÓN =========
+// Inicialización
 let globalArchivos = [];
 
 (async function init() {
   globalArchivos = await cargarDesdeMongo();
+  console.log("Datos cargados de Mongo:", globalArchivos);
 
   if (!globalArchivos || globalArchivos.length === 0) {
     fotos.innerHTML = "<p>No hay imágenes disponibles.</p>";
     return;
   }
 
-  const Cats_Cconcentrado = [...new Set(globalArchivos.map(doc => doc.categ))];
+  const Cats_Cconcentrado = [...new Set(globalArchivos.map(doc => doc.categ).flat())];
   loadCats(Cats_Cconcentrado);
   cargarimagenes(globalArchivos);
 })();
