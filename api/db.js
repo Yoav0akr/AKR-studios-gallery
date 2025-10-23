@@ -1,9 +1,6 @@
 import mongoose from "mongoose";
-if (process.env.MONGODB_URI){
+
 const MONGODB_URI = process.env.MONGODB_URI;
-} else {
-    const MONGODB_URI = "localhost:27017";
-}
 
 let cached = global.mongoose;
 if (!cached) cached = global.mongoose = { conn: null, promise: null };
@@ -47,3 +44,4 @@ export default async function handler(req, res) {
       return res.status(405).end(`Método ${req.method} no permitido`);
   }
 }
+
