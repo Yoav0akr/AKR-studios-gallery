@@ -37,7 +37,7 @@ export default async function handler(req, res) {
       categ: [String],
     });
 
-    const Imagen = conn.models.Imagen || conn.model("Imagen", ImagenSchema);
+    const Imagen = conn.models.Imagen || conn.model("archivos", ImagenSchema);
 
     // --- Manejo de métodos ---
     switch (req.method) {
@@ -67,3 +67,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Error conectando a MongoDB" });
   }
 }
+
