@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-// 🔹 Asegúrate de que la URI exista
+// 🔹 URI de MongoDB desde variable de entorno
 const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
   throw new Error(
@@ -8,7 +8,7 @@ if (!MONGODB_URI) {
   );
 }
 
-// 🔹 Cache global para evitar reconexiones en Vercel
+// 🔹 Cache global para evitar múltiples conexiones en Vercel
 let cached = global.mongoose;
 if (!cached) cached = global.mongoose = { conn: null, promise: null };
 
@@ -28,7 +28,7 @@ export default async function handler(req, res) {
 
     const conn = cached.conn;
 
-    // --- Esquema ---
+    // 🔹 Esquema de imágenes
     const ImagenSchema = new mongoose.Schema({
       id: Number,
       nombre: String,
@@ -37,34 +37,33 @@ export default async function handler(req, res) {
       categ: [String],
     });
 
-    const Imagen = conn.models.Imagen || conn.model("archivos", ImagenSchema);
+    const Imagen = conn.models.Imagen || conn.model("Imagen", ImagenSchema);
 
-    // --- Manejo de métodos ---
+    // 🔹 Manejo de métodos
     switch (req.method) {
       case "GET": {
         const imagenes = await Imagen.find().sort({ id: 1 });
         return res.status(200).json(imagenes);
       }
 
-    case "POST": {
-  try {
-    // parsear body si viene como string
-    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-    const nueva = await Imagen.create(body);
-    return res.status(201).json(nueva);
-  } catch (error) {
-    console.error("Error creando documento:", error);
-    return res.status(400).json({ error: "Datos inválidos o error de MongoDB" });
-  }
-}
+      case "POST": {
+        try {
+          // parsear req.body si viene como string
+          const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+          const nueva = await Imagen.create(body);
+          return res.status(201).json(nueva);
+        } catch (error) {
+          console.error("Error creando documento:", error);
+          return res.status(400).json({ error: "Datos inválidos o error de MongoDB" });
+        }
+      }
 
       default:
         res.setHeader("Allow", ["GET", "POST"]);
         return res.status(405).json({ error: `Método ${req.method} no permitido` });
     }
   } catch (error) {
-    console.error(error);
+    console.error("Error conectando a MongoDB:", error);
     return res.status(500).json({ error: "Error conectando a MongoDB" });
   }
 }
-

@@ -1,38 +1,52 @@
-const EntradaNombre = document.getElementById("nombre_imput");
-const EentradaDeparte = document.getElementById("por-imput");
-const EntradaCategs = document.querySelector("#categs");
-const EntradaGuardar = document.querySelector("#manchego");
+// === upload.js ===
+// Controla la subida de imágenes desde upload.html
 
-function queso() {
-  const texto = EntradaCategs.value.toLowerCase().trim();
-  const array = texto.split(/\s+/);
+document.addEventListener("DOMContentLoaded", () => {
+  const visualisador = document.getElementById("visualisador");
 
-  const nombre = EntradaNombre.value.trim();
-  const por = EentradaDeparte.value.trim();
-  const url = null; // si luego usas Cloudinary, reemplaza con la URL
-
-  guardarEnMongo(nombre, url, por, array);
-}
-
-EntradaGuardar.addEventListener("click", queso);
-
-async function guardarEnMongo(nombre, url, por, categ) {
-  const data = { id: Date.now(), nombre, ub: url, por, categ };
-
-  try {
-    const res = await fetch("/api/db", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    if (!res.ok) throw new Error(`Error ${res.status}`);
-
-    const saved = await res.json();
-    console.log("Guardado en Mongo:", saved);
-    alert("Se ha guardado correctamente");
-  } catch (err) {
-    console.error("Error al guardar en Mongo:", err);
-    alert("No se pudo guardar. Revisa la consola.");
+  if (!visualisador) {
+    console.warn("⚠️ No se encontró el div #visualisador en el HTML.");
+    return;
   }
-}
+
+  visualisador.addEventListener("click", () => {
+    // Crear input para elegir archivo
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.click();
+
+    input.onchange = async () => {
+      const file = input.files[0];
+      if (!file) return;
+
+      console.log("📂 Archivo seleccionado:", file.name);
+
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        // Llamar al endpoint serverless /api/upload
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        if (data.url) {
+          console.log("✅ Imagen subida con éxito:", data.url);
+
+          // Aquí llamas tu función original de Mongo
+          guardarenmongo(data.url); // <-- sigue usando tu versión existente
+        } else {
+          console.error("❌ Error al subir imagen:", data.error);
+          alert("Error al subir imagen: " + data.error);
+        }
+      } catch (err) {
+        console.error("⚠️ Error de conexión o servidor:", err);
+        alert("Error de conexión con el servidor.");
+      }
+    };
+  });
+});
