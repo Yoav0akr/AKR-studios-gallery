@@ -7,30 +7,48 @@ body {
     background-color: #000e06;
 }
 
-a{
+a {
     border: 0.2rem solid #0a6b01;
     padding: 0.75em;
-    color:rgb(211, 211, 211);
+    color: rgb(211, 211, 211);
     background: #703614;
     border-radius: 1rem;
-    height: 90%;    
+    height: 90%;
     justify-content: center;
 }
-.cargador{
-    padding :3em;
+
+.cargador {
+    display: flex;
+    padding: 2em;
     background-color: #000804;
-    margin-top: 3em;
-    border: 3px #146d70;
-    justify-content: grid;
-    
-    height: 5em;
+    margin: 1rem;
+    border: 3px solid #146d70;
+    border-radius: 2em;
+    align-content: space-between;
+    gap :1.5rem;
 }
 
-.visualizador{
-    border:3px solid #0a6b01;
+h2 {
+    color: honeydew;
+    max-width: 100%;
+    text-align: center;
+    font-size: 2.5em;
+    letter-spacing: 0.1rem;
+    font-style: oblique 10deg;
 }
 
-.ses2{
+.visualizador {
+    border: 3px solid #0a6b01;
+    background: #011104;
+    border-radius: 1rem;
+    width: 50%;
+    max-height:50 ;
+    padding: 1 em;
+
+
+}
+
+.ses2 {
     margin: 1em;
 }
 
@@ -44,14 +62,16 @@ a{
     margin: -1em;
 }
 
-#buscador, #cats{
-    border-radius:  1cap;
+#buscador,
+#cats {
+    border-radius: 1cap;
     border: 3px solid #036d0c;
     height: auto;
     margin-right: 2rem;
     height: 90%;
 }
-#cats{
+
+#cats {
     margin-right: 1rem;
 }
 
@@ -66,18 +86,32 @@ button {
     color: #af1146;
     width: 100%;
 }
-button ::hover{
-     background-color: #060016
+
+button :hover{
+    background-color: #060016
+}
+p{
+    margin-bottom: 0.43em;
+    margin-top: 0.2rem;
+}
+.queso {
+    border: 3px solid #240181;
+    background: #05011d;
+    padding: 1rem;
+    border-radius: 1em;
+    display: flex;
+    flex-direction: column;
+    justify-content: left;
+    width: 50%;
+
 }
 
-.queso{
-display: flex;
-flex-direction: row;
-}
-.webo{
+.webo {
+    font-size: 1em;
+    padding: 0.4rem;
     border-radius: var(--defborder);
-    font-size: 1rem;
-    max-height: 3em;
+    max-width: 50%;
+    margin-bottom: 1rem;
 }
 
 
