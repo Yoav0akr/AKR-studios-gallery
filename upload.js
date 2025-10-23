@@ -2,7 +2,7 @@
 // Controla la subida de imágenes desde upload.html
 
 document.addEventListener("DOMContentLoaded", () => {
-  const visualisador = document.querySelector(".visualisador");
+  const visualisador = document.querySelector(".visualizador");
 
   if (!visualisador) {
     console.warn("⚠️ No se encontró el div #visualisador en el HTML.");
@@ -50,3 +50,4 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   });
 });
+
