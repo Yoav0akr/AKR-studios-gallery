@@ -4,23 +4,23 @@
 // Función para llamar los archivos (tu lógica original)
 async function cargarDesdeMongo() {
   try {
-    const res = await fetch("/api/db", {
-      method: "GET"
-    });
+    const res = await fetch("/api/db", {method: "GET" });
 
     if (!res.ok) throw new Error(`Error ${res.status}`);
 
     const archivitos = await res.json();
-    console.log("cargado:", res.json());
-    alert("Se ha cargado correctamente");
-    return res.json();
+console.log("Cargado correctamente:", archivitos.length, "documentos");    alert("Se ha cargado correctamente");
+
+    return archivitos;
   } catch (err) {
-    console.error("Error al guardar en Mongo:", err);
-    alert("No se pudo guardar. Revisa la consola.");
+    console.error("Error al cargar desde Mongo:", err);
+    alert("No se pudo cargar. Revisa la consola.");
+    return [];
   }
 }
 
-const archivitos = cargarDesdeMongo()
+
+const archivitos = await cargarDesdeMongo()
 
 
 const fotos = document.querySelector("#imagenes-contenedor");
@@ -50,12 +50,9 @@ function cargarimagenes(cosas) {
     fotos.append(div);
   });
   actualizarBotonesDescargar();
-  loadCats(cots);
 }
 
-const Cats_Cconcentrado = [...new Set(archivitos.flatMap(doc => doc.categ))];
-const cots = Cats_Cconcentrado;
-
+// ======== CATEGORÍAS =========
 function loadCats(categorias) {
   cats.innerHTML = `<option value="nombre">name</option><option value="por">contribuidor</option>`;
   categorias.forEach(categ => {
@@ -66,24 +63,48 @@ function loadCats(categorias) {
   });
 }
 
-const buscador = document.querySelector("#buscador");
+// ======== DESCARGA =========
+function actualizarBotonesDescargar() {
+  const BotonesDescargar = document.querySelectorAll(".descargarBtn");
+  BotonesDescargar.forEach(boton => {
+    boton.addEventListener("click", download);
+  });
+}
 
+function download(e) {
+  const idboton = e.currentTarget.id;
+  const archivo = globalArchivos.find(item => item._id === idboton || item.id === Number(idboton));
+
+  if (!archivo) {
+    console.warn("Archivo no encontrado para el botón:", idboton);
+    return;
+  }
+
+  const enlace = document.createElement("a");
+  enlace.href = archivo.ub;
+  enlace.download = archivo.nombre;
+  document.body.appendChild(enlace);
+  enlace.click();
+  document.body.removeChild(enlace);
+}
+
+// ======== FILTRADO =========
 function filtrarYMostrar() {
   const texto = buscador.value.toLowerCase().trim();
   const tipoBusqueda = cats.value;
-  let filtrados = archivitos;
+  let filtrados = globalArchivos;
 
   if (tipoBusqueda === "nombre") {
-    filtrados = archivitos.filter(item =>
+    filtrados = globalArchivos.filter(item =>
       item.nombre.toLowerCase().includes(texto)
     );
   } else if (tipoBusqueda === "por") {
-    filtrados = archivitos.filter(item =>
+    filtrados = globalArchivos.filter(item =>
       item.por.toLowerCase().includes(texto)
     );
   } else {
     buscador.value = "";
-    filtrados = archivitos.filter(item => {
+    filtrados = globalArchivos.filter(item => {
       const categ = Array.isArray(item.categ)
         ? item.categ.map(c => c.toLowerCase())
         : [String(item.categ).toLowerCase()];
@@ -94,7 +115,7 @@ function filtrarYMostrar() {
   if (show) {
     if (filtrados.length === 0) {
       show.classList.remove("no-ver");
-      show.innerText = `NO HAY NI VRG DE "${buscador.value.toUpperCase()}"`;
+      show.innerText = `NO HAY RESULTADOS PARA "${buscador.value.toUpperCase()}"`;
     } else {
       show.classList.add("no-ver");
     }
@@ -104,32 +125,21 @@ function filtrarYMostrar() {
   cats.value = tipoBusqueda;
 }
 
-
 buscador.addEventListener("input", filtrarYMostrar);
 cats.addEventListener("change", filtrarYMostrar);
 
-function actualizarBotonesDescargar() {
-  const BotonesDescargar = document.querySelectorAll(".descargarBtn");
-  BotonesDescargar.forEach(boton => {
-    boton.addEventListener("click", download);
-  });
-}
+// ======== INICIALIZACIÓN =========
+let globalArchivos = [];
 
-function download(e) {
-  const idboton = Number(e.currentTarget.id);
-  const archivo = archivitos.find(item => item.id === idboton);
-  if (!archivo) {
-    console.warn("Archivo no encontrado para el botón:", idboton);
+(async function init() {
+  globalArchivos = await cargarDesdeMongo();
+
+  if (!globalArchivos || globalArchivos.length === 0) {
+    fotos.innerHTML = "<p>No hay imágenes disponibles.</p>";
     return;
   }
 
-  const enlace = document.createElement('a');
-  enlace.href = archivo.ub;
-  enlace.download = archivo.nombre;
-  document.body.appendChild(enlace);
-  enlace.click();
-  document.body.removeChild(enlace);
-}
-
-// Inicializa la galería
-cargarimagenes(archivitos);
+  const Cats_Cconcentrado = [...new Set(globalArchivos.map(doc => doc.categ))];
+  loadCats(Cats_Cconcentrado);
+  cargarimagenes(globalArchivos);
+})();
