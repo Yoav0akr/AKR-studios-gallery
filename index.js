@@ -119,7 +119,7 @@ let globalArchivos = [];
   console.log("Datos cargados de Mongo:", globalArchivos);
 
   if (!globalArchivos || globalArchivos.length === 0) {
-    fotos.innerHTML = "<p>No hay imágenes disponibles.</p>";
+    fotos.innerHTML = "<p>SI VES ESTE MENSAJE CAMBIA DE PC O CONECTATE BIEN A INTERNET PUT@.</p>";
     return;
   }
 

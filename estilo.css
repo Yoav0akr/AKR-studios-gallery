@@ -143,11 +143,19 @@ ul {
 }
 
 li {
-    margin-bottom: -1em;
+    margin-bottom: -0.9em;
 }
 
 p {
     color: #06665e;
+
+}
+
+#noRES{
+    width: 100%;
+    text-align: center;
+    font-size: 5em;
+    font-weight: 1000;
 }
 
 .imagen {
@@ -280,5 +288,4 @@ h3 {
     h1 {
         font-size: 1.8em;
     }
-
 }
