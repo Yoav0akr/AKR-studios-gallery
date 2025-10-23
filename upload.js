@@ -8,7 +8,7 @@ const EntradaCategs = document.querySelector("#categs");
 const EntradaGuardar = document.querySelector("#manchego");
 
 // Div visualizador
-const visualisador = document.getElementById("visualisador");
+const visualisador = document.querySelector(".visualisador");
 
 // Variable global para almacenar la URL de Cloudinary
 let cloudinaryURL = null;
