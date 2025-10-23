@@ -7,6 +7,33 @@ body {
     background-color: #000e06;
 }
 
+a{
+    border: 0.2rem solid #0a6b01;
+    padding: 0.75em;
+    color:rgb(211, 211, 211);
+    background: #703614;
+    border-radius: 1rem;
+    height: 90%;    
+    justify-content: center;
+}
+.cargador{
+    padding :3em;
+    background-color: #000804;
+    margin-top: 3em;
+    border: 3px #146d70;
+    justify-content: grid;
+    
+    height: 5em;
+}
+
+.visualizador{
+    border:3px solid #0a6b01;
+}
+
+.ses2{
+    margin: 1em;
+}
+
 .nav {
     display: flex;
     justify-content: space-between;
@@ -49,7 +76,8 @@ flex-direction: row;
 }
 .webo{
     border-radius: var(--defborder);
-    font-size: 1.8rem;
+    font-size: 1rem;
+    max-height: 3em;
 }
 
 

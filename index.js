@@ -1,9 +1,16 @@
-import { archivos } from './bd.js';
+//import { archivos } from './bd.js';
+import { archivos } from './bd2.js';
 const archivitos = archivos;
+
+
 
 const fotos = document.querySelector("#imagenes-contenedor");
 const cats = document.getElementsByName("cats")[0];
 const show = document.getElementById("show");
+
+//cludinary
+const CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME ;
+const CLOUDINARY_URL=`https://res.cloudinary.com/${CLOUD_NAME}/image/list/galeria.json`;
 
 function cargarimagenes(cosas) {
   fotos.innerHTML = "";
