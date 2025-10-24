@@ -24,7 +24,7 @@ const buscador = document.querySelector("#buscador");
 
 // Función para renderizar imágenes
 function cargarimagenes(cosas) {
-  fotos.innerHTML = "";
+  fotos.innerHTML = ``;
   cosas.forEach(nombre => {
     const div = document.createElement("div");
     div.classList.add("imagen");
@@ -69,9 +69,20 @@ function download(e) {
 
   if (!archivo) return console.warn("Archivo no encontrado para el botón:", idboton);
 
+
+
+ let laurl = archivo.ub;
+  if (laurl.includes("res.cloudinary.com")) {
+    const separador = laurl.includes("?") ? "&" : "?";
+    url = `${laurl}${separador}fl_attachment=${encodeURIComponent(archivo.nombre || "archivo")}`;
+  }
+
+
+
   const enlace = document.createElement("a");
-  enlace.href = archivo.ub;
-  enlace.download = archivo.nombre;
+  enlace.href = laurl;
+  enlace.target= "_blank"
+  enlace.download = archivo.nombre||"archivo";
   document.body.appendChild(enlace);
   enlace.click();
   document.body.removeChild(enlace);
