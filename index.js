@@ -1,3 +1,4 @@
+
 // Función para llamar los archivos
 async function cargarDesdeMongo() {
   try {
@@ -24,7 +25,7 @@ const buscador = document.querySelector("#buscador");
 
 // Función para renderizar imágenes
 function cargarimagenes(cosas) {
-  fotos.innerHTML = ``;
+  fotos.innerHTML = ` `;
   cosas.forEach(nombre => {
     const div = document.createElement("div");
     div.classList.add("imagen");
@@ -138,3 +139,5 @@ let globalArchivos = [];
   loadCats(Cats_Cconcentrado);
   cargarimagenes(globalArchivos);
 })();
+
+

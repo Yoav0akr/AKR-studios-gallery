@@ -52,10 +52,9 @@ h2 {
 
 .ses2 {
     margin: 1em;
-}q
+}
 
 .nav {
-    border: 3px solid #00eaff;
     display: flex;
     justify-content: space-between;
     background: var(--main-color);
@@ -231,4 +230,3 @@ h3 {
     font-size: 1.2em;
     font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
 }
-
