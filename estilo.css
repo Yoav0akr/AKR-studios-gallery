@@ -123,6 +123,7 @@ p {
 .imagenes-contenedor {
 
     display: grid;
+    gap: 1em;
   margin: 1em;
     padding: 2em;
     grid-template-columns: repeat(4, minmax(150px, 1fr));
