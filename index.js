@@ -74,7 +74,7 @@ function download(e) {
  let laurl = archivo.ub;
   if (laurl.includes("res.cloudinary.com")) {
     const separador = laurl.includes("?") ? "&" : "?";
-    url = `${laurl}${separador}fl_attachment=${encodeURIComponent(archivo.nombre || "archivo")}`;
+    laurl = `${laurl}${separador}fl_attachment=${encodeURIComponent(archivo.nombre || "archivo")}`;
   }
 
 
