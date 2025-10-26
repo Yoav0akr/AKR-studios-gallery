@@ -346,7 +346,7 @@ margin-left:125%;
         
        
     }
-    #buscador{
+    #buscador,#cats {
         max-width: 15%;
     }
 }
