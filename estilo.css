@@ -77,12 +77,10 @@ h2 {
     border: 3px solid #036d0c;
     height: auto;
     margin-right: 1rem;
-    height: 90%;
+    height: 80%;
 }
 
-#cats {
-    margin-right: 1rem;
-}
+
 
 button {
     font-family: 'Times New Roman', Times, serif;
@@ -347,5 +345,8 @@ margin-left:125%;
         flex-direction: column;
         
        
+    }
+    #buscador{
+        max-width: 20%;
     }
 }
