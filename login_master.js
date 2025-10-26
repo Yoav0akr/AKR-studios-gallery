@@ -1,7 +1,7 @@
 // === Elementos del DOM ===
 const inputAdmin = document.querySelector(".entrada_admin");
 const inputPassword = document.querySelector(".entrada_admin_passw");
-const botonLogin = document.querySelector(".btnloging");
+const botonLogin = document.querySelector(".btnLoging");
 const mensaje = document.querySelector(".cargador");
 
 // === Mostrar mensajes ===
