@@ -10,18 +10,21 @@ if (!MONGODB_URI) {
 let cached = global.mongoose;
 if (!cached) cached = global.mongoose = { conn: null, promise: null };
 
-// 🔹 Esquema y modelo
-const ADMINSchema = new mongoose.Schema({
-  admin: String,
-  password: String, // En producción usar hash con bcrypt
-});
+// 🔹 Esquema y modelo (forzando colección "admins")
+const ADMINSchema = new mongoose.Schema(
+  {
+    admin: String,
+    password: String, // En producción: usar bcrypt
+  },
+  { collection: "admins" } // 👈 fuerza usar tu colección existente
+);
 
-const admins = mongoose.models.admins || mongoose.model("admins", ADMINSchema);
+const Admin = mongoose.models.Admin || mongoose.model("Admin", ADMINSchema);
 
 // 🔹 Handler principal
 export default async function handler(req, res) {
   try {
-    // 🔹 Conexión a MongoDB
+    // 🔹 Conexión a MongoDB (reutilizable)
     if (!cached.conn) {
       if (!cached.promise) {
         cached.promise = mongoose
@@ -31,42 +34,37 @@ export default async function handler(req, res) {
       cached.conn = await cached.promise;
     }
 
-    // 🔹 Manejo de métodos
+    // 🔹 Manejo de métodos HTTP
     switch (req.method) {
       case "GET": {
-        // Devuelve todos los admins (útil para panel)
-        const admins = await Admins.find().sort({ _id: 1 });
+        const admins = await Admin.find().sort({ _id: 1 });
         return res.status(200).json(admins);
       }
 
       case "POST": {
         const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
-        // 🔹 Login
-        if (body.login && body.admins && body.password) {
-          const encontrado = await Admins.findOne({
-            admin: body.admins,
+        // 🔹 LOGIN
+        if (body.login && body.admin && body.password) {
+          const encontrado = await Admin.findOne({
+            admin: body.admin,
             password: body.password,
           });
 
           if (encontrado) {
             return res.status(200).json({ success: true });
           } else {
-            return res
-              .status(401)
-              .json({ success: false, message: "Acceso denegado" });
+            return res.status(401).json({ success: false, message: "Acceso denegado" });
           }
         }
 
-        // 🔹 Crear nuevo admin (desde panel)
+        // 🔹 CREAR NUEVO ADMIN
         try {
-          const nuevo = await Admins.create(body);
+          const nuevo = await Admin.create(body);
           return res.status(201).json(nuevo);
         } catch (error) {
-          console.error("Error creando documento:", error);
-          return res
-            .status(400)
-            .json({ error: "Datos inválidos o error de MongoDB" });
+          console.error("Error creando admin:", error);
+          return res.status(400).json({ error: "Datos inválidos o error de MongoDB" });
         }
       }
 
