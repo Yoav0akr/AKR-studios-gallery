@@ -57,6 +57,7 @@ h2 {
 .ses {
     flex-direction: row;
     justify-content: space-between;
+        max-width: 100%;
 }
 
 .nav {
@@ -309,8 +310,19 @@ h3 {
         height:7rem;
         justify-content: center;
          flex-direction: column;
-
+        display: flex;
+        align-content: center;
+        background: var(--main-color);
+        flex-direction: column;
     }
+    .navOB{
+        display: flex;
+        max-width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 1em;
+    }
+
 
     h1 {
 margin-top: 30%;
@@ -343,8 +355,6 @@ margin-left:125%;
         align-content: center;
         background: var(--main-color);
         flex-direction: column;
-        
-       
     }
     #buscador,#cats {
         max-width: 15%;
