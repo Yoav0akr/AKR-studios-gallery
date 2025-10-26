@@ -97,6 +97,12 @@ async function guardarEnMongo(nombre, url, por, categ) {
     const saved = await res.json();
     console.log("Guardado en Mongo:", saved);
     alert("Se ha guardado correctamente");
+     const enlace = document.createElement("a");
+  enlace.href = "./index.html";
+  document.body.appendChild(enlace);
+  enlace.click();
+  document.body.removeChild(enlace);
+
   } catch (err) {
     console.error("Error al guardar en Mongo:", err);
     alert("No se pudo guardar. Revisa la consola.");
