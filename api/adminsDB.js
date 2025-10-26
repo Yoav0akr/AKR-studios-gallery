@@ -16,7 +16,7 @@ const ADMINSchema = new mongoose.Schema({
   password: String, // En producción usar hash con bcrypt
 });
 
-const Admin = mongoose.models.admin || mongoose.model("admin", ADMINSchema);
+const Admin = mongoose.models.admin || mongoose.model("admins", ADMINSchema);
 
 // 🔹 Handler principal
 export default async function handler(req, res) {
