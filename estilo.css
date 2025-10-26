@@ -281,7 +281,9 @@ font-weight: 1000;
     /* Agrega "..." si el texto es muy largo */
     white-space: nowrap;
 }
-
+    .menu:hover{
+        border:3px solid #f8f8f8;
+    }
 
 .logisimo {
     display: grid;
@@ -361,4 +363,5 @@ margin-left:125%;
         max-width: 15%;
  
     }
+
 }
