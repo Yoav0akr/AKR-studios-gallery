@@ -2,27 +2,35 @@
 <html lang="es">
 
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./estilo.css">
   <link rel="icon" href="AKRlogo.ico">
   <meta charset="UTF-8">
   <title>galeria</title>
 </head>
+
 <body>
 
   <div class="nav">
 
-    <div class="logisimo">
-      <div class="logo">
+    <div class="logo">
         <h1>GALERIA</h1>
       </div>
-    </div>
 
-    <div class="ses">
-      <a href="upload.html">SUBIR FOTO</a>
-        <a href="./login_master.html">edicion y eliminar(solo admin)</a>
-      <select id="cats" name="cats">
-      </select>
-      <input type="text" id="buscador" placeholder="Buscar" />
+
+
+    <div class="navOB">
+
+      <div class="ses">
+        <a  class ="menu" href="upload.html">SUBIR FOTO</a>
+        <a class ="menu"href="./login_master.html">edicion y eliminar(solo admin)</a>
+        <select id="cats" name="cats" class ="menu">
+        </select>
+        <input  class ="menu" type="text" id="buscador" placeholder="Buscar" />
+      </div>
+
+
+
     </div>
   </div>
 
@@ -31,7 +39,8 @@
   </div>
 
   <h4 id="show" class="no-ver"></h4>
-  
+
   <script src="./index.js" type="module"> </script>
 </body>
+
 </html>
