@@ -189,10 +189,10 @@ p {
 
     display: grid;
     gap: 1em;
-    margin: em;
+    margin: 2em;
     padding: 2em;
     grid-template-columns: repeat(4, minmax(40%, 1fr));
-    height: 100%;
+    max-width: 100%;
 }
 
 h4 {
