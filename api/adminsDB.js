@@ -16,7 +16,7 @@ const ADMINSchema = new mongoose.Schema({
   password: String, // En producción usar hash con bcrypt
 });
 
-const Admin = mongoose.models.admin || mongoose.model("admins", ADMINSchema);
+const admins = mongoose.models.admins || mongoose.model("admins", ADMINSchema);
 
 // 🔹 Handler principal
 export default async function handler(req, res) {
@@ -35,7 +35,7 @@ export default async function handler(req, res) {
     switch (req.method) {
       case "GET": {
         // Devuelve todos los admins (útil para panel)
-        const admins = await Admin.find().sort({ _id: 1 });
+        const admins = await Admins.find().sort({ _id: 1 });
         return res.status(200).json(admins);
       }
 
@@ -43,9 +43,9 @@ export default async function handler(req, res) {
         const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
         // 🔹 Login
-        if (body.login && body.admin && body.password) {
-          const encontrado = await Admin.findOne({
-            admin: body.admin,
+        if (body.login && body.admins && body.password) {
+          const encontrado = await Admins.findOne({
+            admin: body.admins,
             password: body.password,
           });
 
@@ -60,7 +60,7 @@ export default async function handler(req, res) {
 
         // 🔹 Crear nuevo admin (desde panel)
         try {
-          const nuevo = await Admin.create(body);
+          const nuevo = await Admins.create(body);
           return res.status(201).json(nuevo);
         } catch (error) {
           console.error("Error creando documento:", error);
