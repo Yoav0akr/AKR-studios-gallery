@@ -51,7 +51,7 @@ function verificarYllevar() {
   if (encontrado) {
     mostrarMensaje(`Bienvenido, ${encontrado.admin} ✅`, "exito");
     setTimeout(() => {
-      window.location.href = "./admin.html"; // página del panel de admins
+      window.location.href = "./admins.html"; // página del panel de admins
     }, 600);
   } else {
     mostrarMensaje("Usuario o contraseña incorrectos ❌", "error");
