@@ -34,6 +34,7 @@ function verificarYllevar() {
   const adminIngresado = inputAdmin.value.trim();
   const passIngresada = inputPassword.value.trim();
 
+
   if (!adminIngresado || !passIngresada) {
     mostrarMensaje("Completa ambos campos.", "error");
     return;
@@ -41,9 +42,11 @@ function verificarYllevar() {
 
   mostrarMensaje("Verificando...", "info");
 
+
   const encontrado = globalAdmins.find(
     (a) => a.admin === adminIngresado && a.password === passIngresada
   );
+  console.log(encontrado)
 
   if (encontrado) {
     mostrarMensaje(`Bienvenido, ${encontrado.admin} ✅`, "exito");
