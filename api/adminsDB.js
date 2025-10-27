@@ -67,6 +67,7 @@ export default async function handler(req, res) {
           return res.status(400).json({ error: "Datos inválidos o error de MongoDB" });
         }
       }
+//fech
 
       default:
         res.setHeader("Allow", ["GET", "POST"]);
