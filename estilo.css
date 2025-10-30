@@ -273,7 +273,7 @@ p {
     display: flex;
     flex-direction: column;
     margin-top: auto;
-    width: 100%;
+    width: 85%;
     max-height: 70%;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -281,6 +281,7 @@ p {
     border: 3px solid #240181;
     background-color: #0f0136;
     padding: 0.75rem;
+    border-radius: 1rem;
 }
 .menu:hover {
     border: 3px solid #f8f8f8;
