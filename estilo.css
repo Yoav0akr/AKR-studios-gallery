@@ -57,7 +57,7 @@ h2 {
 .ses {
     flex-direction: row;
     justify-content: space-between;
-        max-width: 100%;
+    max-width: 100%;
 }
 
 .nav {
@@ -105,13 +105,12 @@ p {
 }
 
 .queso {
-    border: 3px solid #240181;
-
-    padding: 1rem;
-    border-radius: 1em;
     display: flex;
     flex-direction: column;
-    justify-content: left;
+    justify-content: center;
+    border: 3px solid #240181;
+    padding: 1rem;
+    border-radius: 1em;
     width: 50%;
 
 }
@@ -131,7 +130,7 @@ p {
     align-items: center;
     flex-direction: column;
     margin-top: 3%;
-    width: 50%;
+    width: 100%;
 
 }
 
@@ -150,8 +149,8 @@ p {
     font-size: 1em;
     padding: 0.4rem;
     border-radius: var(--defborder);
-    max-width: 100%;
     margin-bottom: 1rem;
+    width: 80%;
 }
 
 #mem {
@@ -159,21 +158,22 @@ p {
     border: 2px solid #3c3c3cb7;
     max-width: 10em;
     height: auto;
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 1/ 1;
     object-fit: cover;
     border-radius: var(--defborder);
     padding: 0.2rem;
-    margin-right: 10%;
+
 
 
 }
 
 .webo {
+    align-self: center;
     font-size: 1em;
     padding: 0.4rem;
     border-radius: var(--defborder);
-    max-width: 50%;
-    margin-bottom: 1rem;
+    max-width: 90%;
+    margin-bottom: 0.5rem;
 }
 
 .navOB {
@@ -236,14 +236,13 @@ p {
 
 .la-imagen {
     border: 2px solid #ff000db7;
-width: 100%;
+    width: 100%;
     height: auto;
     aspect-ratio: 1 / 1;
     object-fit: cover;
     border-radius: var(--defborder);
     padding: 0.2rem;
-     box-sizing: border-box
-
+    box-sizing: border-box
 }
 
 
@@ -259,12 +258,13 @@ width: 100%;
     background-size: cover;
 
 }
+
 .noRES {
-    width:100%;
+    width: 100%;
     align-content: center;
-text-align: center;
-font-size: 2rem;
-font-weight: 1000;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 1000;
 
 }
 
@@ -276,14 +276,15 @@ font-weight: 1000;
     width: 100%;
     max-height: 70%;
     overflow: hidden;
-    /* Oculta el texto que se sale */
     text-overflow: ellipsis;
-    /* Agrega "..." si el texto es muy largo */
     white-space: nowrap;
+    border: 3px solid #240181;
+    background-color: #0f0136;
+    padding: 0.75rem;
 }
-    .menu:hover{
-        border:3px solid #f8f8f8;
-    }
+.menu:hover {
+    border: 3px solid #f8f8f8;
+}
 
 .logisimo {
     display: grid;
@@ -309,16 +310,17 @@ h3 {
 @media (max-width: 740px) {
 
     .nav {
-        font-size: 1rem; 
-        height:7rem;
+        font-size: 1rem;
+        height: 7rem;
         justify-content: center;
-         flex-direction: column;
+        flex-direction: column;
         display: flex;
         align-content: center;
         background: var(--main-color);
         flex-direction: column;
     }
-    .navOB{
+
+    .navOB {
         display: flex;
         max-width: 100%;
         flex-direction: row;
@@ -328,33 +330,33 @@ h3 {
 
 
     h1 {
-margin-top: 1.2rem;
-margin-left:125%;
+        margin-top: 1.2rem;
+        margin-left: 125%;
         font-size: 1.5rem;
     }
 
     .logo {
-          border-radius: 0.3em;
-    border: 3px solid #f8f8f8;
-    max-width: 100%;
-    height: 60px;
-    width: 60px;
-    background: #ffffff36;
-    background-image: url(./AKRlogo.ico);
-    background-repeat: no-repeat;
-    background-size: cover;
+        border-radius: 0.3em;
+        border: 3px solid #f8f8f8;
+        max-width: 100%;
+        height: 60px;
+        width: 60px;
+        background: #ffffff36;
+        background-image: url(./AKRlogo.ico);
+        background-repeat: no-repeat;
+        background-size: cover;
     }
 
     .menu {
-            font-size: 0.6rem;
-    padding: 0.5em;
+        font-size: 0.6rem;
+        padding: 0.5em;
 
     }
 
     .imagenes-contenedor {
         grid-template-columns: repeat(2, minmax(150px, 1fr));
-    padding: 1em;
-    margin: 1em;
+        padding: 1em;
+        margin: 1em;
 
     }
 
@@ -364,9 +366,69 @@ margin-left:125%;
         background: var(--main-color);
         flex-direction: column;
     }
-    #buscador,#cats {
+
+    #buscador,
+    #cats {
         max-width: 15%;
- 
+
     }
+
+    .cargador {
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        padding: 2remrem;
+        background-color: #000804;
+        margin: 2rem;
+        border: 3px solid #146d70;
+        border-radius: 2em;
+        gap: 0.5rem;
+        max-height: 40%;
+
+    }
+
+    .visualizador {
+        text-align: center;
+        border: 3px solid #0a6b01;
+        background: #011104;
+        border-radius: 1rem;
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        height: auto;
+    }
+
+    .queso {
+        display: flex;
+        flex-direction: column;
+        justify-content: left;
+        padding: 0%;
+        padding-top: 10%;
+        border: 3px solid #240181;
+        border-radius: 1em;
+        width: 100%;
+        justify-content: center;
+
+        border: 3px solid #240181;
+        border-radius: 1em;
+        max-height: 30%;
+
+    }
+
+    .webo {
+        align-self: center;
+        margin-top: 2%;
+        margin-bottom: 2%;
+    }
+    .queso2{
+        align-items: center;
+        flex-direction: column;
+        margin: none;
+        max-width: 86%;
+    }
+    .webo1 {
+    width: 15em;
+}
 
 }
