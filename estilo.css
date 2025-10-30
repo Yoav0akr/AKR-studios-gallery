@@ -272,8 +272,8 @@ p {
     text-align: center;
     display: flex;
     flex-direction: column;
-    margin-top: auto;
-    width: 85%;
+    margin-top: 0.5rem;
+    width: 90%;
     max-height: 70%;
     overflow: hidden;
     text-overflow: ellipsis;
