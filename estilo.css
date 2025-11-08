@@ -441,10 +441,10 @@ h3 {
     }
 
     .imagenes-contenedor {
-        grid-template-columns: repeat(2, minmax(150px, 1fr));
+        grid-template-columns: repeat(1, minmax(150px, 1fr));
         padding: 1em;
         margin: 3em;
-
+        max-width:4rem;
     }
 
     #buscador,
