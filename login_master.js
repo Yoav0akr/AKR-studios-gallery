@@ -4,9 +4,7 @@
   const adminEnabled = localStorage.getItem("AdminEnabled");
 
   // Si NO existe, redirigir al index
-  if (!adminEnabled) {
-    window.location.href = "./index.html";
-  }else{
+  if (adminEnabled) {
     window.location.href = "./admins.html";
   }
 })();
