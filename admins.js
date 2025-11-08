@@ -1,5 +1,16 @@
 //seccion para el panle de borrado de imagenes subidas
 
+// Verificar si existe un admin habilitado en localStorage
+(function () {
+  const adminEnabled = localStorage.getItem("AdminEnabled");
+
+  // Si NO existe, redirigir al index
+  if (!adminEnabled) {
+    window.location.href = "./index.html";
+  }
+})();
+
+
 // === CARGAR DESDE MONGO ===
 async function cargarDesdeMongo() {
   try {

@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
+
 //por chatgpt, YAKR de AKR_CodeStudios, yoav0akr
+
 // 🔹 URI de MongoDB desde variable de entorno
 const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
@@ -10,13 +12,13 @@ if (!MONGODB_URI) {
 let cached = global.mongoose;
 if (!cached) cached = global.mongoose = { conn: null, promise: null };
 
-// 🔹 Esquema y modelo (forzando colección "admins")
+// 🔹 Esquema del admin
 const ADMINSchema = new mongoose.Schema(
   {
     admin: String,
-    password: String, // En producción: usar bcrypt
+    password: String,
   },
-  { collection: "admins" } // 👈 fuerza usar tu colección existente
+  { collection: "admins" }
 );
 
 const Admin = mongoose.models.Admin || mongoose.model("Admin", ADMINSchema);
@@ -24,7 +26,7 @@ const Admin = mongoose.models.Admin || mongoose.model("Admin", ADMINSchema);
 // 🔹 Handler principal
 export default async function handler(req, res) {
   try {
-    // 🔹 Conexión a MongoDB (reutilizable)
+    // 🔹 Conectar solo una vez (Vercel reusa conexión)
     if (!cached.conn) {
       if (!cached.promise) {
         cached.promise = mongoose
@@ -34,7 +36,6 @@ export default async function handler(req, res) {
       cached.conn = await cached.promise;
     }
 
-    // 🔹 Manejo de métodos HTTP
     switch (req.method) {
       case "GET": {
         const admins = await Admin.find().sort({ _id: 1 });
@@ -42,10 +43,11 @@ export default async function handler(req, res) {
       }
 
       case "POST": {
-        const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+        const body =
+          typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
-        // 🔹 LOGIN
-        if (body.login && body.admin && body.password) {
+        // 🔹 Si viene login
+        if (body.login === true) {
           const encontrado = await Admin.findOne({
             admin: body.admin,
             password: body.password,
@@ -57,23 +59,21 @@ export default async function handler(req, res) {
             return res.status(401).json({ success: false, message: "Acceso denegado" });
           }
         }
+
+        // 🔹 Si NO es login → crear nuevo admin
+        const nuevo = await Admin.create({
+          admin: body.admin,
+          password: body.password,
+        });
+
+        return res.status(201).json(nuevo);
       }
 
-      case "POST1":{
-        // 🔹 CREAR NUEVO ADMIN
-          const nuevo = await Admin.create(body);
-          return res.status(201).json(nuevo);
-        }
-
-
-
-
-
-//fech
-
       default:
-        res.setHeader("Allow", ["GET", "POST","POST1"]);
-        return res.status(405).json({ error: `Método ${req.method} no permitido` });
+        res.setHeader("Allow", ["GET", "POST"]);
+        return res
+          .status(405)
+          .json({ error: `Método ${req.method} no permitido` });
     }
   } catch (error) {
     console.error("Error conectando a MongoDB:", error);

@@ -1,5 +1,15 @@
 // === Elementos del DOM ===
-localStorage.clear();
+// Verificar si existe un admin habilitado en localStorage
+(function () {
+  const adminEnabled = localStorage.getItem("AdminEnabled");
+
+  // Si NO existe, redirigir al index
+  if (!adminEnabled) {
+    window.location.href = "./index.html";
+  }else{
+    window.location.href = "./admins.html";
+  }
+})();
 
 const inputAdmin = document.querySelector(".entrada_admin");
 const inputPassword = document.querySelector(".entrada_admin_passw");
@@ -55,6 +65,7 @@ function verificarYllevar() {
   if (encontrado) {
     mostrarMensaje(`Bienvenido, ${encontrado.admin} ✅`, "exito");
     setTimeout(() => {
+      localStorage.setItem("AdminEnabled", "true");
       window.location.href = "./admins.html"; // página del panel de admins
     }, 600);
   } else {
