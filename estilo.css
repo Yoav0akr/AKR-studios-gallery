@@ -444,7 +444,6 @@ h3 {
         grid-template-columns: repeat(1, minmax(150px, 1fr));
         padding: 1em;
         margin: 3em;
-        max-width:4rem;
     }
 
     #buscador,
