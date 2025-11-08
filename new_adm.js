@@ -10,7 +10,7 @@ const  passw = document.querySelector(".entrada_admin_passw");
 
   try {
     const res = await fetch("/api/adminsDB", {
-      method: "new",
+      method: "POST1",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });

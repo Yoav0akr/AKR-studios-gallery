@@ -4,7 +4,6 @@ import mongoose, { mongo } from "mongoose";
 const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
   throw new Error("Por favor define MONGODB_URI en las variables de entorno de Vercel");
-  MONGODB_URI= " mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.8";
 }
 
 // 🔹 Cache global para evitar múltiples conexiones en Vercel

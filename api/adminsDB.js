@@ -4,8 +4,6 @@ import mongoose from "mongoose";
 const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
   throw new Error("Por favor define MONGODB_URI en las variables de entorno de Vercel");
-    MONGODB_URI= " mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.8";
-
 }
 
 // 🔹 Cache global para evitar múltiples conexiones en Vercel
@@ -59,20 +57,22 @@ export default async function handler(req, res) {
             return res.status(401).json({ success: false, message: "Acceso denegado" });
           }
         }
+      }
 
+      case "POST1":{
         // 🔹 CREAR NUEVO ADMIN
-        try {
           const nuevo = await Admin.create(body);
           return res.status(201).json(nuevo);
-        } catch (error) {
-          console.error("Error creando admin:", error);
-          return res.status(400).json({ error: "Datos inválidos o error de MongoDB" });
         }
-      }
+
+
+
+
+
 //fech
 
       default:
-        res.setHeader("Allow", ["GET", "POST"]);
+        res.setHeader("Allow", ["GET", "POST","POST1"]);
         return res.status(405).json({ error: `Método ${req.method} no permitido` });
     }
   } catch (error) {

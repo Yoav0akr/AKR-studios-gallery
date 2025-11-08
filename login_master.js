@@ -1,4 +1,6 @@
 // === Elementos del DOM ===
+localStorage.clear();
+
 const inputAdmin = document.querySelector(".entrada_admin");
 const inputPassword = document.querySelector(".entrada_admin_passw");
 const botonLogin = document.querySelector(".btnLoging");
@@ -33,6 +35,8 @@ async function cargarAdmins() {
 function verificarYllevar() {
   const adminIngresado = inputAdmin.value.trim();
   const passIngresada = inputPassword.value.trim();
+  localStorage.setItem('admin', 'enabled');
+
 
 
   if (!adminIngresado || !passIngresada) {

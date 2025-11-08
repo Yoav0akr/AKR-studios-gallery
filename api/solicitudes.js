@@ -1,6 +1,6 @@
 //registros en mongodb
 import mongoose, { Error } from "mongoose";
-const MONGODB_URI = process.env.MONGODB_URI||"mongodb+srv://YAKR:YKR@cluster0.bnck7t3.mongodb.net/?appName=Cluster0";
+const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
   throw new Error("Por favor define MONGODB_URI en las variables de entorno de Vercel, se usara el metododuro");
 };
