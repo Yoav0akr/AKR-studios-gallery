@@ -7,15 +7,7 @@ body {
     background-color: #000e06;
 }
 
-a {
-    border: 0.2rem solid #0a6b01;
-    padding: 0.75em;
-    color: rgb(211, 211, 211);
-    background: #703614;
-    border-radius: 1rem;
-    height: 90%;
-    justify-content: center;
-}
+
 
 .cargador {
     display: flex;
@@ -50,31 +42,72 @@ h2 {
 
 }
 
-.ses2 {
-    margin: 1em;
-}
-
 .ses {
+    display: flex;
     flex-direction: row;
     justify-content: space-between;
-    max-width: 100%;
+
+
 }
+
+.menu {
+    border: 0.2rem solid #0a6b01;
+    padding: 0.75em;
+    color: rgb(255, 255, 255);
+    background: #703614;
+    margin-right: 0.5rem;
+    border-radius: 1rem;
+    height: auto;
+}
+
+.aciones_admin {
+    border-radius: var(--defborder);
+    border: 3px solid #240181;
+    background-color: #0f0136;
+    margin: 3rem;
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem;
+    gap: 1rem;
+}
+
+.cosa {
+    border-radius: var(--defborder);
+    border: 3px solid #af1146;
+    background-color: #401313;
+    width: 100%;
+    height: 8rem;
+    color: beige;
+    font-size: 2rem;
+    text-align: center;
+    padding-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.cosa .solis {
+    background-color: beige;
+    border-radius: 1rem;
+    font-size: 3rem;
+    color: darkred;
+    width: 3rem;
+    align-self: center;
+}
+
 
 .nav {
     display: flex;
     background: var(--main-color);
-    flex-direction: row;
     justify-content: space-between;
-    height: 3em;
-    padding: 1rem;
+    max-height: 3em;
+    padding: 1.5rem;
     margin: -1em;
 }
-
-
 
 #buscador,
 #cats {
     border-radius: 1cap;
+    background-color: #1f1f1f;
     border: 3px solid #036d0c;
     height: auto;
     margin-right: 0.5rem;
@@ -176,13 +209,6 @@ p {
     margin-bottom: 0.5rem;
 }
 
-.navOB {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    max-width: 100%;
-}
-
 
 
 .imagenes-contenedor {
@@ -204,7 +230,10 @@ h4 {
 }
 
 .no-ver {
-    display: none;
+    visibility: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
 }
 
 ul {
@@ -221,6 +250,49 @@ li {
 p {
     color: #06665e;
 
+}
+
+.div-solicitudes {
+    display: grid;
+    border-radius: var(--defborder);
+    border: 3px solid #ea8100;
+    background-color: #2b0a00;
+    gap: 1em;
+    margin: 2em;
+    padding: 2em;
+    grid-template-columns: repeat(4, minmax(150px, 1fr));
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.solicitud {
+    border-radius: var(--defborder);
+    border: 3px solid #6200ea;
+    background-color: #1c2d0b;
+    margin: 1rem;
+    padding: 0.5rem;
+}
+
+.aceptar {
+    background-color: #0b3d00;
+    border: 3px solid #0ea04b;
+    color: #0ffa78;
+    font-weight: 800;
+    font-size: large;
+    border-radius: var(--defborder);
+    padding: 0.5rem;
+    width: 100%;
+}
+
+.rechazar {
+    background-color: #3d0000;
+    border: 3px solid #ea0e0e;
+    color: #ff7878;
+    font-weight: 800;
+    font-size: large;
+    border-radius: var(--defborder);
+    padding: 0.5rem;
+    width: 100%;
 }
 
 
@@ -249,8 +321,8 @@ p {
     border-radius: 0.3em;
     border: 3px solid #f8f8f8;
     max-width: 100%;
-    height: 50px;
-    width: 50px;
+    height: 3rem;
+    width: 3rem;
     background: #ffffff36;
     background-image: url(./AKRlogo.ico);
     background-repeat: no-repeat;
@@ -260,10 +332,9 @@ p {
 
 .noRES {
     width: 100%;
-    align-content: center;
-    text-align: center;
     font-size: 2rem;
     font-weight: 1000;
+    text-align: center;
 
 }
 
@@ -281,6 +352,7 @@ p {
     padding: 0.25rem;
     border-radius: 1rem;
 }
+
 .menu:hover {
     border: 3px solid #f8f8f8;
 }
@@ -307,63 +379,72 @@ h3 {
 }
 
 @media (max-width: 740px) {
+    .cosa {
+        font-size: medium;
+        height: 6rem;
+    }
 
+    .legumbre{
+        padding-left: 3rem;
+
+    }
     .nav {
-        font-size: 1rem;
-        height: 7rem;
-        justify-content: center;
+        transition: transform 0.3s ease-in-out;
+
+        position: fixed;
         flex-direction: column;
-        display: flex;
-        align-content: center;
-        background: var(--main-color);
-        flex-direction: column;
+        justify-content: normal;
+
+        min-height: 100%;
+        padding: 0.5em;
+        margin-top: -3rem;
+        margin-left: -0.4rem;
+        gap: 1rem;
+        max-width: 4.1rem;
+
     }
 
-    .navOB {
-        display: flex;
-        max-width: 100%;
-        flex-direction: row;
-        justify-content: space-between;
-        padding: 1em;
+    .navhiden {
+        overflow: hidden;
+        min-height: 4.2rem;
     }
-
 
     h1 {
-        margin-top: 1.2rem;
-        margin-left: 125%;
-        font-size: 1.5rem;
+        display: none;
+    }
+
+    .rotado {
+        transform: rotate(90deg);
     }
 
     .logo {
+        transition: transform 0.3s ease-in-out;
+        cursor: pointer;
         border-radius: 0.3em;
         border: 3px solid #f8f8f8;
-        max-width: 100%;
-        height: 60px;
+        min-height: 60px;
         width: 60px;
         background: #ffffff36;
         background-image: url(./AKRlogo.ico);
         background-repeat: no-repeat;
         background-size: cover;
+        margin-top: 0.2rem;
     }
 
     .menu {
-        font-size: 0.6rem;
-        padding: 0.5em;
-
+        display: flex;
+        justify-content: center;
+        height: auto;
+        margin-top: 0.5rem;
+        border-radius: 0.5rem;
+        height: 0.1;
     }
 
     .imagenes-contenedor {
         grid-template-columns: repeat(2, minmax(150px, 1fr));
         padding: 1em;
-        margin: 1em;
+        margin: 3em;
 
-    }
-
-    .nav {
-        display: flex;
-        align-content: center;
-        background: var(--main-color);
-        flex-direction: column;
     }
 
     #buscador,
@@ -371,6 +452,8 @@ h3 {
         max-width: 15%;
 
     }
+
+
 
     .cargador {
 
@@ -420,14 +503,27 @@ h3 {
         margin-top: 2%;
         margin-bottom: 2%;
     }
-    .queso2{
+
+    .queso2 {
         align-items: center;
         flex-direction: column;
         margin: none;
         max-width: 86%;
     }
+
     .webo1 {
-    width: 15em;
-}
+        width: 15em;
+    }
+
+    .ses {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        max-width: 7rem;
+        height: 100%;
+        padding: none;
+        padding-top: none;
+
+    }
 
 }

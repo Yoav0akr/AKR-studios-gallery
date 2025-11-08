@@ -77,3 +77,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     })
   );
 });
+
+// para rotar el logo y ocultar nav
+const  navs = document.querySelector(".nav")
+const logo = document.querySelector(".logo");
+logo.addEventListener("click", () => {
+  logo.classList.toggle("rotado");
+  navs.classList.toggle("navhiden");
+  navigator.vibrate(200);
+});

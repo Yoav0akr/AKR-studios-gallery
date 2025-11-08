@@ -1,4 +1,3 @@
-
 // Función para llamar los archivos
 async function cargarDesdeMongo() {
   try {
@@ -31,18 +30,19 @@ function cargarimagenes(cosas) {
     const div = document.createElement("div");
     div.classList.add("imagen");
     div.innerHTML = `
-      <img class="la-imagen" src="${nombre.ub}" alt="${nombre.nombre}" />
+    <h3 class="producto-titulo">${nombre.nombre}</h3>
+      <img class="la-imagen" id="${nombre.nombre || nombre.nombre}"src="${nombre.ub}" alt="${nombre.nombre}" />
       <div class="detalles">
         <ul>
           <li><p>Por/De: ${nombre.por}</p></li>
           <li><p>Categoría: ${nombre.categ}</p></li>
         </ul>
-        <h3 class="producto-titulo">${nombre.nombre}</h3>
-        <button class="descargarBtn" id="${nombre.id || nombre._id}">Descargar</button>
       </div>
+      <button class="descargarBtn" id="${nombre.id || nombre._id}">Descargar</button>
     `;
     fotos.append(div);
   });
+   actualizardivsVIsualizar();
   actualizarBotonesDescargar();
 }
 
@@ -64,6 +64,24 @@ function actualizarBotonesDescargar() {
     boton.addEventListener("click", download);
   });
 }
+// visualizar
+const visualizar = document.querySelectorAll(".la-imagen");
+function actualizardivsVIsualizar() {
+  visualizar.forEach(boton => {
+    boton.addEventListener("click", noSeXd);
+  });
+}
+function noSeXd(e){
+const estafoto =e.currentTarget.id;
+const archivo = globalArchivos.find(item => item._id === estafoto || item.id === Number(estafoto));
+cats.value="nombre";
+ buscador.value= archivo;
+filtrarYMostrar()
+}
+
+
+
+
 
 function download(e) {
   const idboton = e.currentTarget.id;
@@ -73,7 +91,7 @@ function download(e) {
 
 
 
- let laurl = archivo.ub;
+  let laurl = archivo.ub;
   if (laurl.includes("res.cloudinary.com")) {
     const separador = laurl.includes("?") ? "&" : "?";
     laurl = `${laurl}${separador}fl_attachment=${encodeURIComponent(archivo.nombre || "archivo")}`;
@@ -83,8 +101,8 @@ function download(e) {
 
   const enlace = document.createElement("a");
   enlace.href = laurl;
-  enlace.target= "_blank"
-  enlace.download = archivo.nombre||"archivo";
+  enlace.target = "_blank"
+  enlace.download = archivo.nombre || "archivo";
   document.body.appendChild(enlace);
   enlace.click();
   document.body.removeChild(enlace);
@@ -133,17 +151,24 @@ let globalArchivos = [];
 
   if (!globalArchivos || globalArchivos.length === 0) {
 
-     const div = document.createElement("div");
+    const div = document.createElement("div");
     div.classList.add("noRES");
-    div.innerHTML = 
-    `<p id="noRES">SI VES ESTE MENSAJE CAMBIA DE PC O CONECTATE BIEN A INTERNET PUT@.</p>`;
+    div.innerHTML =
+      `<p id="noRES">SI VES ESTE MENSAJE CAMBIA DE PC O CONECTATE BIEN A INTERNET PUT@.</p>`;
     fotos.append(div);
     return;
   }
-
   const Cats_Cconcentrado = [...new Set(globalArchivos.map(doc => doc.categ).flat())];
   loadCats(Cats_Cconcentrado);
   cargarimagenes(globalArchivos);
 })();
 
+// para rotar el logo y ocultar nav
+const  navs = document.querySelector(".nav")
+const logo = document.querySelector(".logo");
+logo.addEventListener("click", () => {
+  logo.classList.toggle("rotado");
+  navs.classList.toggle("navhiden");
+  navigator.vibrate(200);
+});
 

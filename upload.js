@@ -70,7 +70,9 @@ function queso() {
   const por = EentradaDeparte.value.trim();
   const url = cloudinaryURL; // toma la URL subida a Cloudinary
 
-  if (!url) {
+
+
+    if (!url) {
     alert("Primero sube una imagen antes de guardar.");
     return;
   }
@@ -107,4 +109,13 @@ async function guardarEnMongo(nombre, url, por, categ) {
     console.error("Error al guardar en Mongo:", err);
     alert("No se pudo guardar. Revisa la consola.");
   }
-}
+};
+
+// para rotar el logo y ocultar nav
+const  navs = document.querySelector(".nav")
+const logo = document.querySelector(".logo");
+logo.addEventListener("click", () => {
+  logo.classList.toggle("rotado");
+  navs.classList.toggle("navhiden");
+  navigator.vibrate(200);
+});
