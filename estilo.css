@@ -378,7 +378,7 @@ h3 {
     font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
 }
 
-@media (max-width: 300px) {
+@media (max-width: 800px) {
     .cosa {
         font-size: medium;
         height: 6rem;
