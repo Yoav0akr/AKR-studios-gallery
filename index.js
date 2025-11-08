@@ -162,8 +162,6 @@ let globalArchivos = [];
   loadCats(Cats_Cconcentrado);
   cargarimagenes(globalArchivos);
 })();
-localStorage.clear();
-
 // para rotar el logo y ocultar nav
 const  navs = document.querySelector(".nav")
 const logo = document.querySelector(".logo");

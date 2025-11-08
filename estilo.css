@@ -140,23 +140,12 @@ p {
 .queso {
     display: flex;
     flex-direction: column;
-    justify-content: center;
     border: 3px solid #240181;
     padding: 1rem;
     border-radius: 1em;
-    width: 50%;
-
-}
-
-.queso2 {
-    border: 3px solid #240181;
-    background: #05011d;
-    padding: 1rem;
-    border-radius: 1em;
-    display: flex;
-    justify-content: space-between;
     width: 100%;
 }
+
 
 .web {
     display: flex;
@@ -187,6 +176,8 @@ p {
 }
 
 #mem {
+    display: flex;
+    align-self: center;
     border-radius: 3em;
     border: 2px solid #3c3c3cb7;
     max-width: 10em;
@@ -195,6 +186,8 @@ p {
     object-fit: cover;
     border-radius: var(--defborder);
     padding: 0.2rem;
+    margin-bottom: 1rem;
+
 
 
 
