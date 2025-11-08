@@ -3,12 +3,11 @@
 (function () {
   const adminEnabled = localStorage.getItem("AdminEnabled");
 
-  // Si NO existe, redirigir al index
+  // Si existe AdminEnabled, redirige a admins.html
   if (adminEnabled) {
-    window.location.href = "./admins.html";
+    window.location.href = "./admins.html"; 
   }
 })();
-
 const inputAdmin = document.querySelector(".entrada_admin");
 const inputPassword = document.querySelector(".entrada_admin_passw");
 const botonLogin = document.querySelector(".btnLoging");
@@ -43,7 +42,7 @@ async function cargarAdmins() {
 function verificarYllevar() {
   const adminIngresado = inputAdmin.value.trim();
   const passIngresada = inputPassword.value.trim();
-  localStorage.setItem('admin', 'enabled');
+
 
 
 
