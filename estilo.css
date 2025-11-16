@@ -1,11 +1,12 @@
 :root {
-    --defborder: 1.3em;
+    --defborder: 5px;
     --main-color: #290909;
 }
 
 body {
     background-color: #000e06;
 }
+
 
 
 
@@ -21,6 +22,7 @@ body {
 }
 
 h2 {
+    margin: 0;
     color: honeydew;
     max-width: 100%;
     text-align: center;
@@ -30,8 +32,9 @@ h2 {
 }
 
 .visualizador {
-    text-align: center;
-    padding-top: 25%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: 3px solid #0a6b01;
     background: #011104;
     border-radius: 1rem;
@@ -51,13 +54,15 @@ h2 {
 }
 
 .menu {
+    display: flex;
     border: 0.2rem solid #0a6b01;
     padding: 0.75em;
     color: rgb(255, 255, 255);
     background: #703614;
     margin-right: 0.5rem;
     border-radius: 1rem;
-    height: auto;
+    align-items: center;
+    height: 2rem;
 }
 
 .aciones_admin {
@@ -99,6 +104,7 @@ h2 {
     display: flex;
     background: var(--main-color);
     justify-content: space-between;
+    align-items: stretch;
     max-height: 3em;
     padding: 1.5rem;
     margin: -1em;
@@ -106,7 +112,7 @@ h2 {
 
 #buscador,
 #cats {
-    border-radius: 1cap;
+    border-radius: var(--defborder);
     background-color: #1f1f1f;
     border: 3px solid #036d0c;
     height: auto;
@@ -135,6 +141,8 @@ button :hover {
 p {
     margin-bottom: 0.43em;
     margin-top: 0.2rem;
+
+
 }
 
 .queso {
@@ -162,7 +170,7 @@ p {
     padding: 2em;
     background-color: #000804;
     margin: 1rem;
-    border: 3px solid #146d70;
+    border: var(--defborder) solid #146d70;
     border-radius: 2em;
 
 }
@@ -205,7 +213,6 @@ p {
 
 
 .imagenes-contenedor {
-
     display: grid;
     gap: 1em;
     margin: 2em;
@@ -216,17 +223,19 @@ p {
 }
 
 h4 {
-    justify-self: center;
+
+    margin: 0;
+    text-align: center;
+    width: 100%;
     font-size: 3em;
     color: brown;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    padding-top: 5rem;
 }
 
+
 .no-ver {
-    visibility: hidden;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
+    display: none;
 }
 
 ul {
@@ -332,13 +341,14 @@ p {
 }
 
 .detalles {
+    font-size: 2rem;
     text-align: center;
     display: flex;
     flex-direction: column;
     margin-top: 0.5rem;
-    max-height: 70%;
+    height: 100%;
     overflow: hidden;
-    text-overflow: ellipsis;
+    text-overflow: hiden;
     white-space: nowrap;
     border: 3px solid #240181;
     background-color: #0f0136;
@@ -377,29 +387,27 @@ h3 {
         height: 6rem;
     }
 
-    .legumbre{
-        padding-left: 2.5rem;
-
-    }
     .nav {
-        transition: transform 0.3s ease-in-out;
-
         position: fixed;
         flex-direction: column;
         justify-content: normal;
 
-        min-height: 100%;
+        min-height: 50%;
         padding: 0.5em;
-        margin-top: -3rem;
-        margin-left: -0.4rem;
+
+        margin-left: -0.5rem;
         gap: 1rem;
-        max-width: 4.1rem;
+        max-width: 4.3rem;
+        transition: 0.5s ease-in-out;
+
+        border-radius: 0 0 var(--defborder);
+        overflow-y: hidden;
 
     }
 
     .navhiden {
         overflow: hidden;
-        min-height: 4.2rem;
+        min-height: 4.6rem;
     }
 
     h1 {
@@ -407,11 +415,11 @@ h3 {
     }
 
     .rotado {
-        transform: rotate(90deg);
+        transform: rotate(-90deg);
     }
 
     .logo {
-        transition: transform 0.3s ease-in-out;
+        transition: transform 0.5s ease-in-out;
         cursor: pointer;
         border-radius: 0.3em;
         border: 3px solid #f8f8f8;
@@ -427,25 +435,18 @@ h3 {
     .menu {
         display: flex;
         justify-content: center;
-        height: auto;
         margin-top: 0.5rem;
         border-radius: 0.5rem;
         height: 0.1;
+        min-width: 2rem;
     }
 
     .imagenes-contenedor {
+
         grid-template-columns: repeat(1, minmax(150px, 1fr));
-        padding: 1em;
-        margin: 3em;
+        padding-top: 3rem;
+        margin-top: 0;
     }
-
-    #buscador,
-    #cats {
-        max-width: 15%;
-
-    }
-
-
 
     .cargador {
 
@@ -516,6 +517,10 @@ h3 {
         padding: none;
         padding-top: none;
 
+    }
+
+    p {
+        font-size: 2rem;
     }
 
 }
