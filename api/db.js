@@ -39,7 +39,7 @@ export default async function handler(req, res) {
     switch (req.method) {
       // === OBTENER TODAS ===
       case "GET": {
-        const imagenes = await Imagen.find().sort({ id: 1 });
+        const imagenes = await Imagen.find().sort({ id: -1 });
         return res.status(200).json(imagenes);
       }
 
