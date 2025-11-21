@@ -8,7 +8,7 @@ const EntradaNombre = document.getElementById("nombre_imput");
 const EentradaDeparte = document.getElementById("por-imput");
 const EntradaCategs = document.querySelector("#categs");
 const EntradaGuardar = document.querySelector("#manchego");
-
+const Entradadesc=document.querySelector("#mimides")
 // Div visualizador
 const visualisador = document.querySelector(".visualizador");
 
@@ -68,10 +68,11 @@ function queso() {
   const texto = EntradaCategs.value.toLowerCase().trim();
   const array = texto.split(/\s+/);
 
+
   const nombre = EntradaNombre.value.trim();
   const por = EentradaDeparte.value.trim();
   const url = cloudinaryURL; // toma la URL subida a Cloudinary
-
+const desk= Entradadesc.value.trim();
 
 
     if (!url) {
@@ -79,14 +80,14 @@ function queso() {
     return;
   }
 
-  guardarEnMongo(nombre, url, por, array);
+  guardarEnMongo(nombre, url, por, array, desk);
 }
 
 // Evento del botón de guardar
 EntradaGuardar.addEventListener("click", queso);
 
 // Función para guardar en MongoDB (tu lógica original)
-async function guardarEnMongo(nombre, url, por, categ) {
+async function guardarEnMongo(nombre, url, por, categ,descripcion) {
   const data = { id: Date.now(), nombre, ub: url, por, categ };
 
   try {

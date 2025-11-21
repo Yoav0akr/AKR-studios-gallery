@@ -35,6 +35,7 @@ export default async function handler(req, res) {
       ub: String,
       por: String,
       categ: [String],
+      desk:string
     });
 
     const Imagen = conn.models.Imagen || conn.model("Imagen", ImagenSchema);
