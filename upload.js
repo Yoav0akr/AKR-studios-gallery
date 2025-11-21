@@ -8,7 +8,7 @@ const EntradaNombre = document.getElementById("nombre_imput");
 const EentradaDeparte = document.getElementById("por-imput");
 const EntradaCategs = document.querySelector("#categs");
 const EntradaGuardar = document.querySelector("#manchego");
-const Entradadesc=document.querySelector("#mimides")
+const Entradadesc=document.querySelector("#mimidesk")
 // Div visualizador
 const visualisador = document.querySelector(".visualizador");
 
@@ -88,7 +88,7 @@ EntradaGuardar.addEventListener("click", queso);
 
 // Función para guardar en MongoDB (tu lógica original)
 async function guardarEnMongo(nombre, url, por, categ,descripcion) {
-  const data = { id: Date.now(), nombre, ub: url, por, categ };
+  const data = { id: Date.now(), nombre, ub: url, por, categ, descripcion };
 
   try {
     const res = await fetch("/api/db", {
