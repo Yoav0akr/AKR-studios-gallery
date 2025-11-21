@@ -28,13 +28,12 @@ function cargarimagenes(cosas) {
   fotos.innerHTML = ` `;
   cosas.forEach(nombre => {
     const div = document.createElement("div");
-const descripcion = ()=>{
-  if(!nombre.desk){
-    return "sin descripcion"
-  }else{
-    return nombre.desk
-  };
-};
+    let descripcion = nombre.desk
+    if (!nombre.desk) {
+      descripcion = "sin descripcion"
+    } else {
+      descripcion = nombre.desk
+    };
 
     div.classList.add("imagen");
     div.innerHTML = `
@@ -54,7 +53,7 @@ const descripcion = ()=>{
     `;
     fotos.append(div);
   });
-   actualizardivsVIsualizar();
+  actualizardivsVIsualizar();
   actualizarBotonesDescargar();
 }
 
@@ -82,12 +81,12 @@ function actualizardivsVIsualizar() {
     boton.addEventListener("click", noSeXd);
   });
 }
-function noSeXd(e){
-const estafoto =e.currentTarget.id;
-const archivo = globalArchivos.find(item => item._id === estafoto || item.id === Number(estafoto));
-cats.value="nombre";
- buscador.value= archivo;
-filtrarYMostrar()
+function noSeXd(e) {
+  const estafoto = e.currentTarget.id;
+  const archivo = globalArchivos.find(item => item._id === estafoto || item.id === Number(estafoto));
+  cats.value = "nombre";
+  buscador.value = archivo;
+  filtrarYMostrar()
 }
 
 
@@ -141,7 +140,7 @@ function filtrarYMostrar() {
   if (show) {
     if (filtrados.length === 0) {
       div_mesages.classList.remove("no-ver");
-    div_mesages.innerText = `NO HAY RESULTADOS PARA "${buscador.value.toUpperCase()}"`;
+      div_mesages.innerText = `NO HAY RESULTADOS PARA "${buscador.value.toUpperCase()}"`;
     } else {
       div_mesages.classList.add("no-ver");
     }
