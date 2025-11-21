@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 // 🔹 URI de MongoDB desde variable de entorno
 const MONGODB_URI = process.env.MONGODB_URI;
@@ -10,35 +10,30 @@ if (!MONGODB_URI) {
 let cached = global.mongoose;
 if (!cached) cached = global.mongoose = { conn: null, promise: null };
 
+// 🔹 SCHEMA Y MODELO fuera del handler
+const ImagenSchema = new mongoose.Schema({
+  id: Number,
+  nombre: String,
+  ub: String,
+  por: String,
+  categ: [String],
+  desk: String,
+});
+
+const Imagen = mongoose.models.Imagen || mongoose.model("Imagen", ImagenSchema);
+
+// 🔹 HANDLER
 export default async function handler(req, res) {
   try {
     // 🔹 Conexión a MongoDB
     if (!cached.conn) {
       if (!cached.promise) {
-        cached.promise = mongoose
-          .connect(MONGODB_URI, {
-            bufferCommands: false,
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-          })
-          .then((mongoose) => mongoose);
+        cached.promise = mongoose.connect(MONGODB_URI, {
+          bufferCommands: false,
+        });
       }
       cached.conn = await cached.promise;
     }
-
-    const conn = cached.conn;
-
-    // 🔹 Esquema de imágenes
-    const ImagenSchema = new mongoose.Schema({
-      id: Number,
-      nombre: String,
-      ub: String,
-      por: String,
-      categ: [String],
-      desk:string
-    });
-
-    const Imagen = conn.models.Imagen || conn.model("Imagen", ImagenSchema);
 
     // 🔹 Manejo de métodos
     switch (req.method) {
@@ -67,7 +62,6 @@ export default async function handler(req, res) {
           if (!id && !_id)
             return res.status(400).json({ error: "Falta el parámetro id o _id" });
 
-          // Buscar por id numérico o _id de Mongo
           const filtro = id ? { id: Number(id) } : { _id };
           const eliminado = await Imagen.findOneAndDelete(filtro);
 
