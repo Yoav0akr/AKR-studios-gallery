@@ -28,6 +28,14 @@ function cargarimagenes(cosas) {
   fotos.innerHTML = ` `;
   cosas.forEach(nombre => {
     const div = document.createElement("div");
+const descripcion = ()=>{
+  if(!nombre.desk){
+    return "sin descripcion"
+  }else{
+    return nombre.desk
+  };
+};
+
     div.classList.add("imagen");
     div.innerHTML = `
     <h3 class="producto-titulo">${nombre.nombre}</h3>
@@ -36,9 +44,13 @@ function cargarimagenes(cosas) {
         <ul>
           <li><p>Por/De: ${nombre.por}</p></li>
           <li><p>Categoría: ${nombre.categ}</p></li>
+          <li><p>Descrpcion: ${descripcion}</p></li>
         </ul>
       </div>
+      <div class="desc-soli">
       <button class="descargarBtn" id="${nombre.id || nombre._id}">Descargar</button>
+      <button class="soliEli no-ver" id="${nombre.id || nombre._id}">solicitar eliminar</button>
+      </div>
     `;
     fotos.append(div);
   });
@@ -48,7 +60,6 @@ function cargarimagenes(cosas) {
 
 // Categorías
 function loadCats(categorias) {
-  cats.innerHTML = `<option value="nombre">name</option><option value="por">contribuidor</option>`;
   categorias.forEach(categ => {
     const option = document.createElement("option");
     option.value = categ;
@@ -109,6 +120,7 @@ function download(e) {
 }
 
 // Filtrado
+const div_mesages = document.querySelector(".mensage");
 function filtrarYMostrar() {
   const texto = buscador.value.toLowerCase().trim();
   const tipoBusqueda = cats.value;
@@ -128,10 +140,10 @@ function filtrarYMostrar() {
 
   if (show) {
     if (filtrados.length === 0) {
-      show.classList.remove("no-ver");
-      show.innerText = `NO HAY RESULTADOS PARA "${buscador.value.toUpperCase()}"`;
+      div_mesages.classList.remove("no-ver");
+    div_mesages.innerText = `NO HAY RESULTADOS PARA "${buscador.value.toUpperCase()}"`;
     } else {
-      show.classList.add("no-ver");
+      div_mesages.classList.add("no-ver");
     }
   }
 
@@ -155,19 +167,21 @@ let globalArchivos = [];
     div.classList.add("noRES");
     div.innerHTML =
       `<p id="noRES">SI VES ESTE MENSAJE CAMBIA DE PC O CONECTATE BIEN A INTERNET PUT@.</p>`;
-    fotos.append(div);
+    div_mesages.append(div);
     return;
   }
   const Cats_Cconcentrado = [...new Set(globalArchivos.map(doc => doc.categ).flat())];
   loadCats(Cats_Cconcentrado);
   cargarimagenes(globalArchivos);
 })();
-// para rotar el logo y ocultar nav
-const  navs = document.querySelector(".nav")
+
+
+// para rotar el logo y desplegar/ocultar nav
+const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
+
 logo.addEventListener("click", () => {
   logo.classList.toggle("rotado");
   navs.classList.toggle("navhiden");
   navigator.vibrate(200);
 });
-
