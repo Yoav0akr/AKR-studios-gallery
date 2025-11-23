@@ -1,20 +1,29 @@
 import mongoose from "mongoose";
+import cloudinary from "cloudinary";
 
-// 🔹 URI de MongoDB desde variable de entorno
+// Configurar Cloudinary
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// URI MongoDB
 const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
   throw new Error("Por favor define MONGODB_URI en las variables de entorno de Vercel");
 }
 
-// 🔹 Cache global para evitar múltiples conexiones en Vercel
+// Cache global
 let cached = global.mongoose;
 if (!cached) cached = global.mongoose = { conn: null, promise: null };
 
-// 🔹 SCHEMA Y MODELO fuera del handler
+// Schema
 const ImagenSchema = new mongoose.Schema({
   id: Number,
   nombre: String,
   ub: String,
+  public_id: String,  // <--- NECESARIO para borrar en Cloudinary
   por: String,
   categ: [String],
   desk: String,
@@ -22,10 +31,10 @@ const ImagenSchema = new mongoose.Schema({
 
 const Imagen = mongoose.models.Imagen || mongoose.model("Imagen", ImagenSchema);
 
-// 🔹 HANDLER
+// API Handler
 export default async function handler(req, res) {
   try {
-    // 🔹 Conexión a MongoDB
+    // Conexión
     if (!cached.conn) {
       if (!cached.promise) {
         cached.promise = mongoose.connect(MONGODB_URI, {
@@ -35,15 +44,14 @@ export default async function handler(req, res) {
       cached.conn = await cached.promise;
     }
 
-    // 🔹 Manejo de métodos
     switch (req.method) {
-      // === OBTENER TODAS ===
+      // === GET ===
       case "GET": {
         const imagenes = await Imagen.find().sort({ id: -1 });
         return res.status(200).json(imagenes);
       }
 
-      // === CREAR NUEVA ===
+      // === POST ===
       case "POST": {
         try {
           const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
@@ -55,22 +63,42 @@ export default async function handler(req, res) {
         }
       }
 
-      // === ELIMINAR UNA SOLA IMAGEN ===
+      // === DELETE (Mongo + Cloudinary) ===
       case "DELETE": {
         try {
-          const { id, _id } = req.query; // puedes enviar ?id= o ?_id=
+          const { id, _id } = req.query;
           if (!id && !_id)
             return res.status(400).json({ error: "Falta el parámetro id o _id" });
 
           const filtro = id ? { id: Number(id) } : { _id };
-          const eliminado = await Imagen.findOneAndDelete(filtro);
 
-          if (!eliminado)
+          // Buscar
+          const imagen = await Imagen.findOne(filtro);
+          if (!imagen)
             return res.status(404).json({ error: "No se encontró la imagen a eliminar" });
+
+          // Borrar en Cloudinary
+          if (imagen.public_id) {
+            try {
+              const resultado = await cloudinary.v2.uploader.destroy(imagen.public_id);
+
+              if (resultado.result === "not found") {
+                console.warn("⚠️ No estaba en Cloudinary:", imagen.public_id);
+              } else {
+                console.log("🗑️ Eliminada en Cloudinary:", imagen.public_id);
+              }
+            } catch (cloudErr) {
+              console.error("❌ Error borrando en Cloudinary:", cloudErr);
+              return res.status(500).json({ error: "Error borrando en Cloudinary" });
+            }
+          }
+
+          // Borrar en Mongo
+          const eliminado = await Imagen.findOneAndDelete(filtro);
 
           return res.status(200).json({
             success: true,
-            message: "Imagen eliminada correctamente",
+            message: "Imagen eliminada de Mongo y Cloudinary",
             eliminado,
           });
         } catch (error) {
@@ -79,7 +107,7 @@ export default async function handler(req, res) {
         }
       }
 
-      // === MÉTODOS NO PERMITIDOS ===
+      // Métodos no permitidos
       default:
         res.setHeader("Allow", ["GET", "POST", "DELETE"]);
         return res.status(405).json({ error: `Método ${req.method} no permitido` });
