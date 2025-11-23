@@ -10,7 +10,7 @@
     --text-main: #e6e6e6;
     --text-soft: #a8a8a8;
 
-    --accent-1: #7e3ff2;  /* morado */
+    --accent-1: #26124c;  /* morado */
     --accent-2: #03c988;  /* verde neón */
 
     --danger: #ff4d4d;
@@ -27,7 +27,6 @@ body {
 
 h1, h2, h3, p, ul, li {
     margin: 0;
-    padding: 0;
 }
 
 p {
@@ -36,16 +35,18 @@ p {
 }
 
 ul {
+    list-style: none;
     text-align: start;
     margin-left: -1em;
+
 }
 
 li {
     margin-bottom: -0.9em;
-    font-size: small;
 }
 
 button {
+    align-self: flex-end;
     font-family: 'Times New Roman', Times, serif;
     font-weight: 1000;
     background-color: var(--accent-1);
@@ -55,6 +56,10 @@ button {
     font-size: 90%;
     color: #fff;
     width: 100%;
+}
+
+.btndescargar{
+    margin-top: auto;
 }
 
 button:hover {
@@ -265,13 +270,13 @@ h1 {
 .imagen {
     display: flex;
     flex-direction: column;
-    padding: 0.2rem;
+    
     background: var(--bg-2);
     border-radius: var(--defborder);
+    padding: 0.2rem;
 }
 
 .la-imagen {
-    width: 100%;
     aspect-ratio: 1 / 1;
     object-fit: cover;
     padding: 0.2rem;
@@ -345,7 +350,7 @@ h1 {
 @media (max-width: 944px) {
 
     .cosa {
-        font-size: medium;
+        font-size: 1rem;
         height: 6rem;
     }
 
