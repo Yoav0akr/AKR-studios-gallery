@@ -66,13 +66,16 @@ button:hover {
     background-color: #4e22a7;
 }
 .producto-titulo {
-    white-space: normal;                  
-    overflow-wrap: break-word;           
-    font-size: clamp(0.9rem, 2vw, 1.5rem);
-    line-height: 1.2;
-    margin-bottom: 0.5rem;
-    text-align: center;                  
+    white-space: nowrap;        /* 🔒 Todo en una línea */
+    overflow: hidden;           /* Ocultar exceso */
+    text-overflow: ellipsis;    /* ... si no cabe */
+    
+    font-size: clamp(0.8rem, 2.5vw, 1.3rem); /* Ajuste automático */
+    font-weight: 700;
+    width: 100%;
+    display: block;
 }
+
 
 /* ===================== */
 /*        NAVBAR         */
