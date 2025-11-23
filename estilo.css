@@ -101,7 +101,9 @@ h1 {
 /* ===================== */
 /*     CONTENEDORES      */
 /* ===================== */
-
+.desc-soli{
+    margin-top: auto;
+}
 .cargador,
 .cargador1 {
     display: flex;
