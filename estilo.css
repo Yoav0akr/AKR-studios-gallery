@@ -32,6 +32,12 @@ h1, h2, h3, p, ul, li {
 p {
     margin: 0.2rem 0 0.43rem;
     color: var(--text-soft);
+        white-space: nowrap;        /* Mantener en una sola línea */
+    overflow: hidden;           /* Ocultar lo que se pase */
+    text-overflow: ellipsis;    /* Mostrar “...” */
+    display: block;
+    width: 100%;
+    
 }
 
 ul {
