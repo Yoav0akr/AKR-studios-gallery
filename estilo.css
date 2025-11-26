@@ -382,7 +382,9 @@ h1 {
     color: var(--danger);
     background: #331111;
 }
-
+.detalles{
+    height: auto;
+}
 /* ===================== */
 /*     RESPONSIVE        */
 /* ===================== */
