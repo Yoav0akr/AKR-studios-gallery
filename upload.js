@@ -1,7 +1,7 @@
 // === upload.js ===
+// contol de admins
 
-// Controla la subida de imágenes + guardado en MongoDB desde tu formulario
-localStorage.clear();
+
 
 // Variables del formulario
 const EntradaNombre = document.getElementById("nombre_imput");
