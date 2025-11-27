@@ -1,326 +1,186 @@
-//seccion para el panle de borrado de imagenes subidas
+// =============================
+// ELEMENTOS HTML
+// =============================
+const boton_solicitudes = document.getElementById("solicitudes");
+const boton_PB = document.getElementById("panel_de_borrado");
+const boton_personas = document.getElementById("panel_de_admins");
 
-import { Admin } from "mongodb";
+const fotos = document.getElementById("imagenes-contenedor");
+const personas = document.querySelector(".lista-personas");
+const divSOLIS = document.querySelector(".div-solicitudes");
+const buscador = document.getElementById("buscador");
+const cats = document.getElementById("cats");
+const show = document.getElementById("show");
 
-// === CARGAR DESDE MONGO ===
+// =============================
+// FUNCIONES GENERALES
+// =============================
+
+// Ocultar todos los paneles
+function hideAll() {
+  fotos.classList.add("no-ver");
+  personas.classList.add("no-ver");
+  divSOLIS.classList.add("no-ver");
+}
+
+// =============================
+// CARGAR IMÁGENES DESDE MONGO
+// =============================
+let globalArchivos = [];
+
 async function cargarDesdeMongo() {
   try {
     const res = await fetch("/api/db", { method: "GET" });
     if (!res.ok) throw new Error(`Error ${res.status}`);
-
-    const archivitos = await res.json();
-    console.log("Cargado correctamente:", archivitos.length, "documentos");
-    return archivitos;
+    const data = await res.json();
+    globalArchivos = data;
+    return data;
   } catch (err) {
     console.error("Error al cargar desde Mongo:", err);
     return [];
   }
 }
 
-// === ELEMENTOS HTML ===
-const fotos = document.querySelector("#imagenes-contenedor");
-const cats = document.getElementsByName("cats")[0];
-const show = document.getElementById("show");
-const buscador = document.querySelector("#buscador");
-
-// === RENDERIZAR IMÁGENES ===
-function cargarimagenes(cosas) {
-  fotos.innerHTML = ``;
-  cosas.forEach(nombre => {
+// Renderizar imágenes
+function cargarImagenes(archivos) {
+  fotos.innerHTML = "";
+  archivos.forEach(item => {
     const div = document.createElement("div");
     div.classList.add("imagen");
     div.innerHTML = `
-      <img class="la-imagen" src="${nombre.ub}" alt="${nombre.nombre}" />
+      <img class="la-imagen" src="${item.ub}" alt="${item.nombre}" />
       <div class="detalles">
         <ul>
-          <li><p>Por/De: ${nombre.por}</p></li>
-          <li><p>Categoría: ${nombre.categ}</p></li>
+          <li><p>Por/De: ${item.por}</p></li>
+          <li><p>Categoría: ${item.categ}</p></li>
         </ul>
-        <h3 class="producto-titulo">${nombre.nombre}</h3>
-        <button class="descargarBtn" id="${nombre._id || nombre.id}">ELIMINAR</button>
+        <h3 class="producto-titulo">${item.nombre}</h3>
+        <button class="descargarBtn" data-id="${item._id}">ELIMINAR</button>
       </div>
     `;
-    fotos.append(div);
+    fotos.appendChild(div);
   });
-  actualizarBotonesDescargar();
+  vincularBotonesEliminar();
 }
 
-// === CARGAR CATEGORÍAS ===
-function loadCats(categorias) {
-  cats.innerHTML = `<option value="nombre">name</option><option value="por">contribuidor</option>`;
-  categorias.forEach(categ => {
-    const option = document.createElement("option");
-    option.value = categ;
-    option.innerHTML = categ;
-    cats.append(option);
-  });
-}
+// Vincular botones eliminar imágenes
+function vincularBotonesEliminar() {
+  document.querySelectorAll(".descargarBtn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      const id = e.currentTarget.dataset.id;
+      const archivo = globalArchivos.find(a => a._id === id);
+      if (!archivo) return alert("Archivo no encontrado");
 
-// === VINCULAR BOTONES DE ELIMINAR ===
-function actualizarBotonesDescargar() {
-  const BotonesDescargar = document.querySelectorAll(".descargarBtn");
-  BotonesDescargar.forEach(boton => {
-    boton.addEventListener("click", eliminarArchivo);
-  });
-}
+      const confirmar = confirm(`¿Seguro que deseas eliminar "${archivo.nombre}"?`);
+      if (!confirmar) return;
 
-// === FUNCIÓN PRINCIPAL: ELIMINAR ARCHIVO ===
-async function eliminarArchivo(e) {
-  const idboton = e.currentTarget.id;
-  const archivo = globalArchivos.find(item => item._id === idboton || item.id === Number(idboton));
-
-  if (!archivo) {
-    console.warn("Archivo no encontrado para el botón:", idboton);
-    return;
-  }
-
-  const confirmar = confirm(`¿Seguro que deseas eliminar "${archivo.nombre}"?`);
-  if (!confirmar) return;
-
-  try {
-    // 1️⃣ Intentar obtener el public_id desde la URL de Cloudinary
-    const match = archivo.ub.match(/upload\/(?:v\d+\/)?(.+?)(\.[a-zA-Z0-9]+)?$/);
-    const public_id = match ? match[1] : null;
-
-    // 2️⃣ Eliminar de Cloudinary
-    if (public_id) {
-      const resCloud = await fetch(`/api/upload?public_id=${public_id}`, { method: "DELETE" });
-      const dataCloud = await resCloud.json();
-
-      if (!dataCloud.success) {
-        console.warn("⚠️ No se eliminó de Cloudinary:", dataCloud.error || dataCloud);
-      } else {
-        console.log("🗑️ Eliminado de Cloudinary:", archivo.nombre);
+      try {
+        // Eliminar de MongoDB
+        const res = await fetch(`/api/db?_id=${id}`, { method: "DELETE" });
+        const data = await res.json();
+        if (data.success) {
+          globalArchivos = globalArchivos.filter(a => a._id !== id);
+          cargarImagenes(globalArchivos);
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error al eliminar archivo");
       }
-    } else {
-      console.warn("⚠️ No se pudo obtener public_id de la URL:", archivo.ub);
-    }
-
-    // 3️⃣ Eliminar de MongoDB
-    const resMongo = await fetch(`/api/db?_id=${archivo._id}`, { method: "DELETE" });
-    const dataMongo = await resMongo.json();
-
-    if (dataMongo.success) {
-      alert(`✅ "${archivo.nombre}" eliminado correctamente.`);
-      globalArchivos = globalArchivos.filter(item => item._id !== archivo._id);
-      cargarimagenes(globalArchivos);
-    } else {
-      alert(`⚠️ No se pudo eliminar de MongoDB: ${dataMongo.error || "Error desconocido"}`);
-    }
-  } catch (error) {
-    console.error("❌ Error eliminando archivo:", error);
-    alert("Error al eliminar archivo. Revisa la consola para más detalles.");
-  }
-}
-
-// === FILTRADO Y BÚSQUEDA ===
-function filtrarYMostrar() {
-  const texto = buscador.value.toLowerCase().trim();
-  const tipoBusqueda = cats.value;
-  let filtrados = globalArchivos;
-
-  if (tipoBusqueda === "nombre") {
-    filtrados = globalArchivos.filter(item => item.nombre.toLowerCase().includes(texto));
-  } else if (tipoBusqueda === "por") {
-    filtrados = globalArchivos.filter(item => item.por.toLowerCase().includes(texto));
-  } else {
-    buscador.value = "";
-    filtrados = globalArchivos.filter(item => {
-      const categ = Array.isArray(item.categ)
-        ? item.categ.map(c => c.toLowerCase())
-        : [String(item.categ).toLowerCase()];
-      return categ.includes(tipoBusqueda.toLowerCase());
     });
-  }
-
-  if (show) {
-    if (filtrados.length === 0) {
-      show.classList.remove("no-ver");
-      show.innerText = `NO HAY RESULTADOS PARA "${buscador.value.toUpperCase()}"`;
-    } else {
-      show.classList.add("no-ver");
-    }
-  }
-
-  cargarimagenes(filtrados);
-  cats.value = tipoBusqueda;
+  });
 }
 
-buscador.addEventListener("input", filtrarYMostrar);
-cats.addEventListener("change", filtrarYMostrar);
-
-// === INICIALIZACIÓN ===
-let globalArchivos = [];
-
-(async function init() {
-  globalArchivos = await cargarDesdeMongo();
-  console.log("Datos cargados de Mongo:", globalArchivos);
-
-  if (!globalArchivos || globalArchivos.length === 0) {
-    const c4 = document.querySelector(".c4")
-    const div = document.createElement("div");
-    div.classList.add("noRES");
-    div.innerHTML = `<p id="noRES">SI VES ESTE MENSAJE CAMBIA DE PC O CONECTATE BIEN A INTERNET PUT@.</p>`;
-    c4.append(div);
-    return;
-  }
-
-  const Cats_Cconcentrado = [...new Set(globalArchivos.map(doc => doc.categ).flat())];
-  loadCats(Cats_Cconcentrado);
-  cargarimagenes(globalArchivos);
-})();
-
-
-//aqui el admin selleciona que hacer (si borrar por solicitudes o por gusto/necesidad)
-//interruptores
-const boton_solicitudes = document.querySelector("#solicitudes");
-const boton_PB = document.getElementById("panel_de_borrado");
-const boton_personas = document.getElementById("panel_de_admins");
-//contenedores
-const personas = document.querySelector(".lista-personas");
-const divSOLIS = document.querySelector(".div-solicitudes");
-
-//ocultar todo
-function hideAll() {
-  divSOLIS.classList.add("no-ver");
-  fotos.classList.add("no-ver");
-  personas.classList.add("no-ver");
-}
-
-//mostrar cosas
-
-boton_PB.addEventListener("click", () => {
-  hideAll();
-  fotos.classList.remove("no-ver");
-});
-
-boton_solicitudes.addEventListener("click", () => {
-  hideAll();
-  divSOLIS.classList.remove("no-ver")
-});
-
-boton_personas.addEventListener("click", () => {
-  hideAll();
-  personas.classList.remove("no-ver")
-});
-
-//cargar solicitudes de eliminacion
-async function cargarSolicitudesDesdeMongo() {
+// =============================
+// CARGAR SOLICITUDES
+// =============================
+async function cargarSolicitudes() {
   try {
     const res = await fetch("/api/solicitudes", { method: "GET" });
     if (!res.ok) throw new Error(`Error ${res.status}`);
-    const solicitudes_random = await res.json();
-    console.log("Cargado correctamente:", solicitudes_random.length, "solicitudes");
-    return solicitudes_random;
+    const data = await res.json();
+    renderSolicitudes(data);
   } catch (err) {
-    console.error("Error al cargar solicitudes desde Mongo:", err);
-    return [];
+    console.error("Error al cargar solicitudes:", err);
   }
 }
-//llamar a la funcion para cargar las solicitudes
-(async function initSolicitudes() {
 
-  try {
-    const solicitudes_random = await cargarSolicitudesDesdeMongo();
-    console.log("Solicitudes cargadas de Mongo:", solicitudes_random);
-    cargarSolicitudesDesdeMongo(solicitudes_random);
-  } catch (error) {
-    console.error("Error cargando solicitudes:", error);
+function renderSolicitudes(solicitudes) {
+  divSOLIS.innerHTML = "";
+  if (!solicitudes || solicitudes.length === 0) {
+    divSOLIS.innerHTML = "<p>No hay solicitudes</p>";
+    return;
   }
-})();
 
-
-
-//funion para acrgar las solicitudes
-function cargarsolicitudes(solicitudes_random) {
-
-  if (!solicitudes_random) {
-    divSOLIS.innerHTML = "<h1>no hay solicitudes</h1>";
-  } else {
-    divSOLIS.innerHTML = ``;
-    solicitudes_random.forEach(solicitud => {
-      const div = document.createElement("div");
-      div.classList.add("solicitud");
-      div.innerHTML = `
-     <h2>Solicitud de eliminacion</h2>        
-        <p>se solicita: borrar</p>
-        <img class="la-imagen" src="${solicitud.ub}" alt="${solicitud.nombre}" />
-        <h3 class="producto-titulo">${solicitud.nombre}</h3>
-      <button class="aceptar" id="${solicitud.nombre}">Aceptar</button>
-      <button class="rechazar"id="${solicitudnombre}">Rechazar</button>
+  solicitudes.forEach(item => {
+    const div = document.createElement("div");
+    div.classList.add("solicitud");
+    div.innerHTML = `
+      <h2>Solicitud de eliminación</h2>
+      <p>Se solicita borrar</p>
+      <img class="la-imagen" src="${item.ub}" alt="${item.nombre}" />
+      <h3 class="producto-titulo">${item.nombre}</h3>
+      <button class="aceptar" data-id="${item._id}">Aceptar</button>
+      <button class="rechazar" data-id="${item._id}">Rechazar</button>
     `;
-      divSOLIS.append(div);
-      const solis = document.querySelector(".solis")
-      solis.innerHTML = solicitudes_random.length
+    divSOLIS.appendChild(div);
+  });
 
+  // Vincular botones aceptar/rechazar
+  document.querySelectorAll(".aceptar").forEach(btn => {
+    btn.addEventListener("click", async e => {
+      const id = e.currentTarget.dataset.id;
+      // Lógica de aceptar
+      alert(`Aceptado: ${id}`);
     });
-  }
-};
+  });
 
-//al dar al boton de aceptar
+  document.querySelectorAll(".rechazar").forEach(btn => {
+    btn.addEventListener("click", async e => {
+      const id = e.currentTarget.dataset.id;
+      // Lógica de rechazar
+      alert(`Rechazado: ${id}`);
+    });
+  });
+}
 
-
-// para rotar el logo y ocultar nav
-const navs = document.querySelector(".nav")
-const logo = document.querySelector(".logo");
-logo.addEventListener("click", () => {
-  logo.classList.toggle("rotado");
-  navs.classList.toggle("navhiden");
-  navigator.vibrate(200);
-});
-
-//seccion para controlar los permisos
-
-// === CARGAR DESDE MONGO PRESONAS ===
-async function cargarPersonas() {
+// =============================
+// CARGAR ADMINISTRADORES
+// =============================
+async function cargarAdmins() {
   try {
     const res = await fetch("/api/adminsDB", { method: "GET" });
-    if (!res.ok) throw new Error(`Error ${res.status}`);
-
-    const archivitos = await res.json();
-    console.log("Cargado correctamente:", archivitos.length, "documentos");
-    return archivitos;
+    if (!res.ok) throw new Error("Error cargando admins");
+    const data = await res.json();
+    renderizarPersonas(data);
   } catch (err) {
-    console.error("Error al cargar desde Mongo:", err);
-    return [];
+    console.error(err);
   }
 }
-//renderizar admins
-
 
 function renderizarPersonas(admins) {
-  personas.innerHTML = ``;
-
+  personas.innerHTML = "";
   admins.forEach(admin => {
     const div = document.createElement("div");
     div.classList.add("persona");
-
     div.innerHTML = `
-      <h3 class="nombre">Nombre del usuario: ${admin.admin}</h3>
-      <h3 class="estado">Admin pass: <span class="pass-state">${admin.adminpass}</span></h3>
-
+      <h3 class="nombre">Nombre: ${admin.admin}</h3>
+      <h3 class="estado">Admin pass: <span>${admin.adminpass}</span></h3>
       <div class="jaiba">
         <button class="almeja eliminar-not" data-id="${admin._id}">ELIMINAR</button>
         <button class="almeja get-up" data-id="${admin._id}">Give admin</button>
         <button class="almeja get-down" data-id="${admin._id}">Remove admin</button>
       </div>
     `;
-
-    personas.append(div);
+    personas.appendChild(div);
   });
-
   vincularBotonesAdmins();
 }
+
 function vincularBotonesAdmins() {
-
-
-  //manejo de permisos
-  // Eliminar admin
   document.querySelectorAll(".eliminar-not").forEach(btn => {
     btn.addEventListener("click", async e => {
       const id = e.currentTarget.dataset.id;
-      const confirmar = confirm("¿Seguro que deseas eliminar este admin?");
-      if (!confirmar) return;
+      if (!confirm("¿Seguro que deseas eliminar este admin?")) return;
 
       const res = await fetch("/api/adminsDB", {
         method: "DELETE",
@@ -328,51 +188,92 @@ function vincularBotonesAdmins() {
         body: JSON.stringify({ id }),
       });
       const data = await res.json();
-      if (data.success) {
-        alert("Admin eliminado correctamente");
-        initAdmins(); // refresca la lista
-      } else {
-        alert("Error al eliminar admin");
-      }
+      if (data.success) cargarAdmins();
     });
   });
 
-  // Dar admin
   document.querySelectorAll(".get-up").forEach(btn => {
     btn.addEventListener("click", async e => {
       const id = e.currentTarget.dataset.id;
-
-      const res = await fetch("/api/adminsDB", {
+      await fetch("/api/adminsDB", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, adminpass: true }),
       });
-
-      const data = await res.json();
-      if (data.success) initAdmins();
+      cargarAdmins();
     });
   });
 
-  // Quitar admin
   document.querySelectorAll(".get-down").forEach(btn => {
     btn.addEventListener("click", async e => {
       const id = e.currentTarget.dataset.id;
-
-      const res = await fetch("/api/adminsDB", {
+      await fetch("/api/adminsDB", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, adminpass: false }),
       });
-
-      const data = await res.json();
-      if (data.success) initAdmins();
+      cargarAdmins();
     });
   });
 }
 
+// =============================
+// FILTRADO Y BÚSQUEDA
+// =============================
+function filtrarYMostrar() {
+  const texto = buscador.value.toLowerCase().trim();
+  const tipo = cats.value;
+  let filtrados = globalArchivos;
 
+  if (tipo === "nombre") {
+    filtrados = globalArchivos.filter(item => item.nombre.toLowerCase().includes(texto));
+  } else if (tipo === "por") {
+    filtrados = globalArchivos.filter(item => item.por.toLowerCase().includes(texto));
+  } else {
+    filtrados = globalArchivos.filter(item => {
+      const categs = Array.isArray(item.categ) ? item.categ : [item.categ];
+      return categs.map(c => c.toLowerCase()).includes(tipo.toLowerCase());
+    });
+  }
 
+  if (filtrados.length === 0) {
+    show.classList.remove("no-ver");
+    show.textContent = `NO HAY RESULTADOS PARA "${buscador.value.toUpperCase()}"`;
+  } else {
+    show.classList.add("no-ver");
+  }
 
+  cargarImagenes(filtrados);
+}
 
+buscador.addEventListener("input", filtrarYMostrar);
+cats.addEventListener("change", filtrarYMostrar);
 
+// =============================
+// SWITCH PANEL
+// =============================
+boton_PB.addEventListener("click", () => {
+  hideAll();
+  fotos.classList.remove("no-ver");
+});
 
+boton_solicitudes.addEventListener("click", () => {
+  hideAll();
+  divSOLIS.classList.remove("no-ver");
+});
+
+boton_personas.addEventListener("click", () => {
+  hideAll();
+  personas.classList.remove("no-ver");
+});
+
+// =============================
+// INICIALIZACIÓN
+// =============================
+(async function init() {
+  await cargarDesdeMongo();
+  cargarImagenes(globalArchivos);
+
+  await cargarSolicitudes();
+  await cargarAdmins();
+})();
