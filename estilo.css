@@ -10,10 +10,8 @@
     --text-main: #e6e6e6;
     --text-soft: #a8a8a8;
 
-    --accent-1: #26124c;
-    /* morado */
-    --accent-2: #03c988;
-    /* verde neón */
+    --accent-1: #26124c; /* morado */
+    --accent-2: #03c988; /* verde neón */
 
     --danger: #ff4d4d;
 }
@@ -21,18 +19,13 @@
 /* ===================== */
 /*   GLOBAL / RESET      */
 /* ===================== */
-
 body {
     background-color: var(--bg-1);
     color: var(--text-main);
+    font-family: Arial, sans-serif;
 }
 
-h1,
-h2,
-h3,
-p,
-ul,
-li {
+h1, h2, h3, p, ul, li {
     margin: 0;
 }
 
@@ -40,21 +33,15 @@ p {
     margin: 0.2rem 0 0.43rem;
     color: var(--text-soft);
     white-space: nowrap;
-    /* Mantener en una sola línea */
     overflow: hidden;
-    /* Ocultar lo que se pase */
     text-overflow: ellipsis;
-    /* Mostrar “...” */
     display: block;
-    width: auto;
-
 }
 
 ul {
     list-style: none;
-    text-align: start;
     margin-left: -1em;
-
+    text-align: start;
 }
 
 li {
@@ -62,7 +49,6 @@ li {
 }
 
 button {
-    align-self: flex-end;
     font-family: 'Times New Roman', Times, serif;
     font-weight: 1000;
     background-color: var(--accent-1);
@@ -71,11 +57,8 @@ button {
     padding: 1.2rem;
     font-size: 90%;
     color: #fff;
+    cursor: pointer;
     width: 100%;
-}
-
-.descargarBtn {
-    margin-top: auto;
 }
 
 button:hover {
@@ -84,20 +67,17 @@ button:hover {
 
 .producto-titulo {
     white-space: nowrap;
-    /* Mantener en una sola línea */
     overflow: hidden;
-    /* Ocultar lo que se pase */
     text-overflow: ellipsis;
-    /* Mostrar “...” */
     display: block;
     width: 100%;
+    color: #eeff00;
+    font-size: 1.5rem;
 }
-
 
 /* ===================== */
 /*        NAVBAR         */
 /* ===================== */
-
 .nav {
     display: flex;
     background: var(--bg-2);
@@ -117,6 +97,7 @@ button:hover {
     background-size: contain;
     background-repeat: no-repeat;
     background-image: url(./AKRlogo.ico);
+    cursor: pointer;
 }
 
 h1 {
@@ -133,7 +114,6 @@ h1 {
     background: #1d3f0d;
     padding: 1rem;
     border-radius: 2rem;
-
 }
 
 .persona {
@@ -154,6 +134,7 @@ h1 {
     flex-direction: row;
     justify-content: center;
     height: 100%;
+    gap: 0.5rem;
 }
 
 .panel {
@@ -204,7 +185,6 @@ h1 {
 /* ===================== */
 /*        MENÚ           */
 /* ===================== */
-
 .menu {
     display: flex;
     align-items: center;
@@ -230,7 +210,6 @@ h1 {
 /* ===================== */
 /*        BLOQUES        */
 /* ===================== */
-
 .panel h2 {
     text-align: center;
 }
@@ -272,7 +251,6 @@ h1 {
 .queso2 {
     display: flex;
     flex-direction: column;
-
 }
 
 .queso {
@@ -293,7 +271,6 @@ h1 {
 }
 
 /* Inputs */
-
 #manchego {
     margin: 0;
 }
@@ -315,9 +292,6 @@ h1 {
 }
 
 .webo:hover {
-    font-size: 1em;
-    padding: 0.4rem;
-    border-radius: var(--defborder);
     background: var(--bg-3);
     border: 2px solid #333;
     color: #fff;
@@ -334,26 +308,63 @@ h1 {
     align-self: center;
 }
 
-.almeja {
-    display: flex;
+/* ===================== */
+/* BOTONES DE PANEL Y JAIBA */
+/* ===================== */
+.boton-panel,
+#panel_de_admins,
+#panel_de_borrado,
+#solicitudes {
+    display: inline-flex;
     justify-content: center;
     align-items: center;
+    padding: 0.6rem 1.2rem;
+    margin: 0.3rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: var(--defborder);
+    border: 3px solid var(--accent-2);
+    background-color: var(--accent-1);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
     text-align: center;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    
+    width: auto;
 }
 
-#true{
-    color: #00aaff;
+.boton-panel:hover,
+#panel_de_admins:hover,
+#panel_de_borrado:hover,
+#solicitudes:hover {
+    background-color: var(--accent-2);
+    color: #000;
+    transform: scale(1.05);
+}
+
+.jaiba .almeja {
+    flex: 1;
+    margin: 0.2rem;
+    padding: 0.4rem 0.6rem;
+    font-size: 0.9rem;
+    font-weight: bold;
+    border-radius: var(--defborder);
+    border: 2px solid var(--accent-2);
+    background-color: var(--accent-1);
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+}
+
+.jaiba .almeja:hover {
+    background-color: var(--accent-2);
+    color: #000;
+    transform: scale(1.05);
 }
 
 /* ===================== */
 /*       IMÁGENES        */
 /* ===================== */
-
 .imagenes-contenedor,
 .div-solicitudes {
     display: grid;
@@ -368,7 +379,6 @@ h1 {
 .imagen {
     display: flex;
     flex-direction: column;
-
     background: var(--bg-2);
     border-radius: var(--defborder);
     padding: 0.2rem;
@@ -385,7 +395,6 @@ h1 {
 /* ===================== */
 /*    SOLICITUDES        */
 /* ===================== */
-
 .solicitud {
     padding: 0.5rem;
     margin: 1rem;
@@ -418,7 +427,6 @@ h1 {
 /* ===================== */
 /* OTROS                 */
 /* ===================== */
-
 .logisimo {
     display: grid;
     place-items: center;
@@ -445,15 +453,9 @@ h1 {
     height: auto;
 }
 
-.producto-titulo {
-    color: #eeff00;
-    font-size: 1.5rem;
-}
-
 /* ===================== */
 /*     RESPONSIVE        */
 /* ===================== */
-
 @media (max-width: 944px) {
 
     .cosa {
@@ -462,7 +464,6 @@ h1 {
     }
 
     .nav {
-
         position: fixed;
         flex-direction: column;
         min-height: 21rem;
@@ -490,7 +491,6 @@ h1 {
 
     .logo {
         align-self: center;
-        cursor: pointer;
         width: 60px;
         min-height: 60px;
         transition: transform 0.5s ease-in-out;
@@ -552,8 +552,6 @@ h1 {
     }
 
     .web {
-
         width: auto;
     }
-
 }
