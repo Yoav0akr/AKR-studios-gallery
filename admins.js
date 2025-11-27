@@ -21,6 +21,16 @@ function hideAll() {
   divSOLIS.classList.add("no-ver");
 }
 
+// para rotar el logo y desplegar/ocultar nav
+const navs = document.querySelector(".nav");
+const logo = document.querySelector(".logo");
+
+logo.addEventListener("click", () => {
+  logo.classList.toggle("rotado");
+  navs.classList.toggle("navhiden");
+  navigator.vibrate(200);
+});
+
 // ===============================
 // PANELES
 // ===============================

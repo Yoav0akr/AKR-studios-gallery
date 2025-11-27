@@ -28,6 +28,11 @@ body {
 h1, h2, h3, p, ul, li {
     margin: 0;
 }
+a{
+    align-self: center;
+    color: #00ff59;
+    margin: 2rem;
+}
 
 p {
     margin: 0.2rem 0 0.43rem;
