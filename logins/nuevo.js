@@ -1,36 +1,33 @@
-// nuevo.js
-const botonCrear = document.getElementById("manchego");
-const inputNombre = document.getElementById("nombre_imput");
-const inputPassword = document.getElementById("por-imput");
+const btn = document.getElementById("manchego");
 
-botonCrear.addEventListener("click", async () => {
-  const admin = inputNombre.value.trim();
-  const password = inputPassword.value.trim();
+btn.addEventListener("click", async () => {
+  const nombre = document.getElementById("nombre_imput").value.trim();
+  const password = document.getElementById("por-imput").value.trim();
 
-  if (!admin || !password) {
-    alert("Rellena ambos campos por favor.");
+  if (!nombre || !password) {
+    alert("Debes llenar todos los campos");
     return;
   }
 
   try {
-    const res = await fetch("../api/adminsDB", {
+    const res = await fetch("/api/adminsDB", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ admin, password })
+      body: JSON.stringify({ admin: nombre, password }),
     });
 
     const data = await res.json();
 
-    if (data.success) {
-      alert(`✅ Admin "${admin}" creado correctamente. Se guardó como adminpass: false`);
-      inputNombre.value = "";
-      inputPassword.value = "";
-    } else {
-      alert(`⚠️ Error: ${data.message || "No se pudo crear el admin"}`);
+    if (!data.success) {
+      alert(`Error creando admin: ${data.message || data.error}`);
+      return;
     }
-  } catch (error) {
-    console.error("Error creando admin:", error);
-    alert("❌ Error creando admin. Revisa la consola.");
+
+    alert(`Usuario "${nombre}" creado correctamente`);
+    window.location.href = "./existente.html"; // redirige al login
+  } catch (err) {
+    console.error("Error creando admin:", err);
+    alert("Error creando admin. Revisa la consola.");
   }
 });
 
