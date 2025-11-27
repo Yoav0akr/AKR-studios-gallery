@@ -28,12 +28,12 @@ function cargarimagenes(cosas) {
   fotos.innerHTML = ` `;
   cosas.forEach(nombre => {
     const div = document.createElement("div");
-    let descripcion = nombre.desk
-    if (!nombre.desk) {
-      descripcion = "sin descripcion"
-    } else {
-      descripcion = nombre.desk
-    };
+let descripcion = "";
+if (!nombre.mimidesk) {
+  descripcion = "sin descripcion";
+} else {
+  descripcion = nombre.mimidesk;
+}
 
     div.classList.add("imagen");
     div.innerHTML = `

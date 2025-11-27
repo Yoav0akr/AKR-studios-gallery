@@ -87,8 +87,8 @@ const desk= Entradadesc.value.trim();
 EntradaGuardar.addEventListener("click", queso);
 
 // Función para guardar en MongoDB (tu lógica original)
-async function guardarEnMongo(nombre, url, por, categ,descripcion) {
-  const data = { id: Date.now(), nombre, ub: url, por, categ, descripcion };
+async function guardarEnMongo(nombre, url, por, categ,mimidesk) {
+  const data = { id: Date.now(), nombre, ub: url, por, categ, mimidesk };
 
   try {
     const res = await fetch("/api/db", {

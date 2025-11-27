@@ -26,7 +26,7 @@ const ImagenSchema = new mongoose.Schema({
   public_id: String,  // <--- NECESARIO para borrar en Cloudinary
   por: String,
   categ: [String],
-  desk: String,
+  mimidesk: String,
 });
 
 const Imagen = mongoose.models.Imagen || mongoose.model("Imagen", ImagenSchema);
