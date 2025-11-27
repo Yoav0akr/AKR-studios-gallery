@@ -385,6 +385,11 @@ h1 {
 .detalles{
     height: auto;
 }
+
+.producto-titulo{
+    color: #eeff00;
+    font-size: 1.5rem;
+}
 /* ===================== */
 /*     RESPONSIVE        */
 /* ===================== */
