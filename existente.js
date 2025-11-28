@@ -1,51 +1,36 @@
-const btnLogin = document.getElementById("manchego");
-const nombreInput = document.getElementById("nombre_imput");
-const passInput = document.getElementById("por-imput");
+const btn = document.getElementById("manchego");
 
-btnLogin.addEventListener("click", async () => {
-  const nombre = nombreInput.value.trim();
-  const pass = passInput.value.trim();
+btn.addEventListener("click", async () => {
+  const nombre = document.getElementById("nombre_imput").value.trim();
+  const password = document.getElementById("por-imput").value.trim();
 
-  if (!nombre || !pass) {
-    alert("Rellena ambos campos!");
+  if (!nombre || !password) {
+    alert("Debes llenar todos los campos");
     return;
   }
 
   try {
-    // Consultar todos los usuarios
-    const res = await fetch("./api/adminsDB");
-    if (!res.ok) throw new Error("Error al consultar usuarios");
+    const res = await fetch("/api/adminsDB", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ admin: nombre, password, login: true }),
+    });
 
-    const usuarios = await res.json();
+    const data = await res.json();
 
-    // Buscar el usuario por nickname
-    const usuario = usuarios.find(u => u.admin === nombre);
-
-    if (!usuario) {
-      alert("Usuario no encontrado!");
+    if (!data.success) {
+      alert(`Error: ${data.message || data.error}`);
       return;
     }
 
-    // Validar contraseña
-    if (usuario.por !== pass) {
-      alert("Contraseña incorrecta!");
-      return;
-    }
-
-    // Guardar sesión local (puedes usar adminpass si quieres un simple flag)
-    localStorage.setItem("sesionAdmin", JSON.stringify({
-      nombre: usuario.admin,
-      adminpass: usuario.adminpass
-    }));
-
-    alert("¡Bienvenido " + usuario.admin + "!");
-    window.location.href = "/index.html"; // Redirige a panel de fotos o admin
-
+    alert(`¡Bienvenido ${nombre}!`);
+    window.location.href = "/index.html"; // redirige a la galería
   } catch (err) {
-    console.error(err);
-    alert("Ocurrió un error, revisa la consola");
+    console.error("Error iniciando sesión:", err);
+    alert("Error iniciando sesión. Revisa la consola.");
   }
 });
+
 
 
 // para rotar el logo y desplegar/ocultar nav
