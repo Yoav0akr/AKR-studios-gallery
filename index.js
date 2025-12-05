@@ -54,7 +54,7 @@ const descripcion = nombre.mimidesk || "sin descripcion";
           <li><p>Por/De: ${nombre.por}</p></li>
           <li><p>Categoría: ${nombre.categ}</p></li>
           <li><p>Descrpcion: ${descripcion}</p></li>
-            <li><p>id: "${nombre.codigo}"</p></li>
+            <li><p>id: "${nombre.id}"</p></li>
         </ul>
       </div>
       <div class="desc-soli">
@@ -194,4 +194,5 @@ logo.addEventListener("click", () => {
   logo.classList.toggle("rotado");
   navs.classList.toggle("navhiden");
   navigator.vibrate(200);
+
 });
