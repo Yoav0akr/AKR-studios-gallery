@@ -165,13 +165,15 @@ async function cargarSolicitudes() {
     div.classList.add("solicitud");
     div.innerHTML = `
       <h2>Solicitud de eliminación</h2>
-      <p>Se solicita: borrar</p>
+      <p>motivo:${s.motivo}</p>
       <img class="la-imagen" src="${s.ub}" alt="${s.nombre}" />
       <h3 class="producto-titulo">${s.nombre}</h3>
       <button class="aceptar" data-id="${s._id}">Aceptar</button>
       <button class="rechazar" data-id="${s._id}">Rechazar</button>
     `;
     divSOLIS.appendChild(div);
+    const numerito = document.querySelector(".solis")
+    numerito.innerText = solicitudes.length;
   });
 }
 
@@ -210,7 +212,7 @@ function vincularBotonesAdmins() {
   document.querySelectorAll(".eliminar").forEach(btn => {
     btn.addEventListener("click", async e => {
       const id = e.currentTarget.dataset.id;
-      if (!confirm("¿Seguro que deseas eliminar este admin?")) return;
+      if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
       await fetch("/api/adminsDB", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
