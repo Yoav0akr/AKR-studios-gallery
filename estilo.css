@@ -603,16 +603,6 @@ min-height:100%;
 /* Para imágenes y videos dentro del visualizador */
 .visualizador video,
 .visualizador img {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-
-    max-width: 100%;
-    max-height: 100%;
-    width: auto;
-    height: auto;
-
     object-fit: contain;          /* Mantiene proporción sin deformar */
     border-radius: 0.5rem;
 }
