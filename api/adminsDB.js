@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs"; // bcryptjs en lugar de bcrypt
 
 // === CONFIGURACIÓN MONGODB ===
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.MONGODB_URI||"mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.8";
 if (!MONGODB_URI) {
   throw new Error("Falta MONGODB_URI en las variables de entorno de Vercel");
 }

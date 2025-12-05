@@ -2,6 +2,10 @@
 // contol de admins
 
 
+// Ejemplo de uso
+
+
+
 
 // Variables del formulario
 const EntradaNombre = document.getElementById("nombre_imput");
@@ -73,6 +77,8 @@ function queso() {
   const por = EentradaDeparte.value.trim();
   const url = cloudinaryURL; // toma la URL subida a Cloudinary
 const desk= Entradadesc.value.trim();
+let codigo= generarCodigoAlfanumerico7();
+
 
 
     if (!url) {
@@ -110,7 +116,7 @@ async function guardarEnMongo(nombre, url, por, categ,mimidesk) {
 
   } catch (err) {
     console.error("Error al guardar en Mongo:", err);
-    alert("No se pudo guardar. Revisa la consola.");
+    alert("No se pudo guardar.");
   }
 };
 

@@ -18,6 +18,18 @@ if (!MONGODB_URI) {
 let cached = global.mongoose;
 if (!cached) cached = global.mongoose = { conn: null, promise: null };
 
+
+//generar id de imagen como segundo identificador
+function generarCodigoAlfanumerico7() {
+  const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let codigo = "";
+  for (let i = 0; i < 7; i++) {
+    const indice = Math.floor(Math.random() * caracteres.length);
+    codigo += caracteres[indice];
+  }
+  return codigo;
+}
+
 // Schema
 const ImagenSchema = new mongoose.Schema({
   id: Number,
@@ -27,6 +39,8 @@ const ImagenSchema = new mongoose.Schema({
   por: String,
   categ: [String],
   mimidesk: String,
+  imgID: String,
+  codigo: String,
 });
 
 const Imagen = mongoose.models.Imagen || mongoose.model("Imagen", ImagenSchema);

@@ -1,8 +1,10 @@
 const btnLog = document.getElementById("btnLogAdmins");
 const adminpass = localStorage.getItem("adminpass") === "true";
+const nombre_usuario = localStorage.getItem("");
+
 
 if (adminpass) {
-  btnLog.style.display = "inline-block"; // o el estilo que quieras
+  btnLog.classLis.remove("nover");
   btnLog.addEventListener("click", () => {
     window.location.href = "./logAD.html"; // tu página de logs
   });
@@ -52,7 +54,7 @@ const descripcion = nombre.mimidesk || "sin descripcion";
           <li><p>Por/De: ${nombre.por}</p></li>
           <li><p>Categoría: ${nombre.categ}</p></li>
           <li><p>Descrpcion: ${descripcion}</p></li>
-            <li><p>id: ${nombre.id}}</p></li>
+            <li><p>id: "${nombre.codigo}"</p></li>
         </ul>
       </div>
       <div class="desc-soli">

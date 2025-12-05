@@ -82,6 +82,8 @@ function cargarImagenes(archivos) {
         <ul>
           <li><p>Por/De: ${a.por}</p></li>
           <li><p>Categoría: ${a.categ}</p></li>
+                      <li><p>id: ${a.id}}</p></li>
+
         </ul>
         <h3 class="producto-titulo">${a.nombre}</h3>
         <button class="descargarBtn" data-id="${a._id}">ELIMINAR</button>

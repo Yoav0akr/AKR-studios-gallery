@@ -190,6 +190,13 @@ h1 {
 /* ===================== */
 /*        MENÚ           */
 /* ===================== */
+.resaltar {
+    color: var(--accent-1);
+    font-weight: bold;
+    border : 3px solid var(--danger) important;
+    border-radius: var(--defborder);
+}
+
 .menu {
     display: flex;
     align-items: center;
@@ -400,6 +407,16 @@ h1 {
 /* ===================== */
 /*    SOLICITUDES        */
 /* ===================== */
+.solicitud-div {
+    display: flex;
+    gap: 1em;
+    margin: 2em;
+    padding: 2em;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+
 .solicitud {
     padding: 0.5rem;
     margin: 1rem;
@@ -456,7 +473,15 @@ h1 {
 
 .detalles {
     height: auto;
+    margin-bottom: 1.5rem;
 }
+.resaltar {
+    color: var(--accent-1);
+    font-weight: bold;
+    border : 3px solid var(--danger);
+    border-radius: var(--defborder);
+}
+
 
 /* ===================== */
 /*     RESPONSIVE        */
