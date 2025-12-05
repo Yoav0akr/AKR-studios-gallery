@@ -1,12 +1,15 @@
 // Verificar si el usuario está registrado
-const usuario = localStorage.getItem('usuarioRegistrado');
-if (!usuario) {
+const adminpass = localStorage.getItem('adminpass');
+const usuario = localStorage.getItem('admin');
+if (adminpass=="false") {
     alert('Debes estar registrado para acceder a esta página y para hacer solicitudes.');
-    // window.location.href = 'registro.html';
+    window.location.href = 'registro.html';
 } else {
-    const inp = document.getElementById('nombre_imput');
-    inp.value = usuario;
-    inp.disabled = true;
+//se auto llena el nombre del usuario en el input y se deshabilita
+    console.log('Usuario registrado:', usuario);
+    document.querySelectorAll('#nombre_imput').value = usuario;
+    document.getElementById('#nombre_imput').enabled === false;
+
 }
 
 // Cargar imágenes desde Mongo

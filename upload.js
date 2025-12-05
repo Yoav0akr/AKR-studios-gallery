@@ -1,11 +1,20 @@
 // === upload.js ===
 
+
 // Variables del formulario
 const EntradaNombre = document.getElementById("nombre_imput");
 const EentradaDeparte = document.getElementById("por-imput");
 const EntradaCategs = document.querySelector("#categs");
 const EntradaGuardar = document.querySelector("#manchego");
 const Entradadesc = document.querySelector("#mimidesk");
+
+//auto llenado del nombre del admin que sube la imagen
+const adminpass = localStorage.getItem('adminpass');
+const usuario = localStorage.getItem('admin');
+//se auto llena el nombre del usuario en el input y se deshabilita
+    EentradaDeparte.value = usuario;
+    EentradaDeparte.enabled = false;
+
 
 // Div visualizador
 const visualisador = document.querySelector(".visualizador");
