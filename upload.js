@@ -1,30 +1,24 @@
 // === upload.js ===
-// contol de admins
-
-
-// Ejemplo de uso
-
-
-
 
 // Variables del formulario
 const EntradaNombre = document.getElementById("nombre_imput");
 const EentradaDeparte = document.getElementById("por-imput");
 const EntradaCategs = document.querySelector("#categs");
 const EntradaGuardar = document.querySelector("#manchego");
-const Entradadesc=document.querySelector("#mimidesk")
+const Entradadesc = document.querySelector("#mimidesk");
+
 // Div visualizador
 const visualisador = document.querySelector(".visualizador");
 
-// Variable global para almacenar la URL de Cloudinary
+// URL de Cloudinary que se usará después para enviar a Mongo
 let cloudinaryURL = null;
 
-// Manejo del clic en el div visualisador
+// --- MANEJO DEL VISUALIZADOR ---
 if (visualisador) {
   visualisador.addEventListener("click", () => {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = "image/*";
+    input.accept = "image/*,video/*"; // Acepta imagen y video
     input.click();
 
     input.onchange = async () => {
@@ -33,11 +27,61 @@ if (visualisador) {
 
       console.log("📂 Archivo seleccionado:", file.name);
 
+      // ===== LIMITE DE 10MB =====
+      const maxSizeMB = 10;
+      const maxBytes = maxSizeMB * 1024 * 1024;
+
+      if (file.size > maxBytes) {
+        alert(
+          `❌ El archivo pesa demasiado.\n\nMáximo: ${maxSizeMB} MB\nActual: ${(file.size / 1024 / 1024).toFixed(2)} MB`
+        );
+        return;
+      }
+
+      // ===== PREVIEW LOCAL =====
+      const localURL = URL.createObjectURL(file);
+      const isVideo = file.type.startsWith("video/");
+      const isImage = file.type.startsWith("image/");
+
+      // NO quitamos el <p>, solo el fondo o videos previos
+      visualisador.style.backgroundImage = "";
+      // Quitamos solo videos antiguos
+      Array.from(visualisador.querySelectorAll("video")).forEach(v => v.remove());
+
+      if (isImage) {
+        visualisador.style.backgroundImage = `url(${localURL})`;
+        visualisador.style.backgroundSize = "cover";
+        visualisador.style.backgroundPosition = "center";
+      }
+
+      if (isVideo) {
+        const video = document.createElement("video");
+        video.src = localURL;
+        video.controls = true;
+        video.autoplay = true;
+        video.loop = true;
+        video.muted = true;
+        video.style.width = "100%";
+        video.style.height = "100%";
+        video.style.objectFit = "cover";
+        video.style.borderRadius = "10px";
+        video.style.position = "absolute";
+        video.style.top = "0";
+        video.style.left = "0";
+        video.style.zIndex = "0"; // 👈 El p queda arriba
+
+        visualisador.appendChild(video);
+      }
+
+      // Deja el P visible arriba:
+      visualisador.querySelector("p").style.position = "relative";
+      visualisador.querySelector("p").style.zIndex = "1";
+
+      // ===== SUBIR A CLOUDINARY =====
       const formData = new FormData();
       formData.append("file", file);
 
       try {
-        // Enviar archivo al endpoint serverless /api/upload
         const res = await fetch("/api/upload", {
           method: "POST",
           body: formData,
@@ -46,53 +90,39 @@ if (visualisador) {
         const data = await res.json();
 
         if (data.url) {
-          console.log("✅ Imagen subida a Cloudinary:", data.url);
+          console.log("✔ Subido a Cloudinary:", data.url);
           cloudinaryURL = data.url;
-
-          // Opcional: mostrar miniatura en el div visualizador
-          visualisador.style.backgroundImage = `url(${cloudinaryURL})`;
-          visualisador.style.backgroundSize = "cover";
-          visualisador.style.backgroundPosition = "center";
         } else {
-          console.error("❌ Error al subir imagen:", data.error);
-          alert("Error al subir imagen: " + data.error);
+          alert("❌ Error al subir: " + data.error);
         }
       } catch (err) {
-        console.error("⚠️ Error de conexión con el servidor:", err);
-        alert("Error de conexión con el servidor.");
+        console.error(err);
+        alert("⚠ Error de conexión con el servidor.");
       }
     };
   });
-} else {
-  console.warn("⚠️ No se encontró el div #visualisador en el HTML.");
 }
 
-// Función que se ejecuta al hacer click en el botón de guardar
+// --- GUARDAR EN BASE DE DATOS ---
 function queso() {
-  const texto = EntradaCategs.value.toLowerCase().trim();
-  const array = texto.split(/\s+/);
-
-
   const nombre = EntradaNombre.value.trim();
   const por = EentradaDeparte.value.trim();
-  const url = cloudinaryURL; // toma la URL subida a Cloudinary
-const desk= Entradadesc.value.trim();
+  const texto = EntradaCategs.value.toLowerCase().trim();
+  const categ = texto.split(/\s+/);
+  const desk = Entradadesc.value.trim();
 
-
-
-    if (!url) {
-    alert("Primero sube una imagen antes de guardar.");
+  if (!cloudinaryURL) {
+    alert("Primero sube un archivo antes de guardar.");
     return;
   }
 
-  guardarEnMongo(nombre, url, por, array, desk);
+  guardarEnMongo(nombre, cloudinaryURL, por, categ, desk);
 }
 
-// Evento del botón de guardar
 EntradaGuardar.addEventListener("click", queso);
 
-// Función para guardar en MongoDB (tu lógica original)
-async function guardarEnMongo(nombre, url, por, categ,mimidesk) {
+// --- GUARDAR EN MONGO ---
+async function guardarEnMongo(nombre, url, por, categ, mimidesk) {
   const data = { id: Date.now(), nombre, ub: url, por, categ, mimidesk };
 
   try {
@@ -102,25 +132,23 @@ async function guardarEnMongo(nombre, url, por, categ,mimidesk) {
       body: JSON.stringify(data),
     });
 
-    if (!res.ok) throw new Error(`Error ${res.status}`);
+    if (!res.ok) throw new Error("Error " + res.status);
 
-    const saved = await res.json();
-    console.log("Guardado en Mongo:", saved);
     alert("Se ha guardado correctamente");
-     const enlace = document.createElement("a");
-  enlace.href = "./index.html";
-  document.body.appendChild(enlace);
-  enlace.click();
-  document.body.removeChild(enlace);
+    const enlace = document.createElement("a");
+    enlace.href = "./index.html";
+    document.body.appendChild(enlace);
+    enlace.click();
+    document.body.removeChild(enlace);
 
   } catch (err) {
     console.error("Error al guardar en Mongo:", err);
     alert("No se pudo guardar.");
   }
-};
+}
 
-// para rotar el logo y ocultar nav
-const  navs = document.querySelector(".nav")
+// --- UI NAV ---
+const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
 logo.addEventListener("click", () => {
   logo.classList.toggle("rotado");

@@ -6,13 +6,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "yoav0akr/yoav/yakr/AKRstudios",
   "license": "ISC",
   "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.8.0",
     "formidable": "^3.5.4",
-    "mongoose": "^8.19.2"
+    "mongoose": "^8.19.2",
+    "sharp": "^0.34.5",
+    "streamifier": "^0.1.1"
   }
 }
