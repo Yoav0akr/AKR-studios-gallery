@@ -77,7 +77,6 @@ function queso() {
   const por = EentradaDeparte.value.trim();
   const url = cloudinaryURL; // toma la URL subida a Cloudinary
 const desk= Entradadesc.value.trim();
-let codigo= generarCodigoAlfanumerico7();
 
 
 
