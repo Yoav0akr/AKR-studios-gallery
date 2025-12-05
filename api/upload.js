@@ -1,115 +1,157 @@
-import { formidable } from "formidable";
-import cloudinary from "cloudinary";
-import sharp from "sharp";
-import streamifier from "streamifier";
+// === upload.js ===
 
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// Variables del formulario
+const EntradaNombre = document.getElementById("nombre_imput");
+const EentradaDeparte = document.getElementById("por-imput");
+const EntradaCategs = document.querySelector("#categs");
+const Entradadesc = document.querySelector("#mimidesk");
+const EntradaGuardar = document.getElementById("manchego");
 
-// Next necesita esto para permitir archivos sin bodyParser
-export const config = { api: { bodyParser: false } };
+// Div visualizador
+const visualisador = document.querySelector(".visualizador");
 
-export default async function handler(req, res) {
-  if (req.method === "POST") {
-    try {
-      // 📌 FORMIDABLE con límite de 10MB
-      const form = formidable({
-        maxFileSize: 10 * 1024 * 1024, // 10 MB
-        keepExtensions: true,
-        allowEmptyFiles: false,
-      });
+// Variable global para almacenar la URL de Cloudinary
+let cloudinaryURL = null;
+let cloudinaryPublicID = null;
+let fileType = null;
 
-      form.parse(req, async (err, fields, files) => {
-        if (err) {
-          if (err.code === "LIMIT_FILE_SIZE") {
-            return res.status(413).json({ error: "El archivo excede los 10MB permitidos." });
-          }
+// ======================
+// 📌 MANEJO DEL CLICK EN EL VISUALIZADOR
+// ======================
+visualisador.addEventListener("click", () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*,video/*";
+  input.click();
 
-          console.error("Error procesando archivo:", err);
-          return res.status(500).json({ error: "Error procesando archivo" });
-        }
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
 
-        let file = Array.isArray(files.file) ? files.file[0] : files.file;
+    console.log("📂 Archivo seleccionado:", file.name);
 
-        if (!file) {
-          return res.status(400).json({ error: "No se recibió un archivo." });
-        }
-
-        const mime = file.mimetype;
-
-        try {
-          let uploadResult;
-
-          // ==========================
-          // 📌 SI ES IMAGEN → SHARP
-          // ==========================
-          if (mime.startsWith("image/")) {
-            const bufferOriginal = await sharp(file.filepath).toBuffer();
-
-            const bufferOptimizado = await sharp(bufferOriginal)
-              .resize({ width: 1920 })
-              .webp({ quality: 80 })
-              .toBuffer();
-
-            uploadResult = await new Promise((resolve, reject) => {
-              const uploadStream = cloudinary.v2.uploader.upload_stream(
-                { folder: "AKR_Gallery", resource_type: "image" },
-                (error, result) => {
-                  if (error) reject(error);
-                  else resolve(result);
-                }
-              );
-              streamifier.createReadStream(bufferOptimizado).pipe(uploadStream);
-            });
-          }
-
-          // ==========================
-          // 📌 SI ES VIDEO
-          // ==========================
-          else if (mime.startsWith("video/")) {
-            uploadResult = await cloudinary.v2.uploader.upload(file.filepath, {
-              folder: "AKR_Gallery",
-              resource_type: "video",
-            });
-          }
-
-          // TIPO NO SOPORTADO
-          else {
-            return res.status(400).json({
-              error: "Formato no permitido. Solo imágenes y videos."
-            });
-          }
-
-          return res.status(200).json({
-            success: true,
-            url: uploadResult.secure_url,
-            public_id: uploadResult.public_id,
-            size_bytes: uploadResult.bytes,
-            type: mime.startsWith("video/") ? "video" : "image"
-          });
-
-        } catch (uploadErr) {
-          console.error("Error subiendo archivo:", uploadErr);
-          return res.status(500).json({
-            error: "Error al subir el archivo a Cloudinary"
-          });
-        }
-      });
-
-    } catch (error) {
-      console.error("❌ Error general en /api/upload:", error);
-      return res.status(500).json({ error: "Error interno del servidor" });
+    // LIMITE MANUAL DEL FRONT 10MB
+    if (file.size > 10 * 1024 * 1024) {
+      alert("El archivo excede los 10MB permitidos.");
+      return;
     }
 
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        console.error("❌ Error del servidor:", errorText);
+        alert("Error al subir archivo.");
+        return;
+      }
+
+      const data = await res.json();
+
+      cloudinaryURL = data.url;
+      cloudinaryPublicID = data.public_id;
+      fileType = data.type;
+
+      console.log("✔ Subido:", data);
+
+      // ======================================
+      // 📌 PREVISUALIZAR (imagen o video)
+      // ======================================
+      visualisador.innerHTML = ""; // limpiamos
+
+      if (fileType === "image") {
+        visualisador.style.backgroundImage = `url(${cloudinaryURL})`;
+        visualisador.style.backgroundSize = "cover";
+        visualisador.style.backgroundPosition = "center";
+      } else if (fileType === "video") {
+        visualisador.style.backgroundImage = "none";
+
+        const vid = document.createElement("video");
+        vid.src = cloudinaryURL;
+        vid.controls = true;
+        vid.style.width = "100%";
+        vid.style.height = "100%";
+        vid.style.objectFit = "cover";
+        vid.style.borderRadius = "10px";
+
+        visualisador.appendChild(vid);
+      }
+
+    } catch (err) {
+      console.error("⚠ Error de conexión UPLOAD:", err);
+      alert("No se pudo conectar al servidor.");
+    }
+  };
+});
+
+// ======================
+// 📌 GUARDAR EN MONGO
+// ======================
+async function queso() {
+  const nombre = EntradaNombre.value.trim();
+  const por = EentradaDeparte.value.trim();
+  const categRaw = EntradaCategs.value.toLowerCase().trim();
+  const mimidesk = Entradadesc.value.trim();
+
+  const arrayCateg = categRaw.length > 0 ? categRaw.split(/\s+/) : [];
+
+  if (!cloudinaryURL) {
+    alert("Primero sube una imagen o video.");
     return;
   }
 
-  // =======================
-  // ❌ MÉTODOS NO PERMITIDOS
-  // =======================
-  res.setHeader("Allow", ["POST"]);
-  return res.status(405).json({ error: `Método ${req.method} no permitido` });
+  const data = {
+    // id ahora LO GENERA EL SERVIDOR
+    nombre,
+    ub: cloudinaryURL,
+    public_id: cloudinaryPublicID,
+    por,
+    categ: arrayCateg,
+    mimidesk,
+    imgID: null,
+  };
+
+  try {
+    const res = await fetch("/api/db", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+      const t = await res.text();
+      console.error("Error POST Mongo:", t);
+      alert("No se pudo guardar en la base de datos.");
+      return;
+    }
+
+    alert("Guardado correctamente!");
+
+    // Redirigir sin recargar de forma fea
+    window.location.href = "./index.html";
+
+  } catch (err) {
+    console.error("⚠ Error guardando en Mongo:", err);
+    alert("Error al guardar.");
+  }
 }
+
+EntradaGuardar.addEventListener("click", queso);
+
+// =====================
+// ANIMACION DEL LOGO
+// =====================
+const navs = document.querySelector(".nav");
+const logo = document.querySelector(".logo");
+
+logo.addEventListener("click", () => {
+  logo.classList.toggle("rotado");
+  navs.classList.toggle("navhiden");
+  navigator.vibrate?.(200);
+});
