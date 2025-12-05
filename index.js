@@ -7,7 +7,7 @@ const titular = document.getElementById("titular");
 
 
 if (adminpass) {
-  divlog.classLis.remove("no-ver");
+  divlog.classList.remove("no-ver");
   titular.classList.remove("no-ver");
 
 
