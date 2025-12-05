@@ -28,7 +28,7 @@ if (visualisador) {
       console.log("📂 Archivo seleccionado:", file.name);
 
       // ===== LIMITE DE 10MB =====
-      const maxSizeMB = 10;
+      const maxSizeMB = 20;
       const maxBytes = maxSizeMB * 1024 * 1024;
 
       if (file.size > maxBytes) {
