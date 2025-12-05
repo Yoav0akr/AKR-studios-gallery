@@ -1,157 +1,105 @@
-// === upload.js ===
+import { formidable } from "formidable";
+import cloudinary from "cloudinary";
+import sharp from "sharp";
 
-// Variables del formulario
-const EntradaNombre = document.getElementById("nombre_imput");
-const EentradaDeparte = document.getElementById("por-imput");
-const EntradaCategs = document.querySelector("#categs");
-const Entradadesc = document.querySelector("#mimidesk");
-const EntradaGuardar = document.getElementById("manchego");
-
-// Div visualizador
-const visualisador = document.querySelector(".visualizador");
-
-// Variable global para almacenar la URL de Cloudinary
-let cloudinaryURL = null;
-let cloudinaryPublicID = null;
-let fileType = null;
-
-// ======================
-// 📌 MANEJO DEL CLICK EN EL VISUALIZADOR
-// ======================
-visualisador.addEventListener("click", () => {
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "image/*,video/*";
-  input.click();
-
-  input.onchange = async () => {
-    const file = input.files[0];
-    if (!file) return;
-
-    console.log("📂 Archivo seleccionado:", file.name);
-
-    // LIMITE MANUAL DEL FRONT 10MB
-    if (file.size > 10 * 1024 * 1024) {
-      alert("El archivo excede los 10MB permitidos.");
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const errorText = await res.text();
-        console.error("❌ Error del servidor:", errorText);
-        alert("Error al subir archivo.");
-        return;
-      }
-
-      const data = await res.json();
-
-      cloudinaryURL = data.url;
-      cloudinaryPublicID = data.public_id;
-      fileType = data.type;
-
-      console.log("✔ Subido:", data);
-
-      // ======================================
-      // 📌 PREVISUALIZAR (imagen o video)
-      // ======================================
-      visualisador.innerHTML = ""; // limpiamos
-
-      if (fileType === "image") {
-        visualisador.style.backgroundImage = `url(${cloudinaryURL})`;
-        visualisador.style.backgroundSize = "cover";
-        visualisador.style.backgroundPosition = "center";
-      } else if (fileType === "video") {
-        visualisador.style.backgroundImage = "none";
-
-        const vid = document.createElement("video");
-        vid.src = cloudinaryURL;
-        vid.controls = true;
-        vid.style.width = "100%";
-        vid.style.height = "100%";
-        vid.style.objectFit = "cover";
-        vid.style.borderRadius = "10px";
-
-        visualisador.appendChild(vid);
-      }
-
-    } catch (err) {
-      console.error("⚠ Error de conexión UPLOAD:", err);
-      alert("No se pudo conectar al servidor.");
-    }
-  };
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// ======================
-// 📌 GUARDAR EN MONGO
-// ======================
-async function queso() {
-  const nombre = EntradaNombre.value.trim();
-  const por = EentradaDeparte.value.trim();
-  const categRaw = EntradaCategs.value.toLowerCase().trim();
-  const mimidesk = Entradadesc.value.trim();
+// Necesario para subir archivos con formidable
+export const config = { api: { bodyParser: false } };
 
-  const arrayCateg = categRaw.length > 0 ? categRaw.split(/\s+/) : [];
+export default async function handler(req, res) {
+  if (req.method === "POST") {
+    try {
+      const form = formidable({
+        maxFileSize: 25 * 1024 * 1024, // 25 MB
+        multiples: false,
+      });
 
-  if (!cloudinaryURL) {
-    alert("Primero sube una imagen o video.");
+      form.parse(req, async (err, fields, files) => {
+        if (err) {
+          if (err.code === "LIMIT_FILE_SIZE") {
+            return res.status(400).json({ error: "El archivo excede el tamaño máximo de 25MB" });
+          }
+          console.error("Error procesando archivo:", err);
+          return res.status(500).json({ error: "Error procesando archivo" });
+        }
+
+        const file = Array.isArray(files.file) ? files.file[0] : files.file;
+
+        if (!file || !file.filepath) {
+          return res.status(400).json({ error: "No se recibió un archivo válido" });
+        }
+
+        // ✅ Limitar solo a imágenes
+        if (!file.mimetype.startsWith("image/")) {
+          return res.status(400).json({ error: "Solo se permiten archivos de imagen" });
+        }
+
+        try {
+          // Comprimir la imagen con Sharp
+          const buffer = await sharp(file.filepath)
+            .resize({ width: 1024 }) // ancho máximo 1024px
+            .jpeg({ quality: 80 })
+            .toBuffer();
+
+          // Subir a Cloudinary directamente desde buffer
+          const uploadFromBuffer = (buffer) =>
+            new Promise((resolve, reject) => {
+              const stream = cloudinary.v2.uploader.upload_stream(
+                { folder: "AKR_Gallery" },
+                (error, result) => {
+                  if (error) reject(error);
+                  else resolve(result);
+                }
+              );
+              stream.end(buffer);
+            });
+
+          const uploadResult = await uploadFromBuffer(buffer);
+
+          return res.status(200).json({
+            success: true,
+            url: uploadResult.secure_url,
+            public_id: uploadResult.public_id,
+          });
+        } catch (uploadErr) {
+          console.error("Error subiendo a Cloudinary:", uploadErr);
+          return res.status(500).json({ error: "Error subiendo a Cloudinary" });
+        }
+      });
+    } catch (error) {
+      console.error("Error general en /api/upload:", error);
+      return res.status(500).json({ error: "Error interno del servidor" });
+    }
+
     return;
   }
 
-  const data = {
-    // id ahora LO GENERA EL SERVIDOR
-    nombre,
-    ub: cloudinaryURL,
-    public_id: cloudinaryPublicID,
-    por,
-    categ: arrayCateg,
-    mimidesk,
-    imgID: null,
-  };
+  if (req.method === "DELETE") {
+    try {
+      const { public_id } = req.query;
 
-  try {
-    const res = await fetch("/api/db", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+      if (!public_id) {
+        return res.status(400).json({ error: "Falta el parámetro 'public_id'" });
+      }
 
-    if (!res.ok) {
-      const t = await res.text();
-      console.error("Error POST Mongo:", t);
-      alert("No se pudo guardar en la base de datos.");
-      return;
+      const result = await cloudinary.v2.uploader.destroy(public_id);
+
+      if (result.result === "not found") {
+        return res.status(404).json({ error: "Archivo no encontrado en Cloudinary" });
+      }
+
+      return res.status(200).json({ success: true, message: "Imagen eliminada correctamente" });
+    } catch (error) {
+      console.error("Error al eliminar en Cloudinary:", error);
+      return res.status(500).json({ error: "Error al eliminar en Cloudinary" });
     }
-
-    alert("Guardado correctamente!");
-
-    // Redirigir sin recargar de forma fea
-    window.location.href = "./index.html";
-
-  } catch (err) {
-    console.error("⚠ Error guardando en Mongo:", err);
-    alert("Error al guardar.");
   }
+
+  res.setHeader("Allow", ["POST", "DELETE"]);
+  return res.status(405).json({ error: `Método ${req.method} no permitido` });
 }
-
-EntradaGuardar.addEventListener("click", queso);
-
-// =====================
-// ANIMACION DEL LOGO
-// =====================
-const navs = document.querySelector(".nav");
-const logo = document.querySelector(".logo");
-
-logo.addEventListener("click", () => {
-  logo.classList.toggle("rotado");
-  navs.classList.toggle("navhiden");
-  navigator.vibrate?.(200);
-});

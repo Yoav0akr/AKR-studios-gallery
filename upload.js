@@ -13,12 +13,12 @@ const visualisador = document.querySelector(".visualizador");
 // URL de Cloudinary que se usará después para enviar a Mongo
 let cloudinaryURL = null;
 
-// --- MANEJO DEL VISUALIZADOR ---
+// --- MANEJO DEL VISUALISADOR ---
 if (visualisador) {
   visualisador.addEventListener("click", () => {
     const input = document.createElement("input");
     input.type = "file";
-    input.accept = "image/*,video/*"; // Acepta imagen y video
+    input.accept = "image/*"; // ✅ Solo imágenes
     input.click();
 
     input.onchange = async () => {
@@ -27,7 +27,7 @@ if (visualisador) {
 
       console.log("📂 Archivo seleccionado:", file.name);
 
-      // ===== LIMITE DE 10MB =====
+      // ===== LIMITE DE 20MB =====
       const maxSizeMB = 20;
       const maxBytes = maxSizeMB * 1024 * 1024;
 
@@ -40,42 +40,19 @@ if (visualisador) {
 
       // ===== PREVIEW LOCAL =====
       const localURL = URL.createObjectURL(file);
-      const isVideo = file.type.startsWith("video/");
-      const isImage = file.type.startsWith("image/");
+      visualisador.style.backgroundImage = `url(${localURL})`;
+      visualisador.style.backgroundSize = "cover";
+      visualisador.style.backgroundPosition = "center";
 
-      // NO quitamos el <p>, solo el fondo o videos previos
-      visualisador.style.backgroundImage = "";
-      // Quitamos solo videos antiguos
+      // Elimina cualquier video antiguo (por si acaso)
       Array.from(visualisador.querySelectorAll("video")).forEach(v => v.remove());
 
-      if (isImage) {
-        visualisador.style.backgroundImage = `url(${localURL})`;
-        visualisador.style.backgroundSize = "cover";
-        visualisador.style.backgroundPosition = "center";
+      // Deja el <p> visible arriba
+      const p = visualisador.querySelector("p");
+      if (p) {
+        p.style.position = "relative";
+        p.style.zIndex = "1";
       }
-
-      if (isVideo) {
-        const video = document.createElement("video");
-        video.src = localURL;
-        video.controls = true;
-        video.autoplay = true;
-        video.loop = true;
-        video.muted = true;
-        video.style.width = "100%";
-        video.style.height = "100%";
-        video.style.objectFit = "cover";
-        video.style.borderRadius = "10px";
-        video.style.position = "absolute";
-        video.style.top = "0";
-        video.style.left = "0";
-        video.style.zIndex = "0"; // 👈 El p queda arriba
-
-        visualisador.append(video);
-      }
-
-      // Deja el P visible arriba:
-      visualisador.querySelector("p").style.position = "relative";
-      visualisador.querySelector("p").style.zIndex = "1";
 
       // ===== SUBIR A CLOUDINARY =====
       const formData = new FormData();
