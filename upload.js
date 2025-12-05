@@ -61,16 +61,13 @@ if (visualisador) {
         video.autoplay = true;
         video.loop = true;
         video.muted = true;
-        video.style.width = "100%";
-        video.style.height = "100%";
+  
         video.style.objectFit = "cover";
         video.style.borderRadius = "10px";
-        video.style.position = "absolute";
         video.style.top = "0";
         video.style.left = "0";
-        video.style.zIndex = "0"; // 👈 El p queda arriba
 
-        visualisador.appendChild(video);
+        visualisador.append(video);
       }
 
       // Deja el P visible arriba:
