@@ -13,6 +13,7 @@
   <div class="nav navhiden">
     <div class="logo rotado">
       <h1>GALERIA</h1>
+       <h1 class="no-ver" id="titular"><!--esto se llena otra ves con js--></h1>
     </div>
 
     <div class="ses">
@@ -23,10 +24,12 @@
         <option value="por">contribuidor</option>
         <!-- se llena con js -->
       </select>
-      <button class="menu no-ver" id="btnLogAdmins">Ver log de admins</button>
+      <div id="loged" class="menu no-ver">
+      <button class="menu" id="btnLogAdmins">PAN admins</button>
+      <button class="menu not"id="solicitar">solicitar</button>
+      </button>
+    </div>
       <input class="menu" type="text" id="buscador" placeholder="Buscar" />
-      <button class="menu not">PEDIR ELIMINAR</button>
-      <h1 class="menu" id="titular"><!--esto se llena otra ves con js--></h1>
     </div>
   </div>
 

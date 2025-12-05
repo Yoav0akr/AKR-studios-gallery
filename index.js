@@ -1,14 +1,33 @@
+const divlog= document.getElementById("loged");
 const btnLog = document.getElementById("btnLogAdmins");
 const adminpass = localStorage.getItem("adminpass") === "true";
-const nombre_usuario = localStorage.getItem("");
+const nombre_usuario = localStorage.getItem("admin");
+const titular = document.getElementById("titular");
+  titular.innerText = `Hola, ${nombre_usuario}`;
 
 
 if (adminpass) {
-  btnLog.classLis.remove("nover");
+  divlog.classLis.remove("no-ver");
+  titular.classList.remove("no-ver");
+
+
   btnLog.addEventListener("click", () => {
-    window.location.href = "./logAD.html"; // tu página de logs
+    window.location.href = "./admins.html";
+
   });
-} 
+};
+// al ahcer clic en solicitar
+const btnsolicitar = document.getElementById("solicitar");
+btnsolicitar.addEventListener("click", () => {
+  window.location.href = "./solicitar.html";
+});
+
+// ==============================
+//  FUNCIONES PARA MONGO
+// ==============================
+
+
+
 
 
 
@@ -194,5 +213,4 @@ logo.addEventListener("click", () => {
   logo.classList.toggle("rotado");
   navs.classList.toggle("navhiden");
   navigator.vibrate(200);
-
 });
