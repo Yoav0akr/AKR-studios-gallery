@@ -8,7 +8,8 @@ if (adminpass=="false") {
 //se auto llena el nombre del usuario en el input y se deshabilita
     console.log('Usuario registrado:', usuario);
     document.querySelectorAll('#nombre_imput').value = usuario;
-    document.getElementById('#nombre_imput').enabled === false;
+//bloquear el campo nombre_imput para que no se pueda editar
+    document.querySelectorAll('#nombre_imput').disabled = true;
 
 }
 
@@ -16,7 +17,7 @@ if (adminpass=="false") {
 const imagenes = await cargarDesdeMongo();
 
 // Elementos del formulario
-const id_foto = document.getElementById('id_foto');
+const id_foto = document.getElementById('#mem');
 const motivo = document.getElementById('motivo_input');
 const descripcion = document.getElementById('descripcion_input');
 const botonSolicitar = document.getElementById('manchego');
