@@ -8,17 +8,18 @@ const nombre_usuario = localStorage.getItem("admin");
 const titular = document.getElementById("titular");
 const btnPANadmins = document.getElementById("btnLogAdmins");
 //verifcar si nombre de usuario no es nulo
-if (adminpass === "true" && nombre_usuario) {
+if (nombre_usuario) {
   //al existir usuario logeado el titular se mostrara con el nombrede de usuario
   titular.innerText = ` Hola ${nombre_usuario}!`;
   titular.classList.remove("no-ver");
   //si admin pass es true se muestra el boton para ir al panel de administracion
   if (adminpass === "true") {
     btnPANadmins.classList.remove("no-ver");
+    
   } else {
     btnPANadmins.classList.add("no-ver");
   };
-}else{
+} else {
   titular.classList.add("no-ver");
   btnPANadmins.classList.add("no-ver");
 };
@@ -132,14 +133,14 @@ function noSeXd(e) {
   filtrarYMostrar()
 }
 
- async function download(e) {
+async function download(e) {
   //descarga de archivos con blob
   const idboton = e.currentTarget.id;
   const archivo = globalArchivos.find(item => item._id === idboton || item.id === Number(idboton));
   if (!archivo) return console.warn("Archivo no encontrado para el botón:", idboton);
-const url = archivo.ub;
-const res = await fetch(url);
-const blob = await res.blob();
+  const url = archivo.ub;
+  const res = await fetch(url);
+  const blob = await res.blob();
 
   const enlace = document.createElement("a");
   enlace.href = URL.createObjectURL(blob);
@@ -149,7 +150,7 @@ const blob = await res.blob();
   enlace.click();
   document.body.removeChild(enlace);
   //liberar memoria
-  
+
 };
 
 // Filtrado
