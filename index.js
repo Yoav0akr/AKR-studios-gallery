@@ -28,6 +28,11 @@ btnsolicitar.addEventListener("click", () => {
   window.location.href = "./solicitar.html";
 });
 
+//a la hcaer click en PANEL DE ADMINISTRACION
+btnPANadmins.addEventListener("click", () => {
+  window.location.href = "./admins.html";
+});
+
 // ==============================
 //  FUNCIONES PARA MONGO
 // ==============================

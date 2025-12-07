@@ -172,7 +172,7 @@ async function cargarSolicitudes() {
       <button class="rechazar" data-id="${s._id}">Rechazar</button>
     `;
     divSOLIS.appendChild(div);
-    const numerito = document.querySelector(".solis")
+    const numerito = document.getElementById("numerito");
     numerito.innerText = solicitudes.length;
   });
 }
@@ -180,26 +180,25 @@ async function cargarSolicitudes() {
 // ===============================
 // PANEL ADMIN
 // ===============================
-let globalAdmins = [];
 
 async function cargarAdmins() {
-  const res = await fetch("/api/adminsDB");
+  const res = await fetch("/api/personas");
   globalAdmins = await res.json();
   renderizarPersonas(globalAdmins);
 }
 
 function renderizarPersonas(admins) {
   personas.innerHTML = "";
-  admins.forEach(a => {
+  admins.forEach(admin => {
     const div = document.createElement("div");
     div.classList.add("persona");
     div.innerHTML = `
-      <h3>Nombre del usuario: ${a.admin}</h3>
-      <h3>Admin pass: <span>${a.adminpass}</span></h3>
+      <h3>Nombre del usuario: ${admin.admin}</h3>
+      <h3>Admin pass: <span>${admin.adminpass}</span></h3>
       <div class="jaiba">
-        <button class="almeja eliminar" data-id="${a._id}">ELIMINAR</button>
-        <button class="almeja get-up" data-id="${a._id}">Give admin</button>
-        <button class="almeja get-down" data-id="${a._id}">Remove admin</button>
+        <button class="almeja eliminar" data-id="${admin._id}">ELIMINAR</button>
+        <button class="almeja get-up" data-id="${admin._id}">Give admin</button>
+        <button class="almeja get-down" data-id="${admin._id}">Remove admin</button>
       </div>
     `;
     personas.appendChild(div);
@@ -213,7 +212,7 @@ function vincularBotonesAdmins() {
     btn.addEventListener("click", async e => {
       const id = e.currentTarget.dataset.id;
       if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
-      await fetch("/api/adminsDB", {
+      await fetch("/api/personas", {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id })
@@ -226,7 +225,7 @@ function vincularBotonesAdmins() {
   document.querySelectorAll(".get-up").forEach(btn => {
     btn.addEventListener("click", async e => {
       const id = e.currentTarget.dataset.id;
-      await fetch("/api/adminsDB", {
+      await fetch("/api/personas", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, adminpass: true })
@@ -239,7 +238,7 @@ function vincularBotonesAdmins() {
   document.querySelectorAll(".get-down").forEach(btn => {
     btn.addEventListener("click", async e => {
       const id = e.currentTarget.dataset.id;
-      await fetch("/api/adminsDB", {
+      await fetch("/api/personas", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, adminpass: false })
