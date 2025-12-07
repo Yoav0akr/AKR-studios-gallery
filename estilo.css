@@ -399,6 +399,7 @@ h1 {
     max-width: 100%;
     box-sizing: border-box;
     grid-template-columns: repeat(4, minmax(150px, 1fr));
+    margin-top: 2rem;
 }
 
 .imagen {
