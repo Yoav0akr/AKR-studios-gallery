@@ -1,20 +1,26 @@
-const divlog= document.getElementById("loged");
+const divlog = document.getElementById("loged");
 const btnLog = document.getElementById("btnLogAdmins");
-const adminpass = localStorage.getItem("adminpass") === "true";
+
+
+// Control de inicio (se ve si se inició sesión)
+const adminpass = localStorage.getItem("adminpass");
 const nombre_usuario = localStorage.getItem("admin");
 const titular = document.getElementById("titular");
-  titular.innerText = `Hola, ${nombre_usuario}`;
-
-
-if (adminpass) {
-  divlog.classList.remove("no-ver");
+const btnPANadmins = document.getElementById("btnLogAdmins");
+//verifcar si nombre de usuario no es nulo
+if (adminpass === "true" && nombre_usuario) {
+  //al existir usuario logeado el titular se mostrara con el nombrede de usuario
+  titular.innerHTML = ` Hola ${nombre_usuario}!`;
   titular.classList.remove("no-ver");
-
-
-  btnLog.addEventListener("click", () => {
-    window.location.href = "./admins.html";
-
-  });
+  //si admin pass es true se muestra el boton para ir al panel de administracion
+  if (adminpass === "true") {
+    btnPANadmins.classList.remove("no-ver");
+  } else {
+    btnPANadmins.classList.add("no-ver");
+  };
+}else{
+  titular.classList.add("no-ver");
+  btnPANadmins.classList.add("no-ver");
 };
 // al ahcer clic en solicitar
 const btnsolicitar = document.getElementById("solicitar");
@@ -30,7 +36,9 @@ btnsolicitar.addEventListener("click", () => {
 
 
 
-
+// Se cargan archivos de bd3.js si falla la conexión a Mongo
+import { archivos } from './bd3.js';
+let archivitos = archivos;
 
 // Función para llamar los archivos
 async function cargarDesdeMongo() {
@@ -39,15 +47,15 @@ async function cargarDesdeMongo() {
 
     if (!res.ok) throw new Error(`Error ${res.status}`);
 
-    const archivitos = await res.json();
+    archivitos = await res.json(); // aquí solo asignamos, no redeclaramos
     console.log("Cargado correctamente:", archivitos.length, "documentos");
     // alert("Se ha cargado correctamente"); // opcional
 
     return archivitos;
   } catch (err) {
-    console.error("Error al cargar desde Mongo:", err);
+    console.error("Error al cargar desde Mongo, se cargarán archivos internos de prueba", err);
     // alert("No se pudo cargar. Revisa la consola."); // opcional
-    return [];
+    return archivitos; // devolvemos los archivos de prueba en vez de []
   }
 }
 
@@ -62,7 +70,7 @@ function cargarimagenes(cosas) {
   fotos.innerHTML = ` `;
   cosas.forEach(nombre => {
     const div = document.createElement("div");
-const descripcion = nombre.mimidesk || "sin descripcion";
+    const descripcion = nombre.mimidesk || "sin descripcion";
 
     div.classList.add("imagen");
     div.innerHTML = `
