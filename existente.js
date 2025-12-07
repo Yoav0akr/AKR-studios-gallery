@@ -27,7 +27,7 @@ btn.addEventListener("click", async () => {
     window.location.href = "/index.html"; // redirige a la galería
     //guarda en memoria
     localStorage.setItem("admin", nombre);
-    localStorage.setItem("adminpass", false);
+    localStorage.setItem("adminpass", "false");
 
   } catch (err) {
     console.error("Error iniciando sesión:", err);
