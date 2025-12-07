@@ -130,21 +130,20 @@ function noSeXd(e) {
   buscador.value = archivo;
   filtrarYMostrar()
 }
-
-
-
-
-
-function download(e) {
-  const idboton = e.currentTarget.id;
+async function download(e) {
+  const url = e.currentTarget.id; // link de Cloudinary desde el botón
+  const res = await fetch(url);
+  const blob = await res.blob();
 
   const enlace = document.createElement("a");
-  enlace.href = idboton;
-  enlace.target = "_blank"
-  enlace.download =  "foto_descargada de akr-studios";
+  enlace.href = URL.createObjectURL(blob);
+  enlace.download = "AKR.jpg"; // nombre sugerido
   document.body.appendChild(enlace);
   enlace.click();
   document.body.removeChild(enlace);
+
+  // liberar memoria
+  URL.revokeObjectURL(enlace.href);
 }
 
 // Filtrado
