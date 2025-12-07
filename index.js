@@ -144,7 +144,7 @@ const blob = await res.blob();
   const enlace = document.createElement("a");
   enlace.href = URL.createObjectURL(blob);
   enlace.target = "_blank"
-  enlace.download = archivo.nombre + "AKRestudiosGallery.jpg";
+  enlace.download = archivo.nombre + "_AKRestudiosGallery.jpg";
   document.body.appendChild(enlace);
   enlace.click();
   document.body.removeChild(enlace);
