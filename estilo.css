@@ -193,7 +193,7 @@ h1 {
 .ses {
     display: flex;
     justify-content:space-around;
-    align-items: stretch;
+    align-items: s;
     width: 50%;
 
 }
@@ -210,8 +210,7 @@ h1 {
 
 .menu {
     display: flex;
-    flex: 1;
-    flex-grow: 1;
+
     align-items: center;
     padding: 0.5rem;
     border-radius: var(--defborder);
@@ -555,6 +554,8 @@ min-height:100%;
     }
 
     .menu {
+            flex: 1;
+    flex-grow: 1;
         margin: 0;
         justify-content: center;
         margin-top: 0.5rem;
