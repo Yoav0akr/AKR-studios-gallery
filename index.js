@@ -132,14 +132,14 @@ function noSeXd(e) {
   filtrarYMostrar()
 }
 
-function download(e) {
+ async function download(e) {
   //descarga de archivos con blob
   const idboton = e.currentTarget.id;
   const archivo = globalArchivos.find(item => item._id === idboton || item.id === Number(idboton));
   if (!archivo) return console.warn("Archivo no encontrado para el botón:", idboton);
 const url = archivo.ub;
-const res = fetch(url)
-const blob = res.then(r => r.blob());
+const res = await fetch(url);
+const blob = await res.blob();
 
   const enlace = document.createElement("a");
   enlace.href = URL.createObjectURL(blob);
@@ -149,8 +149,8 @@ const blob = res.then(r => r.blob());
   enlace.click();
   document.body.removeChild(enlace);
   //liberar memoria
-  URL.revokeObjectURL(enlace.href);
-}
+  
+};
 
 // Filtrado
 const div_mesages = document.querySelector(".mensage");
