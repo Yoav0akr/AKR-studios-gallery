@@ -10,7 +10,7 @@ const btnPANadmins = document.getElementById("btnLogAdmins");
 //verifcar si nombre de usuario no es nulo
 if (adminpass === "true" && nombre_usuario) {
   //al existir usuario logeado el titular se mostrara con el nombrede de usuario
-  titular.innerHTML = ` Hola ${nombre_usuario}!`;
+  titular.innerText = ` Hola ${nombre_usuario}!`;
   titular.classList.remove("no-ver");
   //si admin pass es true se muestra el boton para ir al panel de administracion
   if (adminpass === "true") {
@@ -90,9 +90,8 @@ function cargarimagenes(cosas) {
         </ul>
       </div>
       <div class="desc-soli">
-      <button class="descargarBtn" id="${nombre.id || nombre._id}">Descargar</button>
-      <button class="soliEli no-ver" id="${nombre.id || nombre._id}">solicitar eliminar</button>
-      </div>
+      <button class="descargarBtn" id="${nombre.ub}">Descargar</button>
+        </div>
     `;
     fotos.append(div);
   });
@@ -138,24 +137,11 @@ function noSeXd(e) {
 
 function download(e) {
   const idboton = e.currentTarget.id;
-  const archivo = globalArchivos.find(item => item._id === idboton || item.id === Number(idboton));
-
-  if (!archivo) return console.warn("Archivo no encontrado para el botón:", idboton);
-
-
-
-  let laurl = archivo.ub;
-  if (laurl.includes("res.cloudinary.com")) {
-    const separador = laurl.includes("?") ? "&" : "?";
-    laurl = `${laurl}${separador}fl_attachment=${encodeURIComponent(archivo.nombre || "archivo")}`;
-  }
-
-
 
   const enlace = document.createElement("a");
-  enlace.href = laurl;
+  enlace.href = idboton;
   enlace.target = "_blank"
-  enlace.download = archivo.nombre || "archivo";
+  enlace.download =  "foto_descargada de akr-studios";
   document.body.appendChild(enlace);
   enlace.click();
   document.body.removeChild(enlace);
