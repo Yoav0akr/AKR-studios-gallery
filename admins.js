@@ -183,7 +183,7 @@ async function cargarSolicitudes() {
 
 async function cargarAdmins() {
   const res = await fetch("/api/personas");
-  globalAdmins = await res.json();
+  const globalAdmins = await res.json();
   renderizarPersonas(globalAdmins);
 }
 
