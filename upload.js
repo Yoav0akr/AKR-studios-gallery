@@ -110,11 +110,7 @@ EntradaGuardar.addEventListener("click", queso);
 
 // --- GUARDAR EN MONGO ---
 async function guardarEnMongo(nombre, url, por, categ, mimidesk) {
-  if (email_user.value.trim()) {
-    var email_result = email_user.value.trim();
-  }else{
-    var email_result = "null";
-  }
+  const email_result = email_user || "null";
   const data = { id: Date.now(), nombre, ub: url, por, categ, mimidesk, email: email_result };
 
   try {
