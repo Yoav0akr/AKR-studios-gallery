@@ -219,4 +219,4 @@ logo.addEventListener("click", () => {
   navs.classList.toggle("navhiden");
   navigator.vibrate(200);
 });
-ScrollReveal().reveal('.imagen');
+ScrollReveal().reveal('.imagen', { delay: 700, reset: true});
