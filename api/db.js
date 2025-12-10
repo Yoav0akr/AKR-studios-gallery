@@ -38,7 +38,7 @@ const ImagenSchema = new mongoose.Schema({
   imgID: String,
   email: String,
 }, {
-  collection: "imagenes"
+  collection: "imagens"
 });
 
 const Imagen = mongoose.models.Imagen || mongoose.model("Imagen", ImagenSchema);
