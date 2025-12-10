@@ -11,6 +11,7 @@ const Entradadesc = document.querySelector("#mimidesk");
 //auto llenado del nombre del admin que sube la imagen
 const adminpass = localStorage.getItem('adminpass');
 const usuario = localStorage.getItem('admin');
+const email_user = localStorage.getItem('email');
 //se auto llena el nombre del usuario en el input y se deshabilita
     EentradaDeparte.value = usuario;
     EentradaDeparte.enabled = false;
@@ -109,7 +110,12 @@ EntradaGuardar.addEventListener("click", queso);
 
 // --- GUARDAR EN MONGO ---
 async function guardarEnMongo(nombre, url, por, categ, mimidesk) {
-  const data = { id: Date.now(), nombre, ub: url, por, categ, mimidesk };
+  if (email_user.value.trim()) {
+    var email_result = email_user.value.trim();
+  }else{
+    var email_result = "null";
+  }
+  const data = { id: Date.now(), nombre, ub: url, por, categ, mimidesk, email: email_result };
 
   try {
     const res = await fetch("/api/db", {

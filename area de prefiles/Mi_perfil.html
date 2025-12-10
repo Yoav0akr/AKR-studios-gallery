@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mi Perfil</title>
+  <link rel="stylesheet" href="../estilo.css">
+  <link rel="icon" href="AKRlogo.ico">
+</head>
+<body>
+  <!-- Reutilizamos la barra de navegación -->
+  <div class="nav navhiden">
+    <div class="logo rotado">
+      <h1>GALERIA</h1>
+    </div>
+    <div class="ses">
+      <a class="menu" href="../index.html">Inicio</a>
+      <a class="menu" href="../upload.html">Subir Foto</a>
+      <a class="menu" href="../nuevo.html">Log out</a>
+    </div>
+  </div>
+
+  <!-- Contenido del perfil -->
+  <section class="perfil" style="margin-top: 3rem;
+  margin-left: 6rem;">
+    <h2>Mi Perfil</h2>
+
+    <div class="info">
+      <label>Nombre:</label>
+      <span id="perfil-nombre">Juan Pérez</span>
+    </div>
+
+    <div class="info">
+      <label>Email:</label>
+      <span id="perfil-email">juanperez@example.com</span>
+    </div>
+
+    <div class="info">
+      <label>Rol:</label>
+      <span id="perfil-rol">Administrador</span>
+    </div>
+
+    <div class="info">
+      <label>Descripción:</label>
+      <span id="perfil-desc">Usuario activo en el sistema, responsable de la gestión.</span>
+    </div>
+  </section>
+  <section class="contenido_subido">
+    <h3>Contenido Subido</h3>
+    <div class="imagenes-contenedor" id="imagenes-contenedor-perfil">
+      <!-- Aquí se cargarán las imágenes subidas por el usuario -->
+    </div>
+
+
+  <footer style="
+    background-color:#f0f0f0;
+    color:#555;
+    font-size:0.85em;
+    text-align:center;
+    padding:15px;
+    border-top:1px solid #ccc;
+  ">
+    Las imágenes de aquí no son responsabilidad de AKRstudios.
+  </footer>
+
+  <script src="./Mi_perfil.js" type="module"></script>
+</body>
+</html>

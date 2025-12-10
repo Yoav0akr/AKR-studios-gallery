@@ -10,24 +10,28 @@ btn.addEventListener("click", async () => {
   }
 
   try {
-    const res = await fetch("/api/adminsDB", {
+    const res = await fetch("http://localhost:3000/api/adminsDB", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ admin: nombre, password, login: true }),
     });
 
     const data = await res.json();
+    console.log("Respuesta login:", data);
 
     if (!data.success) {
       alert(`Error: ${data.message || data.error}`);
       return;
     }
 
-    alert(`¡Bienvenido ${nombre}!`);
-    window.location.href = "/index.html"; // redirige a la galería
-    //guarda en memoria
-    localStorage.setItem("admin", nombre);
-    localStorage.setItem("adminpass", "false");
+    alert(`¡Bienvenido ${data.admin}!`);
+
+    // Guardar en memoria local:
+localStorage.setItem("admin", data.admin);
+localStorage.setItem("adminpass", data.adminpass);
+localStorage.setItem("email", data.email);
+
+    window.location.href = "/index.html";
 
   } catch (err) {
     console.error("Error iniciando sesión:", err);
@@ -35,12 +39,9 @@ btn.addEventListener("click", async () => {
   }
 });
 
-
-
 // para rotar el logo y desplegar/ocultar nav
 const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
-
 logo.addEventListener("click", () => {
   logo.classList.toggle("rotado");
   navs.classList.toggle("navhiden");

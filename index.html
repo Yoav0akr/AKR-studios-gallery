@@ -6,14 +6,15 @@
   <link rel="stylesheet" href="./estilo.css">
   <link rel="icon" href="AKRlogo.ico">
   <meta charset="UTF-8">
-  <title>galeria</title>
+  <title>Galería</title>
 </head>
 
 <body>
+  <!-- NAVBAR -->
   <div class="nav navhiden">
     <div class="logo rotado">
       <h1>GALERIA</h1>
-      <h2 class="no-ver" id="titular"><!--esto se llena otra ves con js--></h2>
+      <h2 class="no-ver" id="titular"></h2>
     </div>
 
     <div class="ses">
@@ -22,49 +23,39 @@
       <select id="cats" name="cats" class="menu">
         <option value="nombre">name</option>
         <option value="por">contribuidor</option>
-        <!-- se llena con js -->
       </select>
-      <div id="loged" class="no-ver ">
-               <button class="menu not" id="Mi_perfil">MI perfil</button>
-
+      <div id="loged" class="no-ver">
+        <button class="menu not" id="Mi_perfil">MI perfil</button>
         <button class="menu" id="btnLogAdmins">PAN admins</button>
-        </button>
       </div>
       <input class="menu" type="text" id="buscador" placeholder="Buscar" />
     </div>
   </div>
 
-  <div class="mensage no-ver">
+  <!-- MENSAJE -->
+  <div class="mensage no-ver"></div>
 
-  </div>
-
+  <!-- GALERÍA -->
   <section class="legumbre">
-
     <h4 id="show" class="no-ver"></h4>
-
-    <div class="imagenes-contenedor" id="imagenes-contenedor">
-    </div>
-
-    <div class="c4"></div>
-
+    <div class="imagenes-contenedor" id="imagenes-contenedor"></div>
+    <div class="pagination" id="pagination"></div>
   </section>
 
-  <footer style="
-  background-color:#f0f0f0;
-  color:#555;
-  font-size:0.85em;
-  text-align:center;
-  padding:15px;
-  border-top:1px solid #ccc;
-">
+  <!-- FOOTER -->
+  <footer style="text-align: center;
+   padding: 10px;
+   background-color:
+    #f1f1f1; margin-top:
+     20px;
+     color: #555;
+     ">
     Las imágenes de aquí no son responsabilidad de AKRstudios.
   </footer>
 
-
-
-  
-  <script src="./index.js" type="module"> </script>
-<script src="https://unpkg.com/scrollreveal"></script>
+  <!-- SCRIPTS -->
+  <script src="https://unpkg.com/scrollreveal"></script>
+  <script type="module" src="./index.js"></script>
 </body>
 
 </html>

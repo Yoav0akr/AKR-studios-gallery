@@ -16,7 +16,7 @@ const ADMINSchema = new mongoose.Schema(
   {
     admin: { type: String, required: true },
     password: { type: String, required: true },
-    adminpass: { type: Boolean, default: false },
+    adminpass: { type: String, default: "false"},
   },
   { collection: "admins" }
 );

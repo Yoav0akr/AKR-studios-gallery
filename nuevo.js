@@ -1,53 +1,71 @@
-// nuevo.js
-const btn = document.getElementById("manchego");
+const email = document.getElementById("email_imput");
+const nombre_usuario = document.getElementById("nombre_imput");
+const pasword = document.getElementById("pasword_inpu");
+const BtCrearUser = document.getElementById("manchego");
 
-btn.addEventListener("click", async () => {
-  const nombre = document.getElementById("nombre_imput").value.trim();
-  const password = document.getElementById("por-imput").value.trim();
+// Crear usuario
+async function CreateUser(email, user, pasw) {
+  const datosUSER = { admin: user, password: pasw, email, login: false };
 
-  if (!nombre || !password) {
-    alert("Debes llenar todos los campos");
-    return;
-  }
+  const res = await fetch("./api/adminsDB", {
+    method: "POST",
+    body: JSON.stringify(datosUSER),
+  });
 
+  if (!res.ok) throw new Error("Error " + res.status);
+
+  alert("Te has unido a la comunidad de AKR Studios exitosamente");
+
+  localStorage.setItem("admin", user);
+  localStorage.setItem("adminpass", "false");
+  localStorage.setItem("email", email);
+
+  window.location.href = "./index.html";
+}
+
+// Ver si existe y crear
+async function execute() {
   try {
-    const res = await fetch("./api/adminsDB", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ admin: nombre, password }),
+    const admin = nombre_usuario.value.trim();
+
+    // GET usando query
+    const res = await fetch(`./api/adminsDB?admin=${admin}`, {
+      method: "GET"
     });
 
-    let data;
-    try {
-      // intentamos parsear la respuesta como JSON
-      data = await res.json();
-    } catch (err) {
-      // si falla, mostramos todo el texto recibido
-      const text = await res.text();
-      console.error("Respuesta no JSON:", text);
-      alert("Error creando admin. Respuesta inesperada del servidor.");
+    const existe = await res.json();
+
+    if (existe.exists) {
+      alert(admin + " ya existe");
+      nombre_usuario.value = "";
       return;
     }
 
-    console.log("Respuesta del backend:", data);
+    // Crear usuario
+    CreateUser(
+      email.value.trim(),
+      nombre_usuario.value.trim(),
+      pasword.value.trim()
+    );
 
-    if (!data.success) {
-      alert(`Error creando admin: ${data.message || data.error || "Error desconocido"}`);
-      return;
-    }
-
-    alert(`Usuario "${nombre}" creado correctamente`);
-    window.location.href = "./existente.html"; // redirige al login
   } catch (err) {
-    console.error("Error creando admin:", err);
-    alert("Error creando admin. Revisa la consola para más detalles.");
+    console.error("Error al crear usuario", err);
+  }
+}
+
+BtCrearUser.addEventListener("click", () => {
+  if (!nombre_usuario.value.trim() ||
+      !pasword.value.trim() ||
+      !email.value.trim()) {
+  
+    alert("Llena todos los campos");
+  } else {
+    execute();
   }
 });
-
-// === Control de estilo y nav ===
+// para rotar el logo y desplegar/ocultar nav
 const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
-
 logo.addEventListener("click", () => {
   logo.classList.toggle("rotado");
   navs.classList.toggle("navhiden");

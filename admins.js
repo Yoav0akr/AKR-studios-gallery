@@ -1,3 +1,5 @@
+import { archivos } from "./bd3";
+
 const adminpass = localStorage.getItem("adminpass") === "true";
 if (!adminpass) {
   alert("No tienes permisos para acceder a esta página.");
@@ -152,9 +154,21 @@ function loadCats(categorias) {
   });
 }
 
+
+
 // ===============================
 // PANEL SOLICITUDES
 // ===============================
+
+function getPublicId(url) {
+  const afterUpload = url.split("/upload/")[1];
+  const withoutExt = afterUpload.split(".")[0];
+  return withoutExt.replace(/v\d+\//, "");
+}
+
+
+
+
 async function cargarSolicitudes() {
   const res = await fetch("/api/solicitudes");
   const solicitudes = await res.json();
@@ -176,6 +190,14 @@ async function cargarSolicitudes() {
     numerito.innerText = solicitudes.length;
   });
 }
+//agregar funcionalidad a los botones aceptar y rechazar
+const  botones_aceptar =document.querySelectorAll(".aceptar");
+botones_aceptar.forEach(boton => {
+  boton.addEventListener("click", async (e) => {
+  
+
+    
+
 
 // ===============================
 // PANEL ADMIN
@@ -196,9 +218,9 @@ function renderizarPersonas(admins) {
       <h3>Nombre del usuario: ${admin.admin}</h3>
       <h3>Admin pass: <span>${admin.adminpass}</span></h3>
       <div class="jaiba">
-        <button class="almeja eliminar" data-id="${admin._id}">ELIMINAR</button>
-        <button class="almeja get-up" data-id="${admin._id}">Give admin</button>
-        <button class="almeja get-down" data-id="${admin._id}">Remove admin</button>
+        <button class="almeja eliminar" id="${admin._id}">ELIMINAR</button>
+        <button class="almeja get-up" id="${admin._id}">Give admin</button>
+        <button class="almeja get-down" id="${admin._id}">Remove admin</button>
       </div>
     `;
     personas.appendChild(div);
@@ -210,7 +232,7 @@ function vincularBotonesAdmins() {
   // Eliminar
   document.querySelectorAll(".eliminar").forEach(btn => {
     btn.addEventListener("click", async e => {
-      const id = e.currentTarget.dataset.id;
+      const id = e.currentTarget.id;
       if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
       await fetch("/api/personas", {
         method: "DELETE",
@@ -224,7 +246,7 @@ function vincularBotonesAdmins() {
   // Dar admin
   document.querySelectorAll(".get-up").forEach(btn => {
     btn.addEventListener("click", async e => {
-      const id = e.currentTarget.dataset.id;
+      const id = e.currentTarget.id;
       await fetch("/api/personas", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },

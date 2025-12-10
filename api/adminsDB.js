@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs"; // bcryptjs en lugar de bcrypt
 
 // === CONFIGURACIÓN MONGODB ===
-const MONGODB_URI = process.env.MONGODB_URI||"mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.8";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.8";
 if (!MONGODB_URI) {
   throw new Error("Falta MONGODB_URI en las variables de entorno de Vercel");
 }
@@ -14,9 +14,10 @@ if (!cached) cached = global.mongoose = { conn: null, promise: null };
 // === MODELO DE ADMIN ===
 const ADMINSchema = new mongoose.Schema(
   {
-    admin: { type: String, required: true },
+    admin: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    adminpass: { type: Boolean, default: false },
+    email: { type: String, required: true },
+    adminpass: { type: String, default: "false" },
   },
   { collection: "admins" }
 );
@@ -46,8 +47,18 @@ export default async function handler(req, res) {
 
     // ---------------- GET → Listar admins ----------------
     if (req.method === "GET") {
-      const admins = await Admin.find().sort({ admin: -1 });
-      return res.status(200).json({ success: true, admins });
+      const admin = req.query.admin;
+
+      if (!admin) {
+        return res.status(400).json({ success: false, error: "Falta admin" });
+      }
+
+      const existe = await Admin.findOne({ admin });
+
+      return res.status(200).json({
+        success: true,
+        exists: !!existe
+      });
     }
 
     // ---------------- POST → Crear o login ----------------
@@ -66,13 +77,18 @@ export default async function handler(req, res) {
             .status(401)
             .json({ success: false, message: "Contraseña incorrecta" });
 
-        return res.status(200).json({ success: true, message: "Login exitoso" });
+        return res.status(200).json({
+          success: true,
+          message: "Login exitoso",
+          admin: encontrado.admin,
+          email: encontrado.email,
+          adminpass: encontrado.adminpass
+        });
       }
 
       // CREAR NUEVO ADMIN
       const hashed = await bcrypt.hash(body.password, 10);
-      const nuevo = await Admin.create({ admin: body.admin, password: hashed });
-
+      const nuevo = await Admin.create({ admin: body.admin, password: hashed, email: body.email });
       return res.status(201).json({
         success: true,
         message: "Admin creado",
