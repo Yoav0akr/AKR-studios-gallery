@@ -149,6 +149,7 @@ button:hover {
     max-height: 3em;
     padding: 1.5rem;
     margin: -1em;
+    z-index: 9099999;
 }
 
 .logo {
