@@ -38,22 +38,23 @@ logo.addEventListener("click", () => {
 });
 
 // ===============================
-// PAGINACIÓN
+// PAGINACIÓN PANEL DE BORRADO
 // ===============================
-let paginaActual = 1;
-const limite = 10;
-let totalPaginas = 1;
+let currentPage = 1;
+const limit = 12;
+let totalPages = 1;
 
 // ===============================
 // PANEL DE BORRADO - IMÁGENES
 // ===============================
-async function cargarImagenes(pagina = 1) {
-  try {
-    const res = await fetch(`/api/db?page=${pagina}&limit=${limite}`);
-    const data = await res.json();
+async function cargarImagenesPaginadas(page = 1) {
+  currentPage = page;
 
+  try {
+    const res = await fetch(`/api/db?page=${page}&limit=${limit}`);
+    const data = await res.json();
     const archivos = data.data || [];
-    totalPaginas = data.totalPages || 1;
+    totalPages = data.totalPages || 1;
 
     fotos.innerHTML = "";
     if (archivos.length === 0) {
@@ -84,8 +85,6 @@ async function cargarImagenes(pagina = 1) {
     });
 
     vincularBotonesEliminar();
-
-    // Paginación
     renderizarPaginacion();
   } catch (err) {
     console.error("Error cargando imágenes:", err);
@@ -94,12 +93,12 @@ async function cargarImagenes(pagina = 1) {
 
 function vincularBotonesEliminar() {
   document.querySelectorAll(".descargarBtn").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
+    btn.addEventListener("click", async e => {
       const id = e.currentTarget.dataset.id;
       if (!confirm("¿Eliminar esta imagen?")) return;
       try {
         await fetch(`/api/db?_id=${id}`, { method: "DELETE" });
-        cargarImagenes(paginaActual);
+        cargarImagenesPaginadas(currentPage);
       } catch (err) {
         console.error("Error eliminando imagen:", err);
       }
@@ -107,19 +106,13 @@ function vincularBotonesEliminar() {
   });
 }
 
-// ===============================
-// RENDER PAGINACIÓN
-// ===============================
 function renderizarPaginacion() {
   paginacion.innerHTML = "";
-  for (let i = 1; i <= totalPaginas; i++) {
+  for (let i = 1; i <= totalPages; i++) {
     const btn = document.createElement("button");
     btn.textContent = i;
-    if (i === paginaActual) btn.disabled = true;
-    btn.addEventListener("click", () => {
-      paginaActual = i;
-      cargarImagenes(paginaActual);
-    });
+    if (i === currentPage) btn.disabled = true;
+    btn.addEventListener("click", () => cargarImagenesPaginadas(i));
     paginacion.appendChild(btn);
   }
 }
@@ -207,7 +200,7 @@ function vincularBotonesAdmins() {
 botonPB.addEventListener("click", () => {
   hideAll();
   fotos.classList.remove("no-ver");
-  cargarImagenes(paginaActual);
+  cargarImagenesPaginadas(1);
 });
 
 botonPersonas.addEventListener("click", () => {
@@ -220,9 +213,8 @@ botonPersonas.addEventListener("click", () => {
 // INICIALIZACIÓN
 // ===============================
 (async function init() {
-  // Cargar primera vez el panel de imágenes y admins
   hideAll();
   fotos.classList.remove("no-ver");
-  cargarImagenes(paginaActual);
+  cargarImagenesPaginadas(1);
   cargarAdmins();
 })();

@@ -7,6 +7,74 @@
   <link rel="icon" href="AKRlogo.ico">
   <meta charset="UTF-8">
   <title>Galería Admin</title>
+  <style>
+    /* Estilos mínimos para paginación */
+    #paginacion {
+      display: flex;
+      justify-content: center;
+      gap: 5px;
+      margin-bottom: 10px;
+    }
+
+    #paginacion button {
+      padding: 5px 10px;
+      border: 1px solid #333;
+      background-color: #fff;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    #paginacion button:disabled {
+      background-color: #333;
+      color: #fff;
+      cursor: default;
+    }
+
+    .imagenes-contenedor {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 15px;
+      margin: 10px;
+    }
+
+    .imagen {
+      border: 1px solid #ccc;
+      padding: 5px;
+      border-radius: 5px;
+      text-align: center;
+      background-color: #fafafa;
+    }
+
+    .detalles ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    .detalles li {
+      margin-bottom: 3px;
+    }
+
+    .lista-personas {
+      margin: 20px;
+    }
+
+    .persona {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      background-color: #f7f7f7;
+    }
+
+    .jaiba button {
+      margin-right: 5px;
+      padding: 5px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
 </head>
 
 <body>
@@ -34,7 +102,7 @@
       <div id="panel_de_admins" class="cosa">Panel de personas</div>
     </div>
 
-    <!-- PAGINACIÓN POR ENCIMA -->
+    <!-- PAGINACIÓN POR ENCIMA DEL PANEL DE BORRADO -->
     <div id="paginacion"></div>
 
     <!-- PANEL DE BORRADO - IMÁGENES -->
