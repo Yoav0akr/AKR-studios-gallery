@@ -567,7 +567,7 @@ h1 {
     background: #aa00ff;
     padding-bottom: 2rem;
     text-decoration:solid;
-    font-family:Minecraft, Verdana, Geneva, Tahoma, sans-serif;
+    font-family: ;
 }
 
 /* ===================== */
@@ -657,7 +657,6 @@ h1 {
         gap: 0.5rem;
         max-height: 40%;
         border-radius: 0.5rem;
-        align-items: center;
         
     }
 

@@ -11,11 +11,14 @@ const EntradaDesc = document.getElementById("mimidesk");
 const usuario = localStorage.getItem("admin") || "";
 const email_user = localStorage.getItem("email") || "";
 
-EntradaPor.value = usuario.value.trim();
-if (EntradaPor.ariaValueMin.trim()= ""){
+// Si hay usuario, llenar el campo "por" y deshabilitarlo
+if (usuario.trim() !== "") {
+  EntradaPor.value = usuario.trim();
   EntradaPor.disabled = true;
-};
-
+} else {
+  EntradaPor.value = ""; // vacío si no hay usuario
+  EntradaPor.disabled = false;
+}
 // --- DIV VISUALIZADOR ---
 const visualizador = document.querySelector(".visualizador");
 let cloudinaryURL = null;
