@@ -1,67 +1,70 @@
-// ======================
-// ELEMENTOS DEL DOM
-// ======================
+// ==============================
+//  ELEMENTOS DOM
+// ==============================
 const divlog = document.getElementById("loged");
 const btnLog = document.getElementById("btnLogAdmins");
 const titular = document.getElementById("titular");
-const btnPerfil = document.getElementById("Mi_perfil");
-const fotos = document.getElementById("imagenes-contenedor");
-const cats = document.getElementById("cats");
-const buscador = document.getElementById("buscador");
+const btnPANadmins = document.getElementById("btnLogAdmins");
+const fotos = document.querySelector("#imagenes-contenedor");
+const cats = document.getElementsByName("cats")[0];
+const show = document.getElementById("show");
+const buscador = document.querySelector("#buscador");
 const div_mesages = document.querySelector(".mensage");
 const btnPrev = document.getElementById("prev");
 const btnNext = document.getElementById("next");
 const paginaActual = document.getElementById("paginaActual");
 
-// ======================
-// SESIÓN DE USUARIO
-// ======================
+// ==============================
+//  CONTROL DE SESIÓN
+// ==============================
 const adminpass = localStorage.getItem("adminpass");
 const nombre_usuario = localStorage.getItem("admin");
 
 if (nombre_usuario) {
-  titular.innerText = `Hola ${nombre_usuario}!`;
+  titular.innerText = ` Hola ${nombre_usuario}!`;
   titular.classList.remove("no-ver");
+
   if (adminpass === "true") {
-    btnLog.classList.remove("no-ver");
+    btnPANadmins.classList.remove("no-ver");
   } else {
-    btnLog.classList.add("no-ver");
+    btnPANadmins.classList.add("no-ver");
   }
 } else {
   titular.classList.add("no-ver");
-  btnLog.classList.add("no-ver");
+  btnPANadmins.classList.add("no-ver");
 }
 
-btnPerfil?.addEventListener("click", () => {
+// ==============================
+//  EVENTOS BOTONES
+// ==============================
+document.getElementById("Mi_perfil").addEventListener("click", () => {
   window.location.href = "./area de prefiles/Mi_perfil.html";
 });
 
-btnLog?.addEventListener("click", () => {
+btnLog.addEventListener("click", () => {
   window.location.href = "./admins.html";
 });
 
-// ======================
-// VARIABLES GLOBALES
-// ======================
+// ==============================
+//  GLOBAL
+// ==============================
 let globalArchivos = [];
-let currentPage = 1;
-let totalPages = 1;
-const LIMIT = 20;
+window.currentPage = 1;
+window.totalPages = 1;
 
-// ======================
-// FUNCIONES DE PAGINACIÓN Y CARGA
-// ======================
-async function cargarDesdeMongo(page = 1, limit = LIMIT) {
+// ==============================
+//  CARGAR DATOS DESDE API
+// ==============================
+async function cargarDesdeMongo(page = 1, limit = 20) {
   try {
     const res = await fetch(`/api/db?page=${page}&limit=${limit}`);
     if (!res.ok) throw new Error("Error " + res.status);
     const resultado = await res.json();
 
     globalArchivos = resultado.data;
-    currentPage = resultado.page;
-    totalPages = resultado.totalPages;
+    window.totalPages = resultado.totalPages;
+    window.currentPage = resultado.page;
 
-    actualizarPaginador();
     return resultado.data;
   } catch (err) {
     console.error(err);
@@ -69,97 +72,102 @@ async function cargarDesdeMongo(page = 1, limit = LIMIT) {
   }
 }
 
-function actualizarPaginador() {
-  if (paginaActual) paginaActual.textContent = `Página ${currentPage} de ${totalPages}`;
-  btnPrev.disabled = currentPage <= 1;
-  btnNext.disabled = currentPage >= totalPages;
-}
-
-// ======================
-// RENDERIZADO DE IMÁGENES
-// ======================
+// ==============================
+//  RENDER DE IMÁGENES
+// ==============================
 function cargarimagenes(cosas) {
   fotos.innerHTML = "";
-  cosas.forEach(item => {
+  cosas.forEach(nombre => {
     const div = document.createElement("div");
-    const descripcion = item.mimidesk || "Sin descripción";
+    const descripcion = nombre.mimidesk || "sin descripcion";
 
     div.classList.add("imagen");
     div.innerHTML = `
-      <h3 class="producto-titulo">${item.nombre}</h3>
-      <img class="la-imagen" id="${item.id}" src="${item.ub}" alt="${item.nombre}" />
+      <h3 class="producto-titulo">${nombre.nombre}</h3>
+      <img class="la-imagen" id="${nombre.id}" src="${nombre.ub}" alt="${nombre.nombre}" />
       <div class="detalles">
         <ul>
-          <li><p>Por/De: ${item.por}</p></li>
-          <li><p>Categoría: ${item.categ.join(", ")}</p></li>
+          <li><p>Por/De: ${nombre.por}</p></li>
+          <li><p>Categoría: ${nombre.categ.join(", ")}</p></li>
           <li><p>Descripción: ${descripcion}</p></li>
-          <li><p>id: "${item.id}"</p></li>
+          <li><p>id: "${nombre.id}"</p></li>
         </ul>
       </div>
       <div class="desc-soli">
-        <button class="descargarBtn" id="${item.id}">Descargar</button>
+        <button class="descargarBtn" id="${nombre.id}">Descargar</button>
       </div>
     `;
-    fotos.appendChild(div);
+    fotos.append(div);
   });
+
   actualizarBotonesDescargar();
-  actualizarVisualizador();
+  actualizarVisualizacion();
 }
 
-// ======================
-// DESCARGAR IMÁGENES
-// ======================
-function actualizarBotonesDescargar() {
-  const botones = document.querySelectorAll(".descargarBtn");
-  botones.forEach(boton => {
-    boton.addEventListener("click", async e => {
-      const id = e.currentTarget.id;
-      const archivo = globalArchivos.find(a => a.id === Number(id));
-      if (!archivo) return;
+// ==============================
+//  DESCARGA DE IMÁGENES
+// ==============================
+async function download(e) {
+  const idboton = e.currentTarget.id;
+  const archivo = globalArchivos.find(item => item.id === Number(idboton));
+  if (!archivo) return console.warn("Archivo no encontrado:", idboton);
 
-      const res = await fetch(archivo.ub);
-      const blob = await res.blob();
-      const enlace = document.createElement("a");
-      enlace.href = URL.createObjectURL(blob);
-      enlace.download = `${archivo.nombre}_AKRestudiosGallery.jpg`;
-      document.body.appendChild(enlace);
-      enlace.click();
-      document.body.removeChild(enlace);
-    });
-  });
+  const res = await fetch(archivo.ub);
+  const blob = await res.blob();
+
+  const enlace = document.createElement("a");
+  enlace.href = URL.createObjectURL(blob);
+  enlace.target = "_blank";
+  enlace.download = archivo.nombre + "_AKRestudiosGallery.jpg";
+  document.body.appendChild(enlace);
+  enlace.click();
+  document.body.removeChild(enlace);
 }
 
-// ======================
-// VISUALIZAR IMÁGENES
-// ======================
-function actualizarVisualizador() {
-  const imgs = document.querySelectorAll(".la-imagen");
-  imgs.forEach(img => {
-    img.addEventListener("click", e => {
-      const id = Number(e.currentTarget.id);
-      const archivo = globalArchivos.find(a => a.id === id);
+// ==============================
+//  VISUALIZACIÓN DE IMAGEN
+// ==============================
+function actualizarVisualizacion() {
+  const visualizar = document.querySelectorAll(".la-imagen");
+  visualizar.forEach(boton => {
+    boton.addEventListener("click", (e) => {
+      const estafoto = Number(e.currentTarget.id);
+      const archivo = globalArchivos.find(item => item.id === estafoto);
       if (!archivo) return;
-      buscador.value = archivo.nombre;
       cats.value = "nombre";
+      buscador.value = archivo.nombre;
       filtrarYMostrar();
     });
   });
 }
 
-// ======================
-// FILTRADO
-// ======================
+// ==============================
+//  BOTONES DESCARGAR
+// ==============================
+function actualizarBotonesDescargar() {
+  const BotonesDescargar = document.querySelectorAll(".descargarBtn");
+  BotonesDescargar.forEach(boton => {
+    boton.addEventListener("click", download);
+  });
+}
+
+// ==============================
+//  FILTRADO
+// ==============================
 function filtrarYMostrar() {
   const texto = buscador.value.toLowerCase().trim();
-  const tipo = cats.value;
+  const tipoBusqueda = cats.value;
   let filtrados = globalArchivos;
 
-  if (tipo === "nombre") {
-    filtrados = globalArchivos.filter(i => i.nombre.toLowerCase().includes(texto));
-  } else if (tipo === "por") {
-    filtrados = globalArchivos.filter(i => i.por.toLowerCase().includes(texto));
+  if (tipoBusqueda === "nombre") {
+    filtrados = globalArchivos.filter(item => item.nombre.toLowerCase().includes(texto));
+  } else if (tipoBusqueda === "por") {
+    filtrados = globalArchivos.filter(item => item.por.toLowerCase().includes(texto));
   } else {
-    filtrados = globalArchivos.filter(i => i.categ.map(c => c.toLowerCase()).includes(tipo.toLowerCase()));
+    filtrados = globalArchivos.filter(item => {
+      const categs = Array.isArray(item.categ) ? item.categ.map(c => c.toLowerCase()) : [String(item.categ).toLowerCase()];
+      return categs.includes(tipoBusqueda.toLowerCase());
+    });
   }
 
   if (filtrados.length === 0) {
@@ -175,36 +183,41 @@ function filtrarYMostrar() {
 buscador.addEventListener("input", filtrarYMostrar);
 cats.addEventListener("change", filtrarYMostrar);
 
-// ======================
-// BOTONES DE PAGINACIÓN
-// ======================
-btnPrev?.addEventListener("click", async () => {
-  if (currentPage > 1) await init(currentPage - 1);
+// ==============================
+//  PAGINACIÓN
+// ==============================
+btnPrev.addEventListener("click", async () => {
+  if (window.currentPage > 1) await init(window.currentPage - 1);
 });
 
-btnNext?.addEventListener("click", async () => {
-  if (currentPage < totalPages) await init(currentPage + 1);
+btnNext.addEventListener("click", async () => {
+  if (window.currentPage < window.totalPages) await init(window.currentPage + 1);
 });
 
-// ======================
-// INICIALIZACIÓN
-// ======================
+// ==============================
+//  INICIALIZACIÓN
+// ==============================
 async function init(page = 1) {
-  const archivos = await cargarDesdeMongo(page);
-  cargarimagenes(archivos);
+  await cargarDesdeMongo(page);
+  cargarimagenes(globalArchivos);
+  paginaActual.textContent = `Página ${window.currentPage} de ${window.totalPages}`;
 }
-init();
 
-// ======================
-// LOGO / NAVBAR ROTAR
-// ======================
+// ==============================
+//  NAVBAR LOGO
+// ==============================
 const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
 
-logo?.addEventListener("click", () => {
+logo.addEventListener("click", () => {
   logo.classList.toggle("rotado");
   navs.classList.toggle("navhiden");
-  navigator.vibrate?.(200);
+  navigator.vibrate(200);
 });
 
 ScrollReveal().reveal('.imagen', { delay: 700, reset: true });
+
+// ==============================
+//  INICIAR
+// ==============================
+init();
