@@ -28,7 +28,7 @@ if (!cached) cached = global.mongoose = { conn: null, promise: null };
 // Schema de imagen
 // ======================
 const ImagenSchema = new mongoose.Schema({
-  id: Number,           // ID numérico incremental
+  id: Number,           // opcional, si quieres mantener un id incremental
   nombre: String,
   ub: String,
   public_id: String,    // Cloudinary
@@ -38,7 +38,7 @@ const ImagenSchema = new mongoose.Schema({
   imgID: String,
   email: String,
 }, {
-  collection: "imagens"
+  collection: "imagens" // <- tu colección real
 });
 
 const Imagen = mongoose.models.Imagen || mongoose.model("Imagen", ImagenSchema);
@@ -69,8 +69,8 @@ export default async function handler(req, res) {
       // Contar total de documentos
       const totalDocs = await Imagen.countDocuments();
 
-      // Traer documentos paginados, orden descendente por id
-      const data = await Imagen.find().sort({ id: -1 }).skip(skip).limit(limit);
+      // Traer documentos paginados, orden descendente por _id (más recientes primero)
+      const data = await Imagen.find().sort({ _id: -1 }).skip(skip).limit(limit);
 
       return res.status(200).json({
         page,
@@ -81,7 +81,6 @@ export default async function handler(req, res) {
       });
     }
 
-
     // ======================
     // POST — agregar nueva imagen
     // ======================
@@ -89,7 +88,7 @@ export default async function handler(req, res) {
       try {
         const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
-        // ID incremental
+        // ID incremental opcional
         const ultimo = await Imagen.findOne().sort({ id: -1 });
         const nuevoID = ultimo ? ultimo.id + 1 : 1;
 
