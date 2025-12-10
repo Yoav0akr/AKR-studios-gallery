@@ -105,7 +105,7 @@ async function guardarEnMongo() {
       return;
     }
 
-    alert("✅ Imagen guardada correctamente con tu email");
+    alert("✅ Imagen guardada correctamente");
     window.location.href = "./index.html";
   } catch (err) {
     console.error("Error al guardar en Mongo:", err);
