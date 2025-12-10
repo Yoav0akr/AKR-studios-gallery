@@ -1,79 +1,76 @@
 import { archivos } from "./bd3";
 
+// ===============================
+// --- VERIFICACIÓN DE ADMIN ---
 const adminpass = localStorage.getItem("adminpass") === "true";
 if (!adminpass) {
   alert("No tienes permisos para acceder a esta página.");
   window.location.href = "./index.html";
 }
 
-
 // ===============================
-// ELEMENTOS DEL DOM
-// ===============================
-const boton_solicitudes = document.getElementById("solicitudes");
-const boton_PB = document.getElementById("panel_de_borrado");
-const boton_personas = document.getElementById("panel_de_admins");
+// --- ELEMENTOS DEL DOM ---
+const botonPB = document.getElementById("panel_de_borrado");
+const botonPersonas = document.getElementById("panel_de_admins");
 
 const fotos = document.getElementById("imagenes-contenedor");
 const personas = document.querySelector(".lista-personas");
-const divSOLIS = document.querySelector(".div-solicitudes");
 const buscador = document.getElementById("buscador");
 const cats = document.getElementById("cats");
 const show = document.getElementById("show");
 
 // ===============================
-// FUNCIONES GENERALES
-// ===============================
-function hideAll() {
-  fotos.classList.add("no-ver");
-  personas.classList.add("no-ver");
-  divSOLIS.classList.add("no-ver");
-}
+// --- VARIABLES GLOBALES ---
+let globalArchivos = [];
+let paginaActual = 1;
+const limite = 10;
+let totalPaginas = 1;
 
-// para rotar el logo y desplegar/ocultar nav
+// ===============================
+// --- UI NAV ---
 const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
 
 logo.addEventListener("click", () => {
   logo.classList.toggle("rotado");
   navs.classList.toggle("navhiden");
-  navigator.vibrate(200);
+  navigator.vibrate?.(200);
 });
 
 // ===============================
-// PANELES
+// --- FUNCIONES GENERALES ---
+function hideAll() {
+  fotos.classList.add("no-ver");
+  personas.classList.add("no-ver");
+}
+
 // ===============================
-boton_PB.addEventListener("click", () => {
+// --- PANEL BOTONES ---
+botonPB.addEventListener("click", () => {
   hideAll();
   fotos.classList.remove("no-ver");
+  cargarImagenesPaginadas(paginaActual);
 });
 
-boton_solicitudes.addEventListener("click", () => {
-  hideAll();
-  divSOLIS.classList.remove("no-ver");
-});
-
-boton_personas.addEventListener("click", () => {
+botonPersonas.addEventListener("click", () => {
   hideAll();
   personas.classList.remove("no-ver");
+  cargarAdmins();
 });
 
 // ===============================
-// CARGAR IMÁGENES DESDE MONGO
-// ===============================
-let globalArchivos = [];
-
+// --- CARGAR IMÁGENES DESDE MONGO ---
 async function cargarDesdeMongo() {
-  const res = await fetch("/api/db", { method: "GET" });
+  const res = await fetch(`/api/db?page=${paginaActual}&limit=${limite}`);
   const data = await res.json();
-  globalArchivos = data;
+  globalArchivos = data.data;
+  totalPaginas = data.totalPages;
   return data;
 }
 
 // ===============================
-// RENDER IMÁGENES
-// ===============================
-function cargarImagenes(archivos) {
+// --- RENDER IMÁGENES ---
+function renderizarImagenes(archivos) {
   fotos.innerHTML = "";
   archivos.forEach(a => {
     const div = document.createElement("div");
@@ -82,10 +79,9 @@ function cargarImagenes(archivos) {
       <img class="la-imagen" src="${a.ub}" alt="${a.nombre}" />
       <div class="detalles">
         <ul>
-          <li><p>Por/De: ${a.por}</p></li>
-          <li><p>Categoría: ${a.categ}</p></li>
-                      <li><p>id: ${a.id}}</p></li>
-
+          <li>Por/De: ${a.por}</li>
+          <li>Categoría: ${a.categ}</li>
+          <li>id: ${a.id}</li>
         </ul>
         <h3 class="producto-titulo">${a.nombre}</h3>
         <button class="descargarBtn" data-id="${a._id}">ELIMINAR</button>
@@ -94,36 +90,33 @@ function cargarImagenes(archivos) {
     fotos.appendChild(div);
   });
   vincularBotonesEliminar();
+  renderizarPaginacion();
 }
 
 // ===============================
-// VINCULAR BOTONES ELIMINAR IMÁGENES
-// ===============================
+// --- VINCULAR BOTONES ELIMINAR ---
 function vincularBotonesEliminar() {
   document.querySelectorAll(".descargarBtn").forEach(btn => {
-    btn.addEventListener("click", async (e) => {
+    btn.addEventListener("click", async e => {
       const id = e.currentTarget.dataset.id;
       const archivo = globalArchivos.find(a => a._id === id);
       if (!archivo) return;
-
       if (!confirm(`¿Eliminar "${archivo.nombre}"?`)) return;
 
       await fetch(`/api/db?_id=${id}`, { method: "DELETE" });
-      globalArchivos = globalArchivos.filter(a => a._id !== id);
-      cargarImagenes(globalArchivos);
+      cargarImagenesPaginadas(paginaActual);
     });
   });
 }
 
 // ===============================
-// FILTRADO
+// --- FILTRADO
 // ===============================
 function filtrarYMostrar() {
   const texto = buscador.value.toLowerCase().trim();
   const tipoBusqueda = cats.value;
 
   let filtrados = globalArchivos;
-
   if (tipoBusqueda === "nombre") filtrados = globalArchivos.filter(a => a.nombre.toLowerCase().includes(texto));
   else if (tipoBusqueda === "por") filtrados = globalArchivos.filter(a => a.por.toLowerCase().includes(texto));
   else filtrados = globalArchivos.filter(a => String(a.categ).toLowerCase() === tipoBusqueda.toLowerCase());
@@ -131,18 +124,16 @@ function filtrarYMostrar() {
   if (filtrados.length === 0) {
     show.classList.remove("no-ver");
     show.innerText = `NO HAY RESULTADOS PARA "${buscador.value.toUpperCase()}"`;
-  } else {
-    show.classList.add("no-ver");
-  }
+  } else show.classList.add("no-ver");
 
-  cargarImagenes(filtrados);
+  renderizarImagenes(filtrados);
 }
 
 buscador.addEventListener("input", filtrarYMostrar);
 cats.addEventListener("change", filtrarYMostrar);
 
 // ===============================
-// CARGAR CATEGORÍAS
+// --- CARGAR CATEGORÍAS
 // ===============================
 function loadCats(categorias) {
   cats.innerHTML = `<option value="nombre">name</option><option value="por">contribuidor</option>`;
@@ -154,55 +145,34 @@ function loadCats(categorias) {
   });
 }
 
-
-
 // ===============================
-// PANEL SOLICITUDES
-// ===============================
+// --- PAGINACIÓN ---
+function renderizarPaginacion() {
+  const cont = document.getElementById("paginacion") || document.createElement("div");
+  cont.id = "paginacion";
+  cont.innerHTML = "";
+  fotos.after(cont);
 
-function getPublicId(url) {
-  const afterUpload = url.split("/upload/")[1];
-  const withoutExt = afterUpload.split(".")[0];
-  return withoutExt.replace(/v\d+\//, "");
+  for (let i = 1; i <= totalPaginas; i++) {
+    const btn = document.createElement("button");
+    btn.textContent = i;
+    btn.disabled = i === paginaActual;
+    btn.addEventListener("click", () => {
+      paginaActual = i;
+      cargarImagenesPaginadas(paginaActual);
+    });
+    cont.appendChild(btn);
+  }
 }
 
-
-
-
-async function cargarSolicitudes() {
-  const res = await fetch("/api/solicitudes");
-  const solicitudes = await res.json();
-
-  divSOLIS.innerHTML = "";
-  solicitudes.forEach(s => {
-    const div = document.createElement("div");
-    div.classList.add("solicitud");
-    div.innerHTML = `
-      <h2>Solicitud de eliminación</h2>
-      <p>motivo:${s.motivo}</p>
-      <img class="la-imagen" src="${s.ub}" alt="${s.nombre}" />
-      <h3 class="producto-titulo">${s.nombre}</h3>
-      <button class="aceptar" data-id="${s._id}">Aceptar</button>
-      <button class="rechazar" data-id="${s._id}">Rechazar</button>
-    `;
-    divSOLIS.appendChild(div);
-    const numerito = document.getElementById("numerito");
-    numerito.innerText = solicitudes.length;
-  });
+async function cargarImagenesPaginadas(pagina = 1) {
+  paginaActual = pagina;
+  const data = await cargarDesdeMongo();
+  renderizarImagenes(data.data);
 }
-//agregar funcionalidad a los botones aceptar y rechazar
-const  botones_aceptar =document.querySelectorAll(".aceptar");
-botones_aceptar.forEach(boton => {
-  boton.addEventListener("click", async (e) => {
-  
-
-    
-
 
 // ===============================
-// PANEL ADMIN
-// ===============================
-
+// --- PANEL ADMIN ---
 async function cargarAdmins() {
   const res = await fetch("/api/personas");
   const globalAdmins = await res.json();
@@ -259,7 +229,7 @@ function vincularBotonesAdmins() {
   // Quitar admin
   document.querySelectorAll(".get-down").forEach(btn => {
     btn.addEventListener("click", async e => {
-      const id = e.currentTarget.dataset.id;
+      const id = e.currentTarget.id;
       await fetch("/api/personas", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -271,15 +241,14 @@ function vincularBotonesAdmins() {
 }
 
 // ===============================
-// INICIALIZACIÓN
+// --- INICIALIZACIÓN
 // ===============================
 (async function init() {
-  const archivos = await cargarDesdeMongo();
-  cargarImagenes(archivos);
+  await cargarImagenesPaginadas(paginaActual);
 
-  const cats_unicos = [...new Set(archivos.map(a => a.categ))];
-  loadCats(cats_unicos);
+  const archivosInit = await cargarDesdeMongo();
+  const catsUnicos = [...new Set(archivosInit.data.map(a => a.categ))];
+  loadCats(catsUnicos);
 
-  await cargarSolicitudes();
-  await cargarAdmins();
+  cargarAdmins();
 })();

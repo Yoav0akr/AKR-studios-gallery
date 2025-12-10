@@ -6,45 +6,46 @@
   <link rel="stylesheet" href="./estilo.css">
   <link rel="icon" href="AKRlogo.ico">
   <meta charset="UTF-8">
-  <title>Galería</title>
+  <title>Galería Admin</title>
 </head>
 
 <body>
 
+  <!-- NAV -->
   <div class="nav navhiden">
     <div class="logo rotado">
-      <h1>GALERIA</h1>
+      <h1>GALERÍA</h1>
     </div>
 
     <div class="ses">
       <a class="menu" href="upload.html">SUBIR FOTO</a>
-      <a class="menu" href="./index.html">DESCARGAAR</a>
+      <a class="menu" href="./index.html">DESCARGAR</a>
       <select id="cats" name="cats" class="menu"></select>
       <input class="menu" type="text" id="buscador" placeholder="Buscar" />
     </div>
   </div>
 
+  <!-- SECCIÓN PRINCIPAL -->
   <section class="legumbre">
+
+    <!-- BOTONES DE PANEL -->
     <div class="aciones_admin">
-      <div id="solicitudes" class="cosa">Solicitudes <span class="solis" id="numerito">0</span></div>
       <div id="panel_de_borrado" class="cosa">Panel de borrado</div>
       <div id="panel_de_admins" class="cosa">Panel de personas</div>
     </div>
 
+    <!-- PANEL DE BORRADO -->
     <div class="imagenes-contenedor no-ver" id="imagenes-contenedor">
-      <!-- Se llena con JS -->
+      <!-- Se llenará con JS -->
     </div>
-
+    <div id="paginacion"></div>
     <h4 id="show" class="no-ver"></h4>
-    <div class="c4"></div>
 
-    <div class="div-solicitudes no-ver">
-      <!-- Se llena con JS -->
-    </div>
-
+    <!-- PANEL DE ADMINISTRADORES -->
     <div class="lista-personas no-ver">
-      <!-- Se llena con JS -->
+      <!-- Se llenará con JS -->
     </div>
+
   </section>
 
   <script src="./admins.js" type="module"></script>
