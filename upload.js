@@ -47,10 +47,6 @@ if (visualizador) {
       visualizador.style.backgroundSize = "cover";
       visualizador.style.backgroundPosition = "center";
 
-      // Quitar videos si los hubiera
-      Array.from(visualizador.querySelectorAll("video")).forEach((v) => v.remove());
-
-      // Asegurar que el texto sea visible
       const p = visualizador.querySelector("p");
       if (p) {
         p.style.position = "relative";
@@ -71,46 +67,25 @@ if (visualizador) {
         if (data.url) {
           console.log("✔ Subido a Cloudinary:", data.url);
           cloudinaryURL = data.url;
+
+          // Guardar automáticamente en Mongo
+          guardarEnMongo();
         } else {
-          alert("❌ Error al subir: " + (data.error || "desconocido"));
+          console.error(data);
+          alert("❌ Error al subir archivo: " + (data.error || "desconocido"));
+          cloudinaryURL = null;
         }
       } catch (err) {
         console.error(err);
         alert("⚠ Error de conexión con el servidor.");
+        cloudinaryURL = null;
       }
     };
   });
 }
 
 // --- GUARDAR EN MONGO ---
-async function guardarEnMongo(nombre, url, por, categ, mimidesk) {
-  const email_result = email_user || "null";
-
-  // ID único temporal, la API hará su ID incremental
-  const data = { nombre, ub: url, por, categ, mimidesk, email: email_result };
-
-  try {
-    const res = await fetch("/api/db", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
-
-    if (!res.ok) throw new Error("Error " + res.status);
-
-    alert("✅ Se ha guardado correctamente");
-    // Redirigir a index.html
-    window.location.href = "./index.html";
-  } catch (err) {
-    console.error("Error al guardar en Mongo:", err);
-    alert("❌ No se pudo guardar.");
-  }
-}
-
-// --- BOTÓN DE GUARDAR ---
-function queso(event) {
-  event.preventDefault();
-
+async function guardarEnMongo() {
   const nombre = EntradaNombre.value.trim();
   const por = EntradaPor.value.trim();
   const texto = EntradaCategs.value.toLowerCase().trim();
@@ -120,10 +95,43 @@ function queso(event) {
   if (!nombre) return alert("❌ Debes poner un nombre.");
   if (!cloudinaryURL) return alert("❌ Primero sube un archivo.");
 
-  guardarEnMongo(nombre, cloudinaryURL, por, categ, desk);
+  const data = {
+    nombre,
+    ub: cloudinaryURL,
+    por,
+    categ,
+    mimidesk: desk,
+    email: email_user || "null",
+  };
+
+  try {
+    const res = await fetch("/api/db", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const resData = await res.json();
+
+    if (!res.ok) {
+      console.error(resData);
+      alert("❌ Error guardando en la base de datos: " + (resData.error || "desconocido"));
+      return;
+    }
+
+    alert("✅ Imagen guardada correctamente con tu email");
+    window.location.href = "./index.html";
+  } catch (err) {
+    console.error("Error al guardar en Mongo:", err);
+    alert("❌ No se pudo guardar.");
+  }
 }
 
-EntradaGuardar.addEventListener("click", queso);
+// --- BOTÓN DE GUARDAR MANUAL ---
+EntradaGuardar.addEventListener("click", (e) => {
+  e.preventDefault();
+  if (cloudinaryURL) guardarEnMongo();
+});
 
 // --- UI NAV ---
 const navs = document.querySelector(".nav");
