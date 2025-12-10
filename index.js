@@ -13,7 +13,7 @@ if (nombre_usuario) {
   titular.innerText = ` Hola ${nombre_usuario}!`;
   titular.classList.remove("no-ver");
   //si admin pass es true se muestra el boton para ir al panel de administracion
-  if (adminpass === "true") {
+  if (adminpass.value=== "true") {
     btnPANadmins.classList.remove("no-ver");
     
   } else {
@@ -24,13 +24,13 @@ if (nombre_usuario) {
   btnPANadmins.classList.add("no-ver");
 };
 // al ahcer clic en solicitar
-const btnsolicitar = document.getElementById("solicitar");
-btnsolicitar.addEventListener("click", () => {
-  window.location.href = "./solicitar.html";
+const btnPerfil = document.getElementById("Mi_perfil");
+btnPerfil.addEventListener("click", () => {
+  window.location.href = "./area de prefiles/Mi_perfil.html";
 });
 
 //a la hcaer click en PANEL DE ADMINISTRACION
-btnPANadmins.addEventListener("click", () => {
+btnLog.addEventListener("click", () => {
   window.location.href = "./admins.html";
 });
 
@@ -219,3 +219,4 @@ logo.addEventListener("click", () => {
   navs.classList.toggle("navhiden");
   navigator.vibrate(200);
 });
+ScrollReveal().reveal('.imagen');
