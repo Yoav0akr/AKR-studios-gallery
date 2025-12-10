@@ -11,8 +11,10 @@ const EntradaDesc = document.getElementById("mimidesk");
 const usuario = localStorage.getItem("admin") || "";
 const email_user = localStorage.getItem("email") || "";
 
-EntradaPor.value = usuario;
-EntradaPor.disabled = true;
+EntradaPor.value = usuario.value.trim();
+if (EntradaPor.ariaValueMin.trim()= ""){
+  EntradaPor.disabled = true;
+};
 
 // --- DIV VISUALIZADOR ---
 const visualizador = document.querySelector(".visualizador");
