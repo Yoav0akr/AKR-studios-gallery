@@ -66,11 +66,11 @@ export default async function handler(req, res) {
       const limit = Number(req.query.limit) || 20;
       const skip = (page - 1) * limit;
 
+      // Contar total de documentos
       const totalDocs = await Imagen.countDocuments();
-      const data = await Imagen.find()
-        .sort({ id: -1 })
-        .skip(skip)
-        .limit(limit);
+
+      // Traer documentos paginados, orden descendente por id
+      const data = await Imagen.find().sort({ id: -1 }).skip(skip).limit(limit);
 
       return res.status(200).json({
         page,
@@ -80,6 +80,7 @@ export default async function handler(req, res) {
         data
       });
     }
+
 
     // ======================
     // POST — agregar nueva imagen
