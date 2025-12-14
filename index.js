@@ -188,10 +188,12 @@ cats.addEventListener("change", filtrarYMostrar);
 // ==============================
 btnPrev.addEventListener("click", async () => {
   if (window.currentPage > 1) await init(window.currentPage - 1);
+  window.location.href = "./index.html";
 });
 
 btnNext.addEventListener("click", async () => {
   if (window.currentPage < window.totalPages) await init(window.currentPage + 1);
+  window.location.href = "./index.html";
 });
 
 // ==============================

@@ -537,9 +537,7 @@ h1 {
     color: var(--accent-1);
 }
 
-.no-ver {
-    display: none;
-}
+
 
 .not {
     color: var(--danger);
@@ -733,4 +731,11 @@ h1 {
     z-index: 10;
     color: var(--text-main);
     text-shadow: 0 0 5px black;
+}
+/* ===================== */
+/*    CLASES NOBLES     */
+/* ===================== */
+
+.no-ver {
+    display: none;
 }

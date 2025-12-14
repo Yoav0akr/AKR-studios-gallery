@@ -4,7 +4,7 @@
 const adminpass = localStorage.getItem("adminpass") === "true";
 if (!adminpass) {
   alert("No tienes permisos para acceder a esta página.");
-  window.location.href = "./index.html";
+   window.location.href = "./index.html";
 }
 
 // ===============================
@@ -28,6 +28,7 @@ function hideAll() {
   personas.classList.add("no-ver");
 }
 
+
 // Rotar logo y mostrar/ocultar nav
 const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
@@ -35,6 +36,21 @@ logo.addEventListener("click", () => {
   logo.classList.toggle("rotado");
   navs.classList.toggle("navhiden");
   navigator.vibrate?.(200);
+});
+
+// ===============================
+// BOTONES DE PANEL
+// ===============================
+botonPB.addEventListener("click", () => {
+  hideAll();
+  fotos.classList.remove("no-ver");
+  cargarImagenesPaginadas(1);
+});
+
+botonPersonas.addEventListener("click", () => {
+  hideAll();
+  personas.classList.remove("no-ver");
+  cargarAdmins();
 });
 
 // ===============================
@@ -194,20 +210,7 @@ function vincularBotonesAdmins() {
   });
 }
 
-// ===============================
-// BOTONES DE PANEL
-// ===============================
-botonPB.addEventListener("click", () => {
-  hideAll();
-  fotos.classList.remove("no-ver");
-  cargarImagenesPaginadas(1);
-});
 
-botonPersonas.addEventListener("click", () => {
-  hideAll();
-  personas.classList.remove("no-ver");
-  cargarAdmins();
-});
 
 // ===============================
 // INICIALIZACIÓN
