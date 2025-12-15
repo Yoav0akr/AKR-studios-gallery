@@ -20,33 +20,37 @@ btn.addEventListener("click", async () => {
       }),
     });
 
-    if (!res.ok) {
-      throw new Error(`Error HTTP ${res.status}`);
-    }
+    const data = await res.json(); // <-- obtener JSON primero
 
-    const data = await res.json();
-    console.log("Respuesta login:", data);
+    if (!res.ok) {
+      // Mostrar mensaje de backend si hay error
+      alert(data.message || `Error HTTP ${res.status}`);
+      console.error("Error login:", data);
+      return;
+    }
 
     if (!data.success) {
       alert(data.message || "Credenciales incorrectas");
       return;
     }
 
-    alert(`¡Bienvenido ${data.admin}!`);
-
+    // ✅ Login exitoso
     localStorage.setItem("admin", data.admin);
     localStorage.setItem("adminpass", String(data.adminpass));
     if (data.email) localStorage.setItem("email", data.email);
 
+    alert(`¡Bienvenido ${data.admin}!`);
     window.location.href = "/index.html";
 
   } catch (err) {
-    console.error("Error iniciando sesión:", err);
+    console.error("Error conectando al servidor:", err);
     alert("No se pudo conectar con el servidor.");
   }
 });
 
-// NAV
+// ==============================
+//  NAVBAR
+// ==============================
 const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
 
