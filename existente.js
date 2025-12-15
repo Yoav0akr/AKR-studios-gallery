@@ -1,7 +1,11 @@
+// ==============================
+//  ELEMENTOS DEL LOGIN
+// ==============================
 const btn = document.getElementById("manchego");
 
 btn.addEventListener("click", async () => {
-  const nombre = document.getElementById("nombre_imput").value.trim();
+  // Tomamos y normalizamos los valores
+  const nombre = document.getElementById("nombre_imput").value.trim().toLowerCase();
   const password = document.getElementById("por-imput").value.trim();
 
   if (!nombre || !password) {
@@ -20,17 +24,12 @@ btn.addEventListener("click", async () => {
       }),
     });
 
-    const data = await res.json(); // <-- obtener JSON primero
+    const data = await res.json();
 
-    if (!res.ok) {
-      // Mostrar mensaje de backend si hay error
+    // Si hay error HTTP o credenciales incorrectas
+    if (!res.ok || !data.success) {
       alert(data.message || `Error HTTP ${res.status}`);
       console.error("Error login:", data);
-      return;
-    }
-
-    if (!data.success) {
-      alert(data.message || "Credenciales incorrectas");
       return;
     }
 
