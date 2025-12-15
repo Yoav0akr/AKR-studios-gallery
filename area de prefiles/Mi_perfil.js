@@ -1,102 +1,129 @@
-
-// Control de inicio (se ve si se inició sesión)
-
+// ==============================
+//  SESIÓN
+// ==============================
+const admin = localStorage.getItem("admin");
 const adminpass = localStorage.getItem("adminpass");
-const nombre_usuario = localStorage.getItem("admin");
-const email_place = document.getElementById("perfil-email");
-const rol_place = document.getElementById("perfil-rol");
-const myPhoto = document.getElementById("imagenes-contenedor-perfil");
-//llenar los areas
-function llenar_perfil(nombre, email, adminpass, fotos_subidas) {
-  email_place.innerText = email;
-  rol_place.innerText = adminpass === "true" ? "Administrador" : "Usuario";
-  document.getElementById("perfil-nombre").innerText = nombre;
+
+if (!admin) {
+  window.location.href = "../existente.html";
 }
 
-//cargar datos del usuario
-let globalArchivos = [];
+// ==============================
+//  ELEMENTOS PERFIL
+// ==============================
+const nombreEl = document.getElementById("perfil-nombre");
+const emailEl = document.getElementById("perfil-email");
+const rolEl = document.getElementById("perfil-rol");
+const descEl = document.getElementById("perfil-desc");
 
-async function cargarDesdeMongo(page = 1, limit = 20) {
+// ==============================
+//  CONTENEDOR IMÁGENES
+// ==============================
+const contenedorImgs = document.getElementById("imagenes-contenedor-perfil");
+
+// ==============================
+//  CARGAR PERFIL
+// ==============================
+async function cargarPerfil() {
   try {
-    const res = await fetch(`/api/db?page=${page}&limit=${limit}`);
-    if (!res.ok) throw new Error("Error " + res.status);
-    const resultado = await res.json();
+    const res = await fetch(`/api/api_perfil?admin=${admin}`);
+    const data = await res.json();
 
-    globalArchivos = resultado.data;
-    window.totalPages = resultado.totalPages;
-    window.currentPage = resultado.page;
+    if (!data.success) throw data.error;
 
-    return resultado.data;
+    nombreEl.innerText = data.user.admin;
+    emailEl.innerText = data.user.email || "—";
+    rolEl.innerText =
+      data.user.adminpass === "true" ? "Administrador" : "Usuario";
+
+    descEl.innerText = "Usuario activo en el sistema.";
   } catch (err) {
-    console.error(err);
-    return [];
+    console.error("Error perfil:", err);
   }
-};
-
-//filtar fotos de usuario
-const userPictuers = async (nombre_usuario) => {
-  const todas_las_fotos = await cargarDesdeMongo(1, 1000);
-  return todas_las_fotos.filter((foto) => foto.por === nombre_usuario);
 }
-const fotos = userPictuers(nombre_usuario);
-cargarimagenes(fotos);
 
+// ==============================
+//  CARGAR MIS FOTOS
+// ==============================
+async function cargarMisFotos() {
+  try {
+    const res = await fetch(`/api/db?por=${admin}`);
+    const data = await res.json();
 
+    if (!data.success) throw data.error;
 
+    pintarFotos(data.data);
+  } catch (err) {
+    console.error("Error fotos:", err);
+  }
+}
 
+// ==============================
+//  PINTAR FOTOS
+// ==============================
+function pintarFotos(fotos) {
+  contenedorImgs.innerHTML = "";
 
-//funcion general para mostrar fotos de usuario
-function cargarimagenes(cosas) {
-  fotos.innerHTML = "";
-  cosas.forEach(nombre => {
+  if (!fotos.length) {
+    contenedorImgs.innerHTML = "<p>No has subido contenido.</p>";
+    return;
+  }
+
+  fotos.forEach(img => {
     const div = document.createElement("div");
-    const descripcion = nombre.mimidesk || "sin descripcion";
+    div.className = "imagen";
 
-    div.classList.add("imagen");
     div.innerHTML = `
-      <h3 class="producto-titulo">${nombre.nombre}</h3>
-      <img class="la-imagen" id="${nombre.id}" src="${nombre.ub}" alt="${nombre.nombre}" />
-      <div class="detalles">
-        <ul>
-          <li><p>Por/De: ${nombre.por}</p></li>
-          <li><p>Categoría: ${nombre.categ.join(", ")}</p></li>
-          <li><p>Descripción: ${descripcion}</p></li>
-          <li><p>id: "${nombre.id}"</p></li>
-        </ul>
-      </div>
-      <div class="desc-soli">
-        <button class="descargarBtn" id="${nombre.id}">Descargar</button>
-        <button class="eliminarBtn" id="${nombre.id}">eliminar</button>
+      <h4>${img.nombre}</h4>
+      <img src="${img.ub}" alt="${img.nombre}" class="la-imagen">
 
+      <p><b>Categoría:</b> ${img.categ.join(", ")}</p>
+
+      <div class="desc-soli">
+        <a href="${img.ub}" download class="descargarBtn yes">
+          Descargar
+        </a>
+        <button class="eliminarBtn not" data-id="${img._id}">
+          Eliminar
+        </button>
       </div>
     `;
-    myPhoto.append(div);
+
+    contenedorImgs.appendChild(div);
   });
 
-  actualizarBotonesDescargar();
-  vincularBotonesEliminar();
-  actualizarVisualizacion();
+  vincularEliminar();
 }
-// vincular  botones eliminar
-function vincularBotonesEliminar() {
+
+// ==============================
+//  ELIMINAR SOLO MIS FOTOS
+// ==============================
+function vincularEliminar() {
   document.querySelectorAll(".eliminarBtn").forEach(btn => {
-    btn.addEventListener("click", async e => {
-      const id = e.currentTarget.dataset.id;
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+
       if (!confirm("¿Eliminar esta imagen?")) return;
+
       try {
-        await fetch(`../api/db?_id=${id}`, { method: "DELETE" });
-        cargarDesdeMongo
+        const res = await fetch(
+          `/api/db?_id=${id}&admin=${admin}`,
+          { method: "DELETE" }
+        );
+
+        const data = await res.json();
+        if (!data.success) throw data.error;
+
+        cargarMisFotos();
       } catch (err) {
-        console.error("Error eliminando imagen:", err);
+        alert("No tienes permiso para borrar esta imagen");
       }
     });
   });
 }
 
-
-
 // ==============================
-//  NAVBAR LOGO
+//  NAVBAR
 // ==============================
 const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
@@ -107,6 +134,8 @@ logo.addEventListener("click", () => {
   navigator.vibrate(200);
 });
 
-if (adminpass !== "true") {
-  window.location.href = "../nuevo.html";
-}
+// ==============================
+//  INIT
+// ==============================
+cargarPerfil();
+cargarMisFotos();

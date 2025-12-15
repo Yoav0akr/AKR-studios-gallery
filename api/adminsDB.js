@@ -1,56 +1,82 @@
 import mongoose from "mongoose";
-import bcrypt from "bcryptjs"; // bcryptjs en lugar de bcrypt
+import bcrypt from "bcryptjs";
 
-// === CONFIGURACIÓN MONGODB ===
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.8";
+// ==============================
+//  MONGODB CONFIG (VERCEL SAFE)
+// ==============================
+const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
-  throw new Error("Falta MONGODB_URI en las variables de entorno de Vercel");
+  throw new Error("Falta MONGODB_URI en variables de entorno");
 }
 
-// Conexión cacheada para Vercel
 let cached = global.mongoose;
 if (!cached) cached = global.mongoose = { conn: null, promise: null };
 
-// === MODELO DE ADMIN ===
-const ADMINSchema = new mongoose.Schema(
-  {
-    admin: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    email: { type: String, required: true },
-    adminpass: { type: String, default: "false" },
+// ==============================
+//  SCHEMA ADMIN
+// ==============================
+const ADMINSchema = new mongoose.Schema({
+  admin: {
+    type: String,
+    required: true,
+    unique: true,
+    trim: true
   },
-  { collection: "admins" }
-);
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true
+  },
+  password: {
+    type: String,
+    required: true
+  },
+  adminpass: {
+    type: String,
+    default: "false" // "true" | "false"
+  }
+}, { collection: "admins" });
 
 const Admin = mongoose.models.Admin || mongoose.model("Admin", ADMINSchema);
 
-// === HANDLER PRINCIPAL ===
+// ==============================
+//  DB CONNECT
+// ==============================
+async function connectDB() {
+  if (!cached.conn) {
+    if (!cached.promise) {
+      cached.promise = mongoose.connect(MONGODB_URI, {
+        bufferCommands: false
+      });
+    }
+    cached.conn = await cached.promise;
+  }
+}
+
+// ==============================
+//  HANDLER
+// ==============================
 export default async function handler(req, res) {
   try {
-    // Conexión única en serverless
-    if (!cached.conn) {
-      if (!cached.promise) {
-        cached.promise = mongoose.connect(MONGODB_URI, {
-          bufferCommands: false,
-        });
-      }
-      cached.conn = await cached.promise;
-    }
+    await connectDB();
 
-    // Parsear body
-    let body = {};
-    try {
-      body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-    } catch (e) {
-      return res.status(400).json({ success: false, error: "JSON inválido" });
-    }
+    const body =
+      typeof req.body === "string"
+        ? JSON.parse(req.body || "{}")
+        : req.body || {};
 
-    // ---------------- GET → Listar admins ----------------
+    // ==============================
+    //  GET → EXISTE ADMIN
+    // ==============================
     if (req.method === "GET") {
-      const admin = req.query.admin;
-
+      const { admin } = req.query;
       if (!admin) {
-        return res.status(400).json({ success: false, error: "Falta admin" });
+        return res.status(400).json({
+          success: false,
+          message: "Falta admin"
+        });
       }
 
       const existe = await Admin.findOne({ admin });
@@ -61,71 +87,134 @@ export default async function handler(req, res) {
       });
     }
 
-    // ---------------- POST → Crear o login ----------------
+    // ==============================
+    //  POST → LOGIN / REGISTRO
+    // ==============================
     if (req.method === "POST") {
-      // LOGIN
-      if (body.login === true) {
-        const encontrado = await Admin.findOne({ admin: body.admin });
-        if (!encontrado)
-          return res
-            .status(404)
-            .json({ success: false, message: "Admin no encontrado" });
 
-        const passOK = await bcrypt.compare(body.password, encontrado.password);
-        if (!passOK)
-          return res
-            .status(401)
-            .json({ success: false, message: "Contraseña incorrecta" });
+      // ---------- LOGIN ----------
+      if (body.login === true) {
+        if (!body.admin || !body.password) {
+          return res.status(400).json({
+            success: false,
+            message: "Faltan credenciales"
+          });
+        }
+
+        const user = await Admin.findOne({ admin: body.admin });
+
+        if (!user) {
+          return res.status(404).json({
+            success: false,
+            message: "Usuario no encontrado"
+          });
+        }
+
+        const passOK = await bcrypt.compare(body.password, user.password);
+        if (!passOK) {
+          return res.status(401).json({
+            success: false,
+            message: "Contraseña incorrecta"
+          });
+        }
 
         return res.status(200).json({
           success: true,
-          message: "Login exitoso",
-          admin: encontrado.admin,
-          email: encontrado.email,
-          adminpass: encontrado.adminpass
+          admin: user.admin,
+          email: user.email,
+          adminpass: user.adminpass
         });
       }
 
-      // CREAR NUEVO ADMIN
+      // ---------- REGISTRO ----------
+      if (!body.admin || !body.password || !body.email) {
+        return res.status(400).json({
+          success: false,
+          message: "Faltan datos"
+        });
+      }
+
+      const existe = await Admin.findOne({ admin: body.admin });
+      if (existe) {
+        return res.status(409).json({
+          success: false,
+          message: "El admin ya existe"
+        });
+      }
+
       const hashed = await bcrypt.hash(body.password, 10);
-      const nuevo = await Admin.create({ admin: body.admin, password: hashed, email: body.email });
+
+      const nuevo = await Admin.create({
+        admin: body.admin,
+        email: body.email,
+        password: hashed,
+        adminpass: "false"
+      });
+
       return res.status(201).json({
         success: true,
-        message: "Admin creado",
-        admin: { id: nuevo._id, admin: nuevo.admin, adminpass: nuevo.adminpass },
+        message: "Usuario creado",
+        admin: nuevo.admin,
+        adminpass: nuevo.adminpass
       });
     }
 
-    // ---------------- PUT → Actualizar admin ----------------
+    // ==============================
+    //  PUT → CAMBIAR adminpass
+    // ==============================
     if (req.method === "PUT") {
-      if (!body.id) return res.status(400).json({ success: false, error: "Falta ID" });
+      if (!body.id || !body.adminpass) {
+        return res.status(400).json({
+          success: false,
+          message: "Faltan datos"
+        });
+      }
 
-      const updates = {};
-      if (body.admin) updates.admin = body.admin;
-      if (body.password) updates.password = await bcrypt.hash(body.password, 10);
-
-      const actualizado = await Admin.findByIdAndUpdate(body.id, updates, { new: true });
+      const actualizado = await Admin.findByIdAndUpdate(
+        body.id,
+        { adminpass: body.adminpass },
+        { new: true }
+      );
 
       return res.status(200).json({
         success: true,
-        message: "Admin actualizado",
-        admin: actualizado,
+        admin: actualizado.admin,
+        adminpass: actualizado.adminpass
       });
     }
 
-    // ---------------- DELETE → Borrar admin ----------------
+    // ==============================
+    //  DELETE → BORRAR ADMIN
+    // ==============================
     if (req.method === "DELETE") {
-      if (!body.id) return res.status(400).json({ success: false, error: "Falta ID" });
+      if (!body.id) {
+        return res.status(400).json({
+          success: false,
+          message: "Falta ID"
+        });
+      }
 
       await Admin.findByIdAndDelete(body.id);
-      return res.status(200).json({ success: true, message: "Admin eliminado" });
+      return res.status(200).json({
+        success: true,
+        message: "Admin eliminado"
+      });
     }
 
-    // ---------------- METHOD NOT ALLOWED ----------------
+    // ==============================
+    //  METHOD NOT ALLOWED
+    // ==============================
     res.setHeader("Allow", ["GET", "POST", "PUT", "DELETE"]);
-    return res.status(405).json({ success: false, error: `Método ${req.method} no permitido` });
+    return res.status(405).json({
+      success: false,
+      message: `Método ${req.method} no permitido`
+    });
+
   } catch (error) {
-    console.error("Error en API /adminsDB:", error);
-    return res.status(500).json({ success: false, error: "Error interno del servidor" });
+    console.error("API adminsDB error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error interno del servidor"
+    });
   }
 }
