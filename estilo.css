@@ -150,6 +150,7 @@ button:hover {
     padding: 1.5rem;
     margin: -1em;
     z-index: 9099999;
+    transform:translateY(0.4rem)
 }
 
 .logo {
@@ -169,7 +170,7 @@ button:hover {
 
 h1 {
     margin-left: 1.6em;
-    margin-top: 0.3em;
+
     color: #fff;
     white-space: nowrap;
 }
@@ -257,6 +258,7 @@ h1 {
     align-items: s;
     width: 50%;
 
+
 }
 
 /* ===================== */
@@ -274,23 +276,23 @@ h1 {
 
     align-items: center;
     padding: 0.5rem;
-    border-radius: var(--defborder);
-    border: 0.2rem solid var(--accent-2);
-    background: #222;
+  
+    background: #333;
     color: #fff;
     margin-right: 0.1rem;
-    width: auto;
+    border: none;
+    border-radius: var(--defborder);
 }
 
 .menu:hover {
-    border: 3px solid #fff;
+    background-color: #021b8c;
 }
 
 .menu input,
 .menu select,
 .menu a,
 .menu button {
-    height: 100%;
+    height: auto;
 }
 
 /* ===================== */
@@ -559,8 +561,7 @@ h1 {
 #loged {
     display: flex;
     flex-direction: row;
-    width: auto;
-    max-width: auto;
+
 }
 .yes{
     background: #aa00ff;
@@ -595,6 +596,7 @@ h1 {
     #loged {
         flex-direction: column;
         align-items: center;
+
     }
 
 
@@ -605,7 +607,7 @@ h1 {
         min-height: 100%;
         max-width: 4.6rem;
         padding: 0.5em;
-        gap: 0.5rem;
+        gap: 1rem;
         border-radius: 0 0 var(--defborder);
         overflow-y: hidden;
         transition: 0.5s ease-in-out;
@@ -637,9 +639,8 @@ h1 {
         flex-grow: 1;
         margin: 0;
         justify-content: center;
-        margin-top: 0.5rem;
         border-radius: 0.5rem;
-        min-width: 2rem;
+        min-height: 2rem;
     }
 
     .imagenes-contenedor {
@@ -681,7 +682,7 @@ h1 {
         width: auto;
         flex-direction: column;
         text-align: center;
-        max-width: 7rem;
+        max-width: 100%;
 
     }
 
