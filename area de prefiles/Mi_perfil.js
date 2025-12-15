@@ -9,17 +9,20 @@ if (!admin) {
 }
 
 // ==============================
-//  ELEMENTOS PERFIL
+//  ELEMENTOS DEL PERFIL
 // ==============================
 const nombreEl = document.getElementById("perfil-nombre");
 const emailEl = document.getElementById("perfil-email");
 const rolEl = document.getElementById("perfil-rol");
 const descEl = document.getElementById("perfil-desc");
+const contenedorImgs = document.getElementById("imagenes-contenedor-perfil");
 
 // ==============================
-//  CONTENEDOR IMÁGENES
+//  CONFIG PAGINACIÓN
 // ==============================
-const contenedorImgs = document.getElementById("imagenes-contenedor-perfil");
+let currentPage = 1;
+const limit = 20;
+let totalPages = 1;
 
 // ==============================
 //  CARGAR PERFIL
@@ -29,32 +32,38 @@ async function cargarPerfil() {
     const res = await fetch(`/api/api_perfil?admin=${admin}`);
     const data = await res.json();
 
-    if (!data.success) throw data.error;
+    if (!data.success) throw data.error || "Error al cargar perfil";
 
-    nombreEl.innerText = data.user.admin;
-    emailEl.innerText = data.user.email || "—";
-    rolEl.innerText =
-      data.user.adminpass === "true" ? "Administrador" : "Usuario";
+    const profile = data.profile;
 
+    nombreEl.innerText = profile.admin;
+    emailEl.innerText = profile.email || "—";
+    rolEl.innerText = profile.role;
     descEl.innerText = "Usuario activo en el sistema.";
   } catch (err) {
     console.error("Error perfil:", err);
+    alert("No se pudo cargar el perfil.");
   }
 }
 
 // ==============================
-//  CARGAR MIS FOTOS
+//  CARGAR FOTOS DEL USUARIO
 // ==============================
-async function cargarMisFotos() {
+async function cargarMisFotos(page = 1) {
   try {
-    const res = await fetch(`/api/db?por=${admin}`);
+    const res = await fetch(`/api/db?page=${page}&limit=${limit}`);
     const data = await res.json();
 
-    if (!data.success) throw data.error;
+    const fotosUsuario = (data.data || []).filter(f => f.por === admin);
 
-    pintarFotos(data.data);
+    totalPages = data.totalPages || 1;
+    currentPage = page;
+
+    pintarFotos(fotosUsuario);
+    pintarPaginador();
   } catch (err) {
     console.error("Error fotos:", err);
+    contenedorImgs.innerHTML = "<p>No se pudieron cargar las fotos.</p>";
   }
 }
 
@@ -76,16 +85,10 @@ function pintarFotos(fotos) {
     div.innerHTML = `
       <h4>${img.nombre}</h4>
       <img src="${img.ub}" alt="${img.nombre}" class="la-imagen">
-
       <p><b>Categoría:</b> ${img.categ.join(", ")}</p>
-
       <div class="desc-soli">
-        <a href="${img.ub}" download class="descargarBtn yes">
-          Descargar
-        </a>
-        <button class="eliminarBtn not" data-id="${img._id}">
-          Eliminar
-        </button>
+        <a href="${img.ub}" download class="descargarBtn yes">Descargar</a>
+        <button class="eliminarBtn not" data-id="${img._id}">Eliminar</button>
       </div>
     `;
 
@@ -102,24 +105,49 @@ function vincularEliminar() {
   document.querySelectorAll(".eliminarBtn").forEach(btn => {
     btn.addEventListener("click", async () => {
       const id = btn.dataset.id;
-
       if (!confirm("¿Eliminar esta imagen?")) return;
 
       try {
-        const res = await fetch(
-          `/api/db?_id=${id}&admin=${admin}`,
-          { method: "DELETE" }
-        );
-
+        const res = await fetch(`/api/db?_id=${id}&admin=${admin}`, {
+          method: "DELETE"
+        });
         const data = await res.json();
+
         if (!data.success) throw data.error;
 
-        cargarMisFotos();
+        cargarMisFotos(currentPage);
       } catch (err) {
-        alert("No tienes permiso para borrar esta imagen");
+        alert("No tienes permiso para borrar esta imagen o ocurrió un error.");
+        console.error(err);
       }
     });
   });
+}
+
+// ==============================
+//  PAGINACIÓN
+// ==============================
+function pintarPaginador() {
+  let pagContainer = document.getElementById("paginador");
+  if (!pagContainer) {
+    pagContainer = document.createElement("div");
+    pagContainer.id = "paginador";
+    pagContainer.style.marginTop = "1rem";
+    pagContainer.style.textAlign = "center";
+    contenedorImgs.after(pagContainer);
+  }
+
+  pagContainer.innerHTML = "";
+
+  for (let i = 1; i <= totalPages; i++) {
+    const btn = document.createElement("button");
+    btn.innerText = i;
+    btn.disabled = i === currentPage;
+    btn.style.margin = "0 5px";
+
+    btn.addEventListener("click", () => cargarMisFotos(i));
+    pagContainer.appendChild(btn);
+  }
 }
 
 // ==============================
