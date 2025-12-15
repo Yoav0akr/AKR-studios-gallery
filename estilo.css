@@ -102,13 +102,12 @@ p {
 
 ul {
     list-style: none;
+    margin-top: 0.6rem;
     margin-left: -1em;
     text-align: start;
 }
 
-li {
-    margin-bottom: -0.9em;
-}
+
 
 button {
     font-family: 'Times New Roman', Times, serif;
