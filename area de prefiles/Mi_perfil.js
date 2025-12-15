@@ -86,8 +86,8 @@ function pintarFotos(fotos) {
       <h4>${img.nombre}</h4>
       <img src="${img.ub}" alt="${img.nombre}" class="la-imagen">
       <p><b>Categoría:</b> ${img.categ.join(", ")}</p>
-      <div class="desc-soli">
-        <a href="${img.ub}" download class="descargarBtn yes">Descargar</a>
+      <div class="toDO">
+        <button class="descargarBtn yes" data-id="${img._id}">Descargar</button>
         <button class="eliminarBtn not" data-id="${img._id}">Eliminar</button>
       </div>
     `;
@@ -96,33 +96,47 @@ function pintarFotos(fotos) {
   });
 
   vincularEliminar();
+  vincularDescargar(fotos);
 }
 
 // ==============================
-//  ELIMINAR SOLO MIS FOTOS
+//  VINCULAR DESCARGAR
 // ==============================
-function vincularEliminar() {
-  document.querySelectorAll(".eliminarBtn").forEach(btn => {
-    btn.addEventListener("click", async () => {
+function vincularDescargar(fotos) {
+  document.querySelectorAll(".descargarBtn").forEach(btn => {
+    btn.addEventListener("click", () => {
       const id = btn.dataset.id;
-      if (!confirm("¿Eliminar esta imagen?")) return;
-
-      try {
-        const res = await fetch(`/api/db?_id=${id}&admin=${admin}`, {
-          method: "DELETE"
-        });
-        const data = await res.json();
-
-        if (!data.success) throw data.error;
-
-        cargarMisFotos(currentPage);
-      } catch (err) {
-        alert("No tienes permiso para borrar esta imagen o ocurrió un error.");
-        console.error(err);
-      }
+      const archivo = fotos.find(f => f._id === id);
+      if (archivo) download(archivo);
     });
   });
 }
+
+// ==============================
+//  DESCARGAR IMAGEN + BLOB
+// ==============================
+async function download(archivo) {
+  try {
+    const res = await fetch(archivo.ub);
+    if (!res.ok) throw new Error("Error al descargar la imagen");
+
+    const blob = await res.blob();
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = archivo.nombre + "_AKR.jpg";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    // Liberar memoria del blob
+    URL.revokeObjectURL(a.href);
+  } catch (err) {
+    console.error("Error descargando imagen:", err);
+    alert("No se pudo descargar la imagen.");
+  }
+}
+
+
 
 // ==============================
 //  PAGINACIÓN
