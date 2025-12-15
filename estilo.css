@@ -81,8 +81,7 @@ h1,
 h2,
 h3,
 p,
-ul,
-li {
+ul {
     margin: 0;
 }
 
@@ -107,9 +106,6 @@ ul {
     text-align: start;
 }
 
-li {
-    margin-bottom: -0.9em;
-}
 
 button {
     font-family: 'Times New Roman', Times, serif;
