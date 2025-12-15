@@ -54,13 +54,19 @@ async function cargarMisFotos(page = 1) {
     const res = await fetch(`/api/db?page=${page}&limit=${limit}`);
     const data = await res.json();
 
+    // Filtrar solo las fotos del usuario
     const fotosUsuario = (data.data || []).filter(f => f.por === admin);
 
-    totalPages = data.totalPages || 1;
+    totalPages = Math.ceil(fotosUsuario.length / limit) || 1;
     currentPage = page;
 
-    pintarFotos(fotosUsuario);
-    pintarPaginador();
+    // Mostrar solo las fotos de la página actual
+    const start = (page - 1) * limit;
+    const end = start + limit;
+    const fotosPagina = fotosUsuario.slice(start, end);
+
+    pintarFotos(fotosPagina);
+    pintarPaginador(totalPages);
   } catch (err) {
     console.error("Error fotos:", err);
     contenedorImgs.innerHTML = "<p>No se pudieron cargar las fotos.</p>";
@@ -83,13 +89,12 @@ function pintarFotos(fotos) {
     div.className = "imagen";
 
     div.innerHTML = `
-      <h3 class="producto-titulo">${img.nombre}</h3>
+      <h4>${img.nombre}</h4>
       <img src="${img.ub}" alt="${img.nombre}" class="la-imagen">
       <p><b>Categoría:</b> ${img.categ.join(", ")}</p>
-      <div class="toDO" style="display: flex;
-    flex-wrap: nowrap;">
-        <button class="descargarBtn yes" data-id="${img._id}">Descargar</button>
-        <button class="eliminarBtn  not" data-id="${img._id}">Eliminar</button>
+      <div class="toDO">
+        <button class="descargarBtn" data-id="${img._id}">Descargar</button>
+        <button class="eliminarBtn" data-id="${img._id}">Eliminar</button>
       </div>
     `;
 
@@ -101,7 +106,7 @@ function pintarFotos(fotos) {
 }
 
 // ==============================
-//  VINCULAR EL BOTÓN DE DESCARGA
+//  DESCARGAR IMAGEN + BLOB
 // ==============================
 function vincularDescargar(fotos) {
   document.querySelectorAll(".descargarBtn").forEach(btn => {
@@ -113,9 +118,6 @@ function vincularDescargar(fotos) {
   });
 }
 
-// ==============================
-//  DESCARGAR IMAGEN + BLOB
-// ==============================
 async function download(archivo) {
   try {
     const res = await fetch(archivo.ub);
@@ -128,8 +130,6 @@ async function download(archivo) {
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-
-    // Liberar memoria del blob
     URL.revokeObjectURL(a.href);
   } catch (err) {
     console.error("Error descargando imagen:", err);
@@ -165,7 +165,7 @@ function vincularEliminar() {
 // ==============================
 //  PAGINADOR
 // ==============================
-function pintarPaginador() {
+function pintarPaginador(totalPages) {
   let pagContainer = document.getElementById("paginador");
   if (!pagContainer) {
     pagContainer = document.createElement("div");
@@ -182,7 +182,6 @@ function pintarPaginador() {
     btn.className = "paginador-btn";
     btn.addEventListener("click", () => cargarMisFotos(i));
     pagContainer.appendChild(btn);
-    pagContainer.classList.add("less")
   }
 }
 
