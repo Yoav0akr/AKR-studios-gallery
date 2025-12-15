@@ -1,27 +1,26 @@
 // ==============================
 //  ELEMENTOS DOM
 // ==============================
-const divlog = document.getElementById("loged");
-const btnLog = document.getElementById("btnLogAdmins");
 const titular = document.getElementById("titular");
 const btnPANadmins = document.getElementById("btnLogAdmins");
+const btnLog = document.getElementById("btnLogAdmins");
 const fotos = document.querySelector("#imagenes-contenedor");
 const cats = document.getElementsByName("cats")[0];
-const show = document.getElementById("show");
 const buscador = document.querySelector("#buscador");
 const div_mesages = document.querySelector(".mensage");
 const btnPrev = document.getElementById("prev");
 const btnNext = document.getElementById("next");
 const paginaActual = document.getElementById("paginaActual");
+const show = document.getElementById("show");
 
 // ==============================
-//  CONTROL DE SESIÓN
+//  SESIÓN
 // ==============================
 const adminpass = localStorage.getItem("adminpass");
 const nombre_usuario = localStorage.getItem("admin");
 
 if (nombre_usuario) {
-  titular.innerText = ` Hola ${nombre_usuario}!`;
+  titular.textContent = `Hola ${nombre_usuario}!`;
   titular.classList.remove("no-ver");
 
   if (adminpass === "true") {
@@ -35,119 +34,109 @@ if (nombre_usuario) {
 }
 
 // ==============================
-//  EVENTOS BOTONES
-// ==============================
-document.getElementById("Mi_perfil").addEventListener("click", () => {
-  window.location.href = "./area de prefiles/Mi_perfil.html";
-});
-
-btnLog.addEventListener("click", () => {
-  window.location.href = "./admins.html";
-});
-
-// ==============================
-//  GLOBAL
+//  GLOBALES
 // ==============================
 let globalArchivos = [];
-window.currentPage = 1;
-window.totalPages = 1;
+let currentPage = 1;
+let totalPages = 1;
+const LIMIT = 20;
 
 // ==============================
-//  CARGAR DATOS DESDE API
+//  API
 // ==============================
-async function cargarDesdeMongo(page = 1, limit = 20) {
+async function cargarDesdeMongo(page = 1) {
   try {
-    const res = await fetch(`/api/db?page=${page}&limit=${limit}`);
-    if (!res.ok) throw new Error("Error " + res.status);
-    const resultado = await res.json();
+    const res = await fetch(`/api/db?page=${page}&limit=${LIMIT}`);
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
 
-    globalArchivos = resultado.data;
-    window.totalPages = resultado.totalPages;
-    window.currentPage = resultado.page;
+    globalArchivos = data.data || [];
+    currentPage = data.page;
+    totalPages = data.totalPages;
 
-    return resultado.data;
+    return globalArchivos;
   } catch (err) {
-    console.error(err);
+    console.error("Error Mongo:", err);
     return [];
   }
 }
 
 // ==============================
-//  RENDER DE IMÁGENES
+//  RENDER IMÁGENES
 // ==============================
-function cargarimagenes(cosas) {
+function cargarimagenes(lista) {
   fotos.innerHTML = "";
-  cosas.forEach(nombre => {
-    const div = document.createElement("div");
-    const descripcion = nombre.mimidesk || "sin descripcion";
 
-    div.classList.add("imagen");
+  if (lista.length === 0) {
+    show.classList.remove("no-ver");
+    show.textContent = "NO HAY IMÁGENES DISPONIBLES";
+    return;
+  }
+
+  show.classList.add("no-ver");
+
+  lista.forEach(item => {
+    const div = document.createElement("div");
+    const descripcion = item.mimidesk || "Sin descripción";
+
+    div.className = "imagen";
     div.innerHTML = `
-      <h3 class="producto-titulo">${nombre.nombre}</h3>
-      <img class="la-imagen" id="${nombre.id}" src="${nombre.ub}" alt="${nombre.nombre}" />
+      <h3 class="producto-titulo">${item.nombre}</h3>
+      <img class="la-imagen" src="${item.ub}" alt="${item.nombre}" />
       <div class="detalles">
         <ul>
-          <li><p>Por/De: ${nombre.por}</p></li>
-          <li><p>Categoría: ${nombre.categ.join(", ")}</p></li>
-          <li><p>Descripción: ${descripcion}</p></li>
-          <li><p>id: "${nombre.id}"</p></li>
+          <li>Por: ${item.por}</li>
+          <li>Categoría: ${(item.categ || []).join(", ")}</li>
+          <li>${descripcion}</li>
         </ul>
       </div>
       <div class="desc-soli">
-        <button class="descargarBtn" id="${nombre.id}">Descargar</button>
+        <button class="descargarBtn">Descargar</button>
       </div>
     `;
-    fotos.append(div);
+
+    div.querySelector(".descargarBtn")
+      .addEventListener("click", () => download(item));
+
+    fotos.appendChild(div);
   });
 
-  actualizarBotonesDescargar();
-  actualizarVisualizacion();
+  ScrollReveal().reveal(".imagen", { delay: 200, reset: true });
 }
 
 // ==============================
-//  DESCARGA DE IMÁGENES
+//  DESCARGA
 // ==============================
-async function download(e) {
-  const idboton = e.currentTarget.id;
-  const archivo = globalArchivos.find(item => item.id === Number(idboton));
-  if (!archivo) return console.warn("Archivo no encontrado:", idboton);
-
+async function download(archivo) {
   const res = await fetch(archivo.ub);
   const blob = await res.blob();
 
-  const enlace = document.createElement("a");
-  enlace.href = URL.createObjectURL(blob);
-  enlace.target = "_blank";
-  enlace.download = archivo.nombre + "_AKRestudiosGallery.jpg";
-  document.body.appendChild(enlace);
-  enlace.click();
-  document.body.removeChild(enlace);
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = archivo.nombre + "_AKR.jpg";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 // ==============================
-//  VISUALIZACIÓN DE IMAGEN
+//  CATEGORÍAS (FLATMAP + ASCII)
 // ==============================
-function actualizarVisualizacion() {
-  const visualizar = document.querySelectorAll(".la-imagen");
-  visualizar.forEach(boton => {
-    boton.addEventListener("click", (e) => {
-      const estafoto = Number(e.currentTarget.id);
-      const archivo = globalArchivos.find(item => item.id === estafoto);
-      if (!archivo) return;
-      cats.value = "nombre";
-      buscador.value = archivo.nombre;
-      filtrarYMostrar();
-    });
-  });
-}
+function renderCategorias(archivos) {
+  const categorias = [
+    ...new Set(
+      archivos
+        .flatMap(a => a.categ || [])
+        .map(c => c.toLowerCase().trim())
+        .filter(Boolean)
+    )
+  ].sort(); // ASCII
 
-// ==============================
-//  BOTONES DESCARGAR
-// ==============================
-function actualizarBotonesDescargar() {
-  const BotonesDescargar = document.querySelectorAll(".descargarBtn");
-  BotonesDescargar.forEach(boton => {
-    boton.addEventListener("click", download);
+  categorias.forEach(cat => {
+    const op = document.createElement("option");
+    op.value = cat;
+    op.textContent = cat;
+    cats.appendChild(op);
   });
 }
 
@@ -156,23 +145,29 @@ function actualizarBotonesDescargar() {
 // ==============================
 function filtrarYMostrar() {
   const texto = buscador.value.toLowerCase().trim();
-  const tipoBusqueda = cats.value;
+  const tipo = cats.value;
+
   let filtrados = globalArchivos;
 
-  if (tipoBusqueda === "nombre") {
-    filtrados = globalArchivos.filter(item => item.nombre.toLowerCase().includes(texto));
-  } else if (tipoBusqueda === "por") {
-    filtrados = globalArchivos.filter(item => item.por.toLowerCase().includes(texto));
+  if (tipo === "nombre") {
+    filtrados = filtrados.filter(a =>
+      a.nombre.toLowerCase().includes(texto)
+    );
+  } else if (tipo === "por") {
+    filtrados = filtrados.filter(a =>
+      a.por.toLowerCase().includes(texto)
+    );
   } else {
-    filtrados = globalArchivos.filter(item => {
-      const categs = Array.isArray(item.categ) ? item.categ.map(c => c.toLowerCase()) : [String(item.categ).toLowerCase()];
-      return categs.includes(tipoBusqueda.toLowerCase());
-    });
+    filtrados = filtrados.filter(a =>
+      (a.categ || [])
+        .map(c => c.toLowerCase())
+        .includes(tipo)
+    );
   }
 
   if (filtrados.length === 0) {
     div_mesages.classList.remove("no-ver");
-    div_mesages.innerText = `NO HAY RESULTADOS PARA "${buscador.value.toUpperCase()}"`;
+    div_mesages.textContent = "NO HAY RESULTADOS";
   } else {
     div_mesages.classList.add("no-ver");
   }
@@ -180,33 +175,36 @@ function filtrarYMostrar() {
   cargarimagenes(filtrados);
 }
 
+// ==============================
+//  EVENTOS
+// ==============================
 buscador.addEventListener("input", filtrarYMostrar);
 cats.addEventListener("change", filtrarYMostrar);
 
-// ==============================
-//  PAGINACIÓN
-// ==============================
 btnPrev.addEventListener("click", async () => {
-  if (window.currentPage > 1) await init(window.currentPage - 1);
-  window.location.href = "./index.html";
+  if (currentPage > 1) {
+    await init(currentPage - 1);
+  }
 });
 
 btnNext.addEventListener("click", async () => {
-  if (window.currentPage < window.totalPages) await init(window.currentPage + 1);
-  window.location.href = "./index.html";
+  if (currentPage < totalPages) {
+    await init(currentPage + 1);
+  }
 });
 
 // ==============================
-//  INICIALIZACIÓN
+//  INIT
 // ==============================
 async function init(page = 1) {
   await cargarDesdeMongo(page);
+  renderCategorias(globalArchivos);
   cargarimagenes(globalArchivos);
-  paginaActual.textContent = `Página ${window.currentPage} de ${window.totalPages}`;
+  paginaActual.textContent = `Página ${currentPage} de ${totalPages}`;
 }
 
 // ==============================
-//  NAVBAR LOGO
+//  NAVBAR
 // ==============================
 const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
@@ -214,12 +212,10 @@ const logo = document.querySelector(".logo");
 logo.addEventListener("click", () => {
   logo.classList.toggle("rotado");
   navs.classList.toggle("navhiden");
-  navigator.vibrate(200);
+  if (navigator.vibrate) navigator.vibrate(200);
 });
 
-ScrollReveal().reveal('.imagen', { delay: 700, reset: true });
-
 // ==============================
-//  INICIAR
+//  START
 // ==============================
 init();
