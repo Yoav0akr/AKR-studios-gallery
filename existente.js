@@ -10,7 +10,7 @@ btn.addEventListener("click", async () => {
   }
 
   try {
-    const res = await fetch("http://localhost:3000/api/adminsDB", {
+    const res = await fetch("./api/adminsDB", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ admin: nombre, password, login: true }),
