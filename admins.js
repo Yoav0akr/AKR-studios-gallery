@@ -119,8 +119,10 @@ function vincularBotonesEliminar() {
       if (!confirm("¿Eliminar esta imagen?")) return;
       try {
         const res = await fetch(`/api/db?_id=${id}`, { method: "DELETE" });
-        const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.message || "Error eliminando");
+        const data = res.headers.get("content-type")?.includes("application/json")
+          ? await res.json()
+          : { success: res.ok };
+        if (!res.ok || !data.success) throw new Error(data.message || "Error eliminando imagen");
         cargarImagenesPaginadas(currentPage);
       } catch (err) {
         console.error(err);
@@ -171,75 +173,74 @@ async function cargarAdmins() {
       personas.appendChild(div);
     });
 
-    vincularBotonesAdmins();
+    // Vincular botones de forma robusta
+    document.querySelectorAll(".eliminar, .get-up, .get-down").forEach(btn => {
+      btn.onclick = async e => {
+        const id = e.currentTarget.dataset.id;
+
+        if (btn.classList.contains("eliminar")) {
+          if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
+          try {
+            const res = await fetch("/api/personas", {
+              method: "DELETE",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id })
+            });
+            const data = res.headers.get("content-type")?.includes("application/json")
+              ? await res.json()
+              : { success: res.ok };
+            if (!res.ok || !data.success) throw new Error(data.message || "Error eliminando usuario");
+            alert("Usuario eliminado correctamente");
+            cargarAdmins();
+          } catch (err) {
+            console.error(err);
+            alert("No se pudo eliminar el usuario.");
+          }
+        }
+
+        if (btn.classList.contains("get-up")) {
+          try {
+            const res = await fetch("/api/personas", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id, adminpass: true })
+            });
+            const data = res.headers.get("content-type")?.includes("application/json")
+              ? await res.json()
+              : { success: res.ok };
+            if (!res.ok || !data.success) throw new Error(data.message || "Error al dar admin");
+            alert("Permisos de admin otorgados correctamente");
+            cargarAdmins();
+          } catch (err) {
+            console.error(err);
+            alert("No se pudo dar permisos de admin.");
+          }
+        }
+
+        if (btn.classList.contains("get-down")) {
+          try {
+            const res = await fetch("/api/personas", {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id, adminpass: false })
+            });
+            const data = res.headers.get("content-type")?.includes("application/json")
+              ? await res.json()
+              : { success: res.ok };
+            if (!res.ok || !data.success) throw new Error(data.message || "Error al quitar admin");
+            alert("Permisos de admin removidos correctamente");
+            cargarAdmins();
+          } catch (err) {
+            console.error(err);
+            alert("No se pudo quitar permisos de admin.");
+          }
+        }
+      };
+    });
   } catch (err) {
     console.error(err);
     personas.innerHTML = "<p>Error cargando administradores.</p>";
   }
-}
-
-function vincularBotonesAdmins() {
-  // Evitar duplicar listeners
-  const eliminarBtns = document.querySelectorAll(".eliminar");
-  eliminarBtns.forEach(btn => {
-    btn.onclick = async e => {
-      const id = e.currentTarget.dataset.id;
-      if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
-      try {
-        const res = await fetch("/api/personas", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id })
-        });
-        const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.message);
-        cargarAdmins();
-      } catch (err) {
-        console.error(err);
-        alert("No se pudo eliminar el usuario.");
-      }
-    };
-  });
-
-  // Dar admin
-  document.querySelectorAll(".get-up").forEach(btn => {
-    btn.onclick = async e => {
-      const id = e.currentTarget.dataset.id;
-      try {
-        const res = await fetch("/api/personas", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id, adminpass: true })
-        });
-        const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.message);
-        cargarAdmins();
-      } catch (err) {
-        console.error(err);
-        alert("No se pudo dar permisos de admin.");
-      }
-    };
-  });
-
-  // Quitar admin
-  document.querySelectorAll(".get-down").forEach(btn => {
-    btn.onclick = async e => {
-      const id = e.currentTarget.dataset.id;
-      try {
-        const res = await fetch("/api/personas", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id, adminpass: false })
-        });
-        const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.message);
-        cargarAdmins();
-      } catch (err) {
-        console.error(err);
-        alert("No se pudo quitar permisos de admin.");
-      }
-    };
-  });
 }
 
 // ===============================
