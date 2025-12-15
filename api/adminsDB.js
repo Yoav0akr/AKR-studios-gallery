@@ -101,7 +101,7 @@ export default async function handler(req, res) {
           });
         }
 
-        const user = await Admin.findOne({ admin: body.admin });
+        const user = await Admin.findOne({ email: body.email });
 
         if (!user) {
           return res.status(404).json({
