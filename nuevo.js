@@ -1,15 +1,25 @@
-const email = document.getElementById("email_imput");
-const nombre_usuario = document.getElementById("nombre_imput");
-const pasword = document.getElementById("pasword_inpu");
+const email = document.getElementById("email_input");
+const nombre_usuario = document.getElementById("nombre_input");
+const password = document.getElementById("password_input");
 const BtCrearUser = document.getElementById("manchego");
 
-// Crear usuario
-async function CreateUser(email, user, pasw) {
-  const datosUSER = { admin: user, password: pasw, email, login: false };
+// ==============================
+//  CREAR USUARIO
+// ==============================
+async function CreateUser(email, user, pass) {
+  const datosUSER = {
+    admin: user,
+    password: pass,
+    email,
+    login: false
+  };
 
   const res = await fetch("./api/adminsDB", {
     method: "POST",
-    body: JSON.stringify(datosUSER),
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(datosUSER)
   });
 
   if (!res.ok) throw new Error("Error " + res.status);
@@ -23,15 +33,18 @@ async function CreateUser(email, user, pasw) {
   window.location.href = "./index.html";
 }
 
-// Ver si existe y crear
+// ==============================
+//  VERIFICAR Y CREAR
+// ==============================
 async function execute() {
   try {
     const admin = nombre_usuario.value.trim();
 
-    // GET usando query
-    const res = await fetch(`./api/adminsDB?admin=${admin}`, {
-      method: "GET"
-    });
+    const res = await fetch(`./api/adminsDB?admin=${admin}`);
+
+    if (!res.ok) {
+      throw new Error("Error verificando usuario");
+    }
 
     const existe = await res.json();
 
@@ -41,33 +54,41 @@ async function execute() {
       return;
     }
 
-    // Crear usuario
-    CreateUser(
+    await CreateUser(
       email.value.trim(),
-      nombre_usuario.value.trim(),
-      pasword.value.trim()
+      admin,
+      password.value.trim()
     );
 
   } catch (err) {
-    console.error("Error al crear usuario", err);
+    console.error("Error al crear usuario:", err);
+    alert("No se pudo crear el usuario");
   }
 }
 
+// ==============================
+//  BOTÓN
+// ==============================
 BtCrearUser.addEventListener("click", () => {
-  if (!nombre_usuario.value.trim() ||
-      !pasword.value.trim() ||
-      !email.value.trim()) {
-  
+  if (
+    !nombre_usuario.value.trim() ||
+    !password.value.trim() ||
+    !email.value.trim()
+  ) {
     alert("Llena todos los campos");
   } else {
     execute();
   }
 });
-// para rotar el logo y desplegar/ocultar nav
+
+// ==============================
+//  NAVBAR
+// ==============================
 const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
+
 logo.addEventListener("click", () => {
   logo.classList.toggle("rotado");
   navs.classList.toggle("navhiden");
-  navigator.vibrate(200);
+  if (navigator.vibrate) navigator.vibrate(200);
 });
