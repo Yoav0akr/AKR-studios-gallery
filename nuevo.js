@@ -15,31 +15,27 @@ async function crearUsuario() {
   }
 
   try {
-    // 1️⃣ Verificar si el admin ya existe
-    const check = await fetch(`/api/adminsDB?admin=${admin}`);
-    const existe = await check.json();
+    // Verificar si el correo ya existe
+    const checkRes = await fetch(`/api/adminsDB?email=${encodeURIComponent(email)}`);
+    const checkData = await checkRes.json();
 
-    if (existe.exists) {
-      alert("Ese usuario ya existe");
-      nombreInput.value = "";
+    if (checkData.exists) {
+      alert("Ese correo ya está registrado");
+      emailInput.value = "";
       return;
     }
 
-    // 2️⃣ Crear admin
+    // Crear admin
     const res = await fetch("/api/adminsDB", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        admin,
-        email,
-        password
-      })
+      body: JSON.stringify({ admin, email, password })
     });
 
     const data = await res.json();
 
     if (!res.ok) {
-      alert(data.error || "Error creando usuario");
+      alert(data.message || "Error creando usuario");
       return;
     }
 
@@ -64,7 +60,6 @@ btn.addEventListener("click", crearUsuario);
 // NAV
 const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
-
 logo.addEventListener("click", () => {
   logo.classList.toggle("rotado");
   navs.classList.toggle("navhiden");
