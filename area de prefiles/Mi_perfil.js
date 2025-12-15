@@ -93,8 +93,8 @@ function pintarFotos(fotos) {
       <img src="${img.ub}" alt="${img.nombre}" class="la-imagen">
       <p><b>Categoría:</b> ${img.categ.join(", ")}</p>
       <div class="toDO">
-        <button class="descargarBtn" data-id="${img._id}">Descargar</button>
-        <button class="eliminarBtn" data-id="${img._id}">Eliminar</button>
+        <button class="descargarBtn yes" data-id="${img._id}">Descargar</button>
+        <button class="eliminarBtn not" data-id="${img._id}">Eliminar</button>
       </div>
     `;
 
