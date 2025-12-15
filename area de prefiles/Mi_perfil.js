@@ -87,8 +87,8 @@ function pintarFotos(fotos) {
       <img src="${img.ub}" alt="${img.nombre}" class="la-imagen">
       <p><b>Categoría:</b> ${img.categ.join(", ")}</p>
       <div class="toDO">
-        <button class="descargarBtn yes" data-id="${img._id}">Descargar</button>
-        <button class="eliminarBtn not" data-id="${img._id}">Eliminar</button>
+        <button class="descargarBtn" data-id="${img._id}">Descargar</button>
+        <button class="eliminarBtn" data-id="${img._id}">Eliminar</button>
       </div>
     `;
 
@@ -100,7 +100,7 @@ function pintarFotos(fotos) {
 }
 
 // ==============================
-//  VINCULAR DESCARGAR
+//  VINCULAR EL BOTÓN DE DESCARGA
 // ==============================
 function vincularDescargar(fotos) {
   document.querySelectorAll(".descargarBtn").forEach(btn => {
@@ -136,18 +136,39 @@ async function download(archivo) {
   }
 }
 
+// ==============================
+//  ELIMINAR SOLO MIS FOTOS
+// ==============================
+function vincularEliminar() {
+  document.querySelectorAll(".eliminarBtn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      if (!confirm("¿Eliminar esta imagen?")) return;
 
+      try {
+        const res = await fetch(`/api/db?_id=${id}&admin=${admin}`, {
+          method: "DELETE"
+        });
+        const data = await res.json();
+        if (!data.success) throw data.error;
+
+        cargarMisFotos(currentPage);
+      } catch (err) {
+        alert("No tienes permiso para borrar esta imagen o ocurrió un error.");
+        console.error(err);
+      }
+    });
+  });
+}
 
 // ==============================
-//  PAGINACIÓN
+//  PAGINADOR
 // ==============================
 function pintarPaginador() {
   let pagContainer = document.getElementById("paginador");
   if (!pagContainer) {
     pagContainer = document.createElement("div");
     pagContainer.id = "paginador";
-    pagContainer.style.marginTop = "1rem";
-    pagContainer.style.textAlign = "center";
     contenedorImgs.after(pagContainer);
   }
 
@@ -157,8 +178,7 @@ function pintarPaginador() {
     const btn = document.createElement("button");
     btn.innerText = i;
     btn.disabled = i === currentPage;
-    btn.style.margin = "0 5px";
-
+    btn.className = "paginador-btn";
     btn.addEventListener("click", () => cargarMisFotos(i));
     pagContainer.appendChild(btn);
   }
