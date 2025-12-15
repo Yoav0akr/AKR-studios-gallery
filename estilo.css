@@ -106,6 +106,9 @@ ul {
     text-align: start;
 }
 
+li {
+    margin-bottom: -0.9em;
+}
 
 button {
     font-family: 'Times New Roman', Times, serif;
@@ -559,11 +562,14 @@ h1 {
     flex-direction: row;
 
 }
-.yes{
+.do{
     background: #aa00ff;
     padding-bottom: 2rem;
-    text-decoration:solid;
-    
+    text-decoration:solid; 
+}
+
+.yes{
+    background: #004005b3;
 }
 
 /* ===================== */
