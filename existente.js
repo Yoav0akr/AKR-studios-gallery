@@ -1,14 +1,10 @@
-// ==============================
-//  ELEMENTOS DEL LOGIN
-// ==============================
 const btn = document.getElementById("manchego");
 
 btn.addEventListener("click", async () => {
-  // Tomamos y normalizamos los valores
-  const nombre = document.getElementById("nombre_imput").value.trim().toLowerCase();
+  const admin = document.getElementById("nombre_imput").value.trim();
   const password = document.getElementById("por-imput").value.trim();
 
-  if (!nombre || !password) {
+  if (!admin || !password) {
     alert("Debes llenar todos los campos");
     return;
   }
@@ -17,23 +13,24 @@ btn.addEventListener("click", async () => {
     const res = await fetch("/api/adminsDB", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        admin: nombre,
-        password,
-        login: true
-      }),
+      body: JSON.stringify({ admin, password, login: true }),
     });
 
     const data = await res.json();
 
-    // Si hay error HTTP o credenciales incorrectas
-    if (!res.ok || !data.success) {
+    if (!res.ok) {
+      // Mostrar mensaje del backend
       alert(data.message || `Error HTTP ${res.status}`);
       console.error("Error login:", data);
       return;
     }
 
-    // ✅ Login exitoso
+    if (!data.success) {
+      alert(data.message || "Credenciales incorrectas");
+      return;
+    }
+
+    // Login exitoso
     localStorage.setItem("admin", data.admin);
     localStorage.setItem("adminpass", String(data.adminpass));
     if (data.email) localStorage.setItem("email", data.email);
