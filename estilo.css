@@ -742,3 +742,9 @@ h1 {
 .no-ver {
     display: none;
 }
+.less{
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    max-width: 2rem;
+}

@@ -182,6 +182,7 @@ function pintarPaginador() {
     btn.className = "paginador-btn";
     btn.addEventListener("click", () => cargarMisFotos(i));
     pagContainer.appendChild(btn);
+    pagContainer.classList.add("less")
   }
 }
 
