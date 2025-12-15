@@ -89,7 +89,7 @@ function pintarFotos(fotos) {
     div.className = "imagen";
 
     div.innerHTML = `
-      <h4>${img.nombre}</h4>
+      <h4 class="producto-titulo">${img.nombre}</h4>
       <img src="${img.ub}" alt="${img.nombre}" class="la-imagen">
       <p><b>Categoría:</b> ${img.categ.join(", ")}</p>
       <div class="toDO">
@@ -202,3 +202,8 @@ logo.addEventListener("click", () => {
 // ==============================
 cargarPerfil();
 cargarMisFotos();
+
+// close sesion
+const close= document.getElementById("close");
+close.addEventListener("click",()=>{
+if (confirm(" estas seguro de querer cerrar sesion? "))localStorage.clear()});

@@ -4,7 +4,7 @@
 const adminpass = localStorage.getItem("adminpass") === "true";
 if (!adminpass) {
   alert("No tienes permisos para acceder a esta página.");
-   window.location.href = "./index.html";
+  window.location.href = "./index.html";
 }
 
 // ===============================
@@ -28,8 +28,9 @@ function hideAll() {
   personas.classList.add("no-ver");
 }
 
-
-// Rotar logo y mostrar/ocultar nav
+// ===============================
+// NAVBAR
+// ===============================
 const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
 logo.addEventListener("click", () => {
@@ -68,12 +69,15 @@ async function cargarImagenesPaginadas(page = 1) {
 
   try {
     const res = await fetch(`/api/db?page=${page}&limit=${limit}`);
+    if (!res.ok) throw new Error("Error cargando imágenes");
     const data = await res.json();
+
     const archivos = data.data || [];
     totalPages = data.totalPages || 1;
 
     fotos.innerHTML = "";
-    if (archivos.length === 0) {
+
+    if (!archivos.length) {
       show.classList.remove("no-ver");
       show.innerText = "NO HAY IMÁGENES DISPONIBLES";
       paginacion.innerHTML = "";
@@ -90,11 +94,11 @@ async function cargarImagenesPaginadas(page = 1) {
         <div class="detalles">
           <ul>
             <li>Por: ${a.por}</li>
-            <li>Categoría: ${a.categ}</li>
-            <li>id: ${a.id}</li>
+            <li>Categoría: ${a.categ.join(", ")}</li>
+            <li>id: ${a._id}</li>
           </ul>
           <h3 class="producto-titulo">${a.nombre}</h3>
-          <button class="descargarBtn" data-id="${a._id}">ELIMINAR</button>
+          <button class="eliminarBtn" data-id="${a._id}">ELIMINAR</button>
         </div>
       `;
       fotos.appendChild(div);
@@ -103,22 +107,26 @@ async function cargarImagenesPaginadas(page = 1) {
     vincularBotonesEliminar();
     renderizarPaginacion();
   } catch (err) {
-    console.error("Error cargando imágenes:", err);
+    console.error(err);
+    fotos.innerHTML = "<p>Error cargando imágenes.</p>";
   }
 }
 
 function vincularBotonesEliminar() {
-  document.querySelectorAll(".descargarBtn").forEach(btn => {
-    btn.addEventListener("click", async e => {
+  document.querySelectorAll(".eliminarBtn").forEach(btn => {
+    btn.onclick = async e => {
       const id = e.currentTarget.dataset.id;
       if (!confirm("¿Eliminar esta imagen?")) return;
       try {
-        await fetch(`/api/db?_id=${id}`, { method: "DELETE" });
+        const res = await fetch(`/api/db?_id=${id}`, { method: "DELETE" });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message || "Error eliminando");
         cargarImagenesPaginadas(currentPage);
       } catch (err) {
-        console.error("Error eliminando imagen:", err);
+        console.error(err);
+        alert("No se pudo eliminar la imagen.");
       }
-    });
+    };
   });
 }
 
@@ -139,10 +147,11 @@ function renderizarPaginacion() {
 async function cargarAdmins() {
   try {
     const res = await fetch("/api/personas");
+    if (!res.ok) throw new Error("Error cargando admins");
     const admins = await res.json();
 
     personas.innerHTML = "";
-    if (!admins || admins.length === 0) {
+    if (!admins.length) {
       personas.innerHTML = "<p>No hay administradores registrados.</p>";
       return;
     }
@@ -154,9 +163,9 @@ async function cargarAdmins() {
         <h3>Nombre del usuario: ${admin.admin}</h3>
         <p>Admin: ${admin.adminpass}</p>
         <div class="jaiba">
-          <button class="almeja eliminar" data-id="${admin._id}">ELIMINAR</button>
-          <button class="almeja get-up" data-id="${admin._id}">Dar admin</button>
-          <button class="almeja get-down" data-id="${admin._id}">Quitar admin</button>
+          <button class="eliminar" data-id="${admin._id}">ELIMINAR</button>
+          <button class="get-up" data-id="${admin._id}">Dar admin</button>
+          <button class="get-down" data-id="${admin._id}">Quitar admin</button>
         </div>
       `;
       personas.appendChild(div);
@@ -164,53 +173,74 @@ async function cargarAdmins() {
 
     vincularBotonesAdmins();
   } catch (err) {
-    console.error("Error cargando admins:", err);
+    console.error(err);
+    personas.innerHTML = "<p>Error cargando administradores.</p>";
   }
 }
 
 function vincularBotonesAdmins() {
-  // Eliminar
-  document.querySelectorAll(".eliminar").forEach(btn => {
-    btn.addEventListener("click", async e => {
+  // Evitar duplicar listeners
+  const eliminarBtns = document.querySelectorAll(".eliminar");
+  eliminarBtns.forEach(btn => {
+    btn.onclick = async e => {
       const id = e.currentTarget.dataset.id;
       if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
-      await fetch("/api/personas", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id })
-      });
-      cargarAdmins();
-    });
+      try {
+        const res = await fetch("/api/personas", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message);
+        cargarAdmins();
+      } catch (err) {
+        console.error(err);
+        alert("No se pudo eliminar el usuario.");
+      }
+    };
   });
 
   // Dar admin
   document.querySelectorAll(".get-up").forEach(btn => {
-    btn.addEventListener("click", async e => {
+    btn.onclick = async e => {
       const id = e.currentTarget.dataset.id;
-      await fetch("/api/personas", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, adminpass: true })
-      });
-      cargarAdmins();
-    });
+      try {
+        const res = await fetch("/api/personas", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, adminpass: true })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message);
+        cargarAdmins();
+      } catch (err) {
+        console.error(err);
+        alert("No se pudo dar permisos de admin.");
+      }
+    };
   });
 
   // Quitar admin
   document.querySelectorAll(".get-down").forEach(btn => {
-    btn.addEventListener("click", async e => {
+    btn.onclick = async e => {
       const id = e.currentTarget.dataset.id;
-      await fetch("/api/personas", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, adminpass: false })
-      });
-      cargarAdmins();
-    });
+      try {
+        const res = await fetch("/api/personas", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id, adminpass: false })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.message);
+        cargarAdmins();
+      } catch (err) {
+        console.error(err);
+        alert("No se pudo quitar permisos de admin.");
+      }
+    };
   });
 }
-
-
 
 // ===============================
 // INICIALIZACIÓN
@@ -218,6 +248,6 @@ function vincularBotonesAdmins() {
 (async function init() {
   hideAll();
   fotos.classList.remove("no-ver");
-  cargarImagenesPaginadas(1);
-  cargarAdmins();
+  await cargarImagenesPaginadas(1);
+  await cargarAdmins();
 })();
