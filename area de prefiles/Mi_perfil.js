@@ -83,12 +83,13 @@ function pintarFotos(fotos) {
     div.className = "imagen";
 
     div.innerHTML = `
-      <h4>${img.nombre}</h4>
+      <h3 class="producto-titulo">${img.nombre}</h3>
       <img src="${img.ub}" alt="${img.nombre}" class="la-imagen">
       <p><b>Categoría:</b> ${img.categ.join(", ")}</p>
-      <div class="toDO">
-        <button class="descargarBtn" data-id="${img._id}">Descargar</button>
-        <button class="eliminarBtn" data-id="${img._id}">Eliminar</button>
+      <div class="toDO" style="display: flex;
+    flex-wrap: nowrap;">
+        <button class="descargarBtn yes" data-id="${img._id}">Descargar</button>
+        <button class="eliminarBtn  not" data-id="${img._id}">Eliminar</button>
       </div>
     `;
 
