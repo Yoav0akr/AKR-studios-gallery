@@ -10,40 +10,48 @@ btn.addEventListener("click", async () => {
   }
 
   try {
-    const res = await fetch("./api/adminsDB", {
+    const res = await fetch("/api/adminsDB", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ admin: nombre, password, login: true }),
+      body: JSON.stringify({
+        admin: nombre,
+        password,
+        login: true
+      }),
     });
+
+    if (!res.ok) {
+      throw new Error(`Error HTTP ${res.status}`);
+    }
 
     const data = await res.json();
     console.log("Respuesta login:", data);
 
     if (!data.success) {
-      alert(`Error: ${data.message || data.error}`);
+      alert(data.message || "Credenciales incorrectas");
       return;
     }
 
     alert(`¡Bienvenido ${data.admin}!`);
 
-    // Guardar en memoria local:
-localStorage.setItem("admin", data.admin);
-localStorage.setItem("adminpass", data.adminpass);
-localStorage.setItem("email", data.email);
+    localStorage.setItem("admin", data.admin);
+    localStorage.setItem("adminpass", String(data.adminpass));
+    if (data.email) localStorage.setItem("email", data.email);
 
     window.location.href = "/index.html";
 
   } catch (err) {
     console.error("Error iniciando sesión:", err);
-    alert("Error iniciando sesión. Revisa la consola.");
+    alert("No se pudo conectar con el servidor.");
   }
 });
 
-// para rotar el logo y desplegar/ocultar nav
+// NAV
 const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
+
 logo.addEventListener("click", () => {
   logo.classList.toggle("rotado");
   navs.classList.toggle("navhiden");
-  navigator.vibrate(200);
+  if (navigator.vibrate) navigator.vibrate(200);
 });
