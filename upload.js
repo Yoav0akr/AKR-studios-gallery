@@ -93,11 +93,12 @@ if (visualizador) {
         }
 
         //si es nsfw:
-          if (await nsfwImage(cloudinaryURL)) {
-      alert("❌ Esta imagen es NSFW (explícita) y no se puede guardar.");
-      cloudinaryURL = null; // invalidar para que no se guarde
-    }
-
+        if (await nsfwImage(cloudinaryURL)) {
+          alert("❌ Esta imagen es NSFW (explícita) y no se puede guardar.");
+          cloudinaryURL = null; // invalidar para que no se guarde
+        }else{
+          console.log(cloudinaryURL, localURL, nsfwImage(cloudinaryURL));
+        }
       } catch (err) {
         console.error("Error en subida/análisis:", err);
         alert("⚠ Error de conexión con el servidor.");
@@ -179,14 +180,14 @@ EntradaGuardar.addEventListener("click", async (e) => {
   e.preventDefault();
 
   if (!archivoSeleccionado) return alert("❌ Selecciona un archivo primero.");
- try{
-  
-  if (cloudinaryURL){
-    guardarEnMongo();
-  }else{
-    alert("imagen inapropiada detectada")
-  }
-   
+  try {
+
+    if (cloudinaryURL) {
+      guardarEnMongo();
+    } else {
+      alert("imagen inapropiada detectada")
+    }
+
   } catch (err) {
     console.error(err);
     alert("⚠ Error de conexión con el servidor.");

@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const apiKey = process.env.DEEPAI_KEY; // tu API key de DeepAI
+    const apiKey = process.env.DEEPAI_KEY;
     const response = await fetch("https://api.deepai.org/api/densecap", {
       method: "POST",
       headers: {
@@ -22,7 +22,14 @@ export default async function handler(req, res) {
       body: JSON.stringify({ image: imageUrl }),
     });
 
-    const data = await response.json();
+    const text = await response.text(); // leer como texto
+    let data;
+    try {
+      data = JSON.parse(text); // intentar parsear JSON
+    } catch {
+      // si no es JSON, devolver texto como error
+      return res.status(response.status).json({ error: text });
+    }
 
     if (!response.ok) {
       return res.status(response.status).json({ error: data });
