@@ -148,7 +148,7 @@ button:hover {
     padding: 1.5rem;
     margin: -1em;
     z-index: 9099999;
-    transform:translateY(0.4rem)
+    transform: translateY(0.4rem)
 }
 
 .logo {
@@ -274,7 +274,7 @@ h1 {
 
     align-items: center;
     padding: 0.5rem;
-  
+
     background: #333;
     color: #fff;
     margin-right: 0.1rem;
@@ -561,15 +561,35 @@ h1 {
     flex-direction: row;
 
 }
-.do{
+
+.do {
     background: #aa00ff;
     padding-bottom: 2rem;
-    text-decoration:solid; 
+    text-decoration: solid;
 }
 
-.yes{
+.yes {
     background: #004005b3;
 }
+
+/* spiner de carga para el upload */
+.spinner {
+  border: 6px solid #f3f3f3; /* color de fondo */
+  border-top: 6px solid #4caf50; /* color del spinner */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  background-image: "./socurses/AKR Gallery.png";
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+
 
 /* ===================== */
 /*     RESPONSIVE        */
@@ -658,7 +678,7 @@ h1 {
         gap: 0.5rem;
         max-height: 40%;
         border-radius: 0.5rem;
-        
+
     }
 
     .visualizador {
@@ -676,7 +696,7 @@ h1 {
 
     .webo {
         margin: 2% 0;
-        
+
     }
 
     .ses {
@@ -734,15 +754,19 @@ h1 {
     color: var(--text-main);
     text-shadow: 0 0 5px black;
 }
+
 /* ===================== */
 /*    CLASES NOBLES     */
 /* ===================== */
 
-.no-ver {
-    display: none;
-}
-.less{
+
+
+.less {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+}
+
+.no-ver {
+    display: none;
 }

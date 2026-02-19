@@ -114,13 +114,32 @@ async function guardarEnMongo() {
 }
 
 // ==============================
+// --- control de categorias y filto de imagioenes inaporpiadas
+// ==============================
+
+async function nsfwImage(imagenUrl) {
+  const res = await fetch("/api/nsfw", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ imageUrl: imagenUrl }),
+  });
+
+  const data = await res.json();
+  const isUnsafe = data.nsfw?.detections?.some(d => d.name === "unsafe");
+  return isUnsafe;
+}
+
+
+
+
+// ==============================
 // --- BOTÓN DE GUARDAR MANUAL ---
 // ==============================
 EntradaGuardar.addEventListener("click", async (e) => {
   e.preventDefault();
 
   if (!archivoSeleccionado) return alert("❌ Selecciona un archivo primero.");
-
+mostrarSpinner();
   // Subida a Cloudinary
   const formData = new FormData();
   formData.append("file", archivoSeleccionado);
@@ -137,12 +156,33 @@ EntradaGuardar.addEventListener("click", async (e) => {
 
     cloudinaryURL = data.url;
     console.log("✔ Subido a Cloudinary:", cloudinaryURL);
+    // 🔹 de le prregunta ala api sobre los resultados
+    const analyzeRes = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageUrl: cloudinaryURL }),
+    });
+    const analyzeData = await analyzeRes.json();
+    const finCaption = analyzeData.output.captions.map(item => item.caption).join(" ");
 
-    // Guardar en Mongo
-    guardarEnMongo();
+    EntradaDesc.value = finCaption
+
+
+
+
+    //si contiene +18 no se guarda en mongo
+    if (!(await nsfwImage(cloudinaryURL))) {
+      // Guardar en Mongo
+      guardarEnMongo();
+    } else {
+      alert("este contenido es nsfw, osea q que es porno o algo explicito, eres acas o un enfermo mental para subir esto?")
+    }
+
   } catch (err) {
     console.error(err);
     alert("⚠ Error de conexión con el servidor.");
+  }finally{
+    ocultarSpinner();
   }
 });
 
@@ -157,4 +197,15 @@ if (logo && navs) {
     navs.classList.toggle("navhiden");
     navigator.vibrate?.(200);
   });
+}
+
+//espinner de carga
+const spinner = document.getElementById("spinner");
+
+function mostrarSpinner() {
+  spinner.classList.remove("no-ver");
+}
+
+function ocultarSpinner() {
+  spinner.classList.add("no-ver");
 }

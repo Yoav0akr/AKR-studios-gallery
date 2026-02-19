@@ -19,7 +19,7 @@ const ADMINSchema = new mongoose.Schema({
   admin: { type: String, required: true, unique: true, trim: true },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   password: { type: String, required: true },
-  adminpass: { type: String, default: "false" }, // "true" | "false"
+  adminpass: { type: String, default: "false" }, // Se mantiene como String
 }, { collection: "admins" });
 
 const Admin = mongoose.models.Admin || mongoose.model("Admin", ADMINSchema);
@@ -108,16 +108,21 @@ export default async function handler(req, res) {
     }
 
     // ==============================
-    //  PUT → CAMBIAR adminpass
+    //  PUT → CAMBIAR adminpass (string)
     // ==============================
     if (req.method === "PUT") {
       if (!body.id || !body.adminpass) return res.status(400).json({ success: false, message: "Faltan datos" });
 
+      // Aseguramos que siempre sea String
+      const rol = String(body.adminpass);
+
       const actualizado = await Admin.findByIdAndUpdate(
         body.id,
-        { adminpass: body.adminpass },
+        { adminpass: rol },
         { new: true }
       );
+
+      if (!actualizado) return res.status(404).json({ success: false, message: "Admin no encontrado" });
 
       return res.status(200).json({
         success: true,
@@ -133,7 +138,9 @@ export default async function handler(req, res) {
     if (req.method === "DELETE") {
       if (!body.id) return res.status(400).json({ success: false, message: "Falta ID" });
 
-      await Admin.findByIdAndDelete(body.id);
+      const eliminado = await Admin.findByIdAndDelete(body.id);
+      if (!eliminado) return res.status(404).json({ success: false, message: "Admin no encontrado" });
+
       return res.status(200).json({ success: true, message: "Admin eliminado" });
     }
 
