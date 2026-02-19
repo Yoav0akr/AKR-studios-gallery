@@ -38,32 +38,72 @@ if (visualizador) {
     input.accept = "image/*";
     input.click();
 
-    input.onchange = () => {
+    input.onchange = async () => {
       const file = input.files[0];
       if (!file) return;
 
-      // Guardar archivo temporal
       archivoSeleccionado = file;
 
-      // Validar tamaño
       const maxBytes = 20 * 1024 * 1024; // 20MB
       if (file.size > maxBytes) {
-        alert(
-          `❌ Archivo demasiado grande (${(file.size / 1024 / 1024).toFixed(2)}MB). Máximo: 20MB`
-        );
+        alert(`❌ Archivo demasiado grande (${(file.size / 1024 / 1024).toFixed(2)}MB). Máximo: 20MB`);
         archivoSeleccionado = null;
         return;
       }
 
-      // Preview en el div completo
+      // Preview local
       const localURL = URL.createObjectURL(file);
       visualizador.style.backgroundImage = `url(${localURL})`;
       visualizador.style.backgroundSize = "cover";
       visualizador.style.backgroundPosition = "center";
       visualizador.style.backgroundRepeat = "no-repeat";
-
-      // Ocultar elementos internos del div (texto, íconos, etc.)
       visualizador.querySelectorAll("p, span, i").forEach(el => el.style.display = "none");
+
+      // 🔹 Subida automática a Cloudinary
+      mostrarSpinner();
+      try {
+        const formData = new FormData();
+        formData.append("file", archivoSeleccionado);
+
+        const res = await fetch("/api/upload", { method: "POST", body: formData });
+        const data = await res.json();
+
+        if (!data.url) {
+          alert("❌ Error subiendo a Cloudinary: " + (data.error || "desconocido"));
+          return;
+        }
+
+        cloudinaryURL = data.url;
+        console.log("✔ Subido a Cloudinary:", cloudinaryURL);
+
+        // 🔹 Llamada automática a /api/analyze
+        const analyzeRes = await fetch("/api/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ imageUrl: cloudinaryURL }),
+        });
+        const analyzeData = await analyzeRes.json();
+
+        if (analyzeData.error) {
+          console.error("Error en análisis:", analyzeData.error);
+          alert("❌ No se pudo analizar la imagen.");
+        } else {
+          const finCaption = analyzeData.output.captions.map(item => item.caption).join(" ");
+          EntradaDesc.value = finCaption; // 🔹 Rellenar automáticamente el campo descripción
+        }
+
+        //si es nsfw:
+          if (await nsfwImage(cloudinaryURL)) {
+      alert("❌ Esta imagen es NSFW (explícita) y no se puede guardar.");
+      cloudinaryURL = null; // invalidar para que no se guarde
+    }
+
+      } catch (err) {
+        console.error("Error en subida/análisis:", err);
+        alert("⚠ Error de conexión con el servidor.");
+      } finally {
+        ocultarSpinner();
+      }
     };
   });
 }
@@ -139,49 +179,18 @@ EntradaGuardar.addEventListener("click", async (e) => {
   e.preventDefault();
 
   if (!archivoSeleccionado) return alert("❌ Selecciona un archivo primero.");
-mostrarSpinner();
-  // Subida a Cloudinary
-  const formData = new FormData();
-  formData.append("file", archivoSeleccionado);
-
-  try {
-    const res = await fetch("/api/upload", { method: "POST", body: formData });
-    const data = await res.json();
-
-    if (!data.url) {
-      console.error(data);
-      alert("❌ Error subiendo a Cloudinary: " + (data.error || "desconocido"));
-      return;
-    }
-
-    cloudinaryURL = data.url;
-    console.log("✔ Subido a Cloudinary:", cloudinaryURL);
-    // 🔹 de le prregunta ala api sobre los resultados
-    const analyzeRes = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imageUrl: cloudinaryURL }),
-    });
-    const analyzeData = await analyzeRes.json();
-    const finCaption = analyzeData.output.captions.map(item => item.caption).join(" ");
-
-    EntradaDesc.value = finCaption
-
-
-
-
-    //si contiene +18 no se guarda en mongo
-    if (!(await nsfwImage(cloudinaryURL))) {
-      // Guardar en Mongo
-      guardarEnMongo();
-    } else {
-      alert("este contenido es nsfw, osea q que es porno o algo explicito, eres acas o un enfermo mental para subir esto?")
-    }
-
+ try{
+  
+  if (cloudinaryURL){
+    guardarEnMongo();
+  }else{
+    alert("imagen inapropiada detectada")
+  }
+   
   } catch (err) {
     console.error(err);
     alert("⚠ Error de conexión con el servidor.");
-  }finally{
+  } finally {
     ocultarSpinner();
   }
 });
