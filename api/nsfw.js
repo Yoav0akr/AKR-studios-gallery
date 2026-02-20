@@ -11,12 +11,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Llamada al detector NSFWCheckers
-    const response = await fetch("https://nsfwcheckers.com/api/v1/nsfw", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: imageUrl }), // aquí el fix
-    });
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/michellejieli/nsfw_model",
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${process.env.HF_TOKEN}`, // tu token
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ inputs: imageUrl }),
+      }
+    );
 
     const data = await response.json();
 
@@ -24,12 +29,20 @@ export default async function handler(req, res) {
       return res.status(response.status).json({ error: data });
     }
 
-    // Retornamos el resultado
+    // Transformamos la respuesta en un objeto {label: score}
+    const scores = {};
+    if (Array.isArray(data)) {
+      data.forEach(item => {
+        scores[item.label] = item.score;
+      });
+    }
+
     return res.status(200).json({
       url: imageUrl,
-      nsfwNUMS: data.output || {},
+      nsfwNUMS: scores,
     });
   } catch (error) {
+    console.error("Error en nsfw:", error);
     return res.status(500).json({ error: error.message });
   }
 }
