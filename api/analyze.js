@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
   try {
     const apiKey = process.env.DEEPAI_KEY;
-    const response = await fetch("https://api.deepai.org/api/densecap", {
+    const response = await fetch("https://api.deepai.org/api/image-captioning", {
       method: "POST",
       headers: {
         "Api-Key": apiKey,

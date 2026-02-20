@@ -76,21 +76,8 @@ if (visualizador) {
         cloudinaryURL = data.url;
         console.log("✔ Subido a Cloudinary:", cloudinaryURL);
 
-        // 🔹 Llamada automática a /api/analyze
-        const analyzeRes = await fetch("/api/analyze", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imageUrl: cloudinaryURL }),
-        });
-        const analyzeData = await analyzeRes.json();
-
-        if (analyzeData.error) {
-          console.error("Error en análisis:", analyzeData.error);
-          alert("❌ No se pudo analizar la imagen.");
-        } else {
-          const finCaption = analyzeData.output.captions.map(item => item.caption).join(" ");
-          EntradaDesc.value = finCaption; // 🔹 Rellenar automáticamente el campo descripción
-        }
+       // sugerimos la descripcion de la imagen segun la IA:
+           EntradaDesc.value = await DETECT_Desk(cloudinaryURL)
 
         //si es nsfw:
         if (await nsfwImage(cloudinaryURL)) {
@@ -155,20 +142,51 @@ async function guardarEnMongo() {
 }
 
 // ==============================
-// --- control de categorias y filto de imagioenes inaporpiadas
+// --- analisis con ia
 // ==============================
 
+//para nsfw
 async function nsfwImage(imagenUrl) {
   const res = await fetch("/api/nsfw", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ imageUrl: imagenUrl }),
+    body: JSON.stringify({ imageUrl: imagenUrl }), // 👈 usar la misma propiedad que tu backend
   });
 
   const data = await res.json();
-  const isUnsafe = data.nsfw?.detections?.some(d => d.name === "unsafe");
+
+  if (!res.ok) {
+    console.error("Error en nsfw:", data.error || data);
+    return true; // si falla, mejor bloquear por seguridad
+  }
+
+  // Aquí decides el umbral de bloqueo
+  const scores = data.nsfwNUMS || {};
+  const isUnsafe = (scores.porn ?? 0) > 0.5 || (scores.sexy ?? 0) > 0.7;
+
   return isUnsafe;
 }
+
+//para las categorias
+
+async function DETECT_Desk(URL_Image) {
+  const analyzeRes = await fetch("/api/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ URL:URL_Image }),
+  });
+  const analyzeData = await analyzeRes.json();
+  
+  if (analyzeData.error) {
+    console.error("Error en análisis:", analyzeData.error);
+    alert("❌ No se pudo analizar la imagen.");
+  } else {
+    const finCaption = analyzeData.output.captions.map(item => item.caption).join(" ");
+    //retornamos la respuesta:
+    return finCaption
+  }
+}
+
 
 
 

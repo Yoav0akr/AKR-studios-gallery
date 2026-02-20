@@ -11,16 +11,11 @@ export default async function handler(req, res) {
   }
 
   try {
-    const apiKey = process.env.DEEPAI_KEY;
-
-    // Llamada al detector NSFW de DeepAI
-    const response = await fetch("https://api.deepai.org/api/nsfw-detector", {
+    // Llamada al detector NSFWCheckers
+    const response = await fetch("https://nsfwcheckers.com/api/v1/nsfw", {
       method: "POST",
-      headers: {
-        "Api-Key": apiKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ image: imageUrl }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: imageUrl }), // aquí el fix
     });
 
     const data = await response.json();
@@ -32,7 +27,7 @@ export default async function handler(req, res) {
     // Retornamos el resultado
     return res.status(200).json({
       url: imageUrl,
-      nsfw: data.output || {},
+      nsfwNUMS: data.output || {},
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
