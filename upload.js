@@ -77,13 +77,16 @@ if (visualizador) {
         console.log("✔ Subido a Cloudinary:", cloudinaryURL);
 
        // sugerimos la descripcion de la imagen segun la IA:
-           EntradaDesc.value = await DETECT_Desk(cloudinaryURL)
-
-        //si es nsfw:
-        if (await nsfwImage(cloudinaryURL)) {
-          alert("❌ Esta imagen es NSFW (explícita) y no se puede guardar.");
-          cloudinaryURL = null; // invalidar para que no se guarde
+       
+       //si es nsfw:
+       if (await nsfwImage(cloudinaryURL)) {
+         alert("❌ Esta imagen es NSFW (explícita) y no se puede guardar.");
+         cloudinaryURL = null; // invalidar para que no se guarde
+         //se reenvia al index
+         window.location.href = "./index.html";
+         
         }else{
+          EntradaDesc.value = await DETECT_Desk(cloudinaryURL)
           console.log(cloudinaryURL, localURL, nsfwImage(cloudinaryURL));
         }
       } catch (err) {

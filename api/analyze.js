@@ -1,40 +1,27 @@
-// api/analyze.js
-
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Método no permitido" });
-  }
-
-  const { imageUrl } = req.body;
-  if (!imageUrl) {
-    return res.status(400).json({ error: "Debes enviar la propiedad imageUrl" });
-  }
+  const { URL } = req.body;
+  if (!URL) return res.status(400).json({ error: "Debes enviar la propiedad URL" });
 
   try {
-    const apiKey = process.env.DEEPAI_KEY;
-    const response = await fetch("https://api.deepai.org/api/image-captioning", {
-      method: "POST",
-      headers: {
-        "Api-Key": apiKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ image: imageUrl }),
-    });
+    const response = await fetch(
+      "https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-base",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.HF_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ inputs: URL }),
+      }
+    );
 
-    const text = await response.text(); // leer como texto
-    let data;
-    try {
-      data = JSON.parse(text); // intentar parsear JSON
-    } catch {
-      // si no es JSON, devolver texto como error
-      return res.status(response.status).json({ error: text });
-    }
+    const data = await response.json();
 
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data });
-    }
+    const caption = Array.isArray(data) && data[0]?.generated_text
+      ? data[0].generated_text
+      : "Descripción no disponible";
 
-    return res.status(200).json(data);
+    return res.status(200).json({ output: { text: caption } });
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
