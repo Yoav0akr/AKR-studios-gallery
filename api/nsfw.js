@@ -12,16 +12,17 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/michellejieli/nsfw_model",
+      "https://router.huggingface.co/michellejieli/nsfw_model",
       {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${process.env.HF_TOKEN}`, // tu token
+          "Authorization": `Bearer ${process.env.HF_TOKEN}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ inputs: imageUrl }),
       }
     );
+
 
     const data = await response.json();
 
