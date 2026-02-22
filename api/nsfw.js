@@ -1,5 +1,4 @@
 // api/nsfw.js
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
@@ -11,18 +10,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch(
-      "https://router.huggingface.co/michellejieli/nsfw_model",
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${process.env.HF_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ inputs: imageUrl }),
-      }
-    );
-
+    const response = await fetch("https://nsfw.api4.ai/v1/results", {
+      method: "POST",
+      headers: {
+        "Authorization": `Key ${process.env.API4AI_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ url: imageUrl }),
+    });
 
     const data = await response.json();
 
@@ -30,17 +25,9 @@ export default async function handler(req, res) {
       return res.status(response.status).json({ error: data });
     }
 
-    // Transformamos la respuesta en un objeto {label: score}
-    const scores = {};
-    if (Array.isArray(data)) {
-      data.forEach(item => {
-        scores[item.label] = item.score;
-      });
-    }
-
     return res.status(200).json({
       url: imageUrl,
-      nsfwNUMS: scores,
+      nsfwNUMS: data.nsfw || {},
     });
   } catch (error) {
     console.error("Error en nsfw:", error);
