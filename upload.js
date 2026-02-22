@@ -87,11 +87,11 @@ if (visualizador) {
         } else if (porn >= 0.6) {
           alert(`❌ Contenido inapropiado (NSFW: ${Math.round(porn * 100)}%) → redirigiendo al inicio`);
           cloudinaryURL = null;
-          window.location.href = "./index.html";
+          // window.location.href = "./index.html";
         } else if (sexy >= 0.7 && porn < 0.6) {
           alert(`⚠ Contenido muy sugerente (Sexy: ${Math.round(sexy * 100)}%) → redirigiendo al inicio`);
           cloudinaryURL = null;
-          window.location.href = "./index.html";
+          // window.location.href = "./index.html";
         } else {
           // Caso intermedio → revisión manual
           alert("⚠ Imagen marcada para revisión manual.");
