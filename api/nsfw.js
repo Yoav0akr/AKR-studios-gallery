@@ -10,10 +10,10 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch("https://nsfw.api4.ai/v1/results", {
+    const response = await fetch("https://api.api4ai.cloud/nsfw/v1/results", {
       method: "POST",
       headers: {
-        "Authorization": `Key ${process.env.API4AI_KEY}`,
+        "X-API-KEY": process.env.API4AI_KEY, // 👈 header correcto
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ url: imageUrl }),
@@ -25,9 +25,12 @@ export default async function handler(req, res) {
       return res.status(response.status).json({ error: data });
     }
 
+    // La API devuelve resultados dentro de results[0].entities[0].classes
+    const scores = data.results?.[0]?.entities?.[0]?.classes || {};
+
     return res.status(200).json({
       url: imageUrl,
-      nsfwNUMS: data.nsfw || {},
+      nsfwNUMS: scores,
     });
   } catch (error) {
     console.error("Error en nsfw:", error);
