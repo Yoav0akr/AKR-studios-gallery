@@ -31,12 +31,16 @@ export default async function handler(req, res) {
     */
 
     // Pasar en limpio → convertir a objeto con porcentajes
+    if (!Array.isArray(result)) {
+      return res.status(500).json({ error: "Modelo no disponible", raw: result });
+    }
+
     const limpio = {};
     result.forEach(r => {
-      limpio[r.label] = `${(r.score * 100).toFixed(1)}%`;
+      limpio[r.label] = r.score; // 🔥 número real, no string
     });
 
-    return res.status(200).json({ scores: limpio });
+    return res.status(200).json(limpio);
   } catch (error) {
     console.error("Error HuggingFace:", error);
     return res.status(500).json({ error: "Error verificando imagen" });
