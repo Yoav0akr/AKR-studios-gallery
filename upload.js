@@ -99,7 +99,7 @@ if (visualizador) {
 
 
         // Ahora puedes extraer variables en una sola línea
-        scores = await nsfwFun(cloudinaryURL);
+        const scores = await nsfwFun(cloudinaryURL);
         const { nsfw = 0, sfw = 0 } = scores;
 
         // 🔹 Lógica de validación NSFW

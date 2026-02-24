@@ -22,25 +22,23 @@ export default async function handler(req, res) {
     );
 
     const result = await response.json();
-    /*
-      Respuesta típica:
-      [
-        { label: "nsfw", score: 0.93 },
-        { label: "sfw", score: 0.07 }
-      ]
-    */
 
-    // Pasar en limpio → convertir a objeto con porcentajes
+    // 🔥 Si HF responde error (modelo cargando, etc)
     if (!Array.isArray(result)) {
-      return res.status(500).json({ error: "Modelo no disponible", raw: result });
+      console.error("Respuesta inesperada de HF:", result);
+      return res.status(500).json({
+        error: "Modelo no disponible",
+        raw: result
+      });
     }
 
-    const limpio = {};
+    const scores = {};
     result.forEach(r => {
-      limpio[r.label] = r.score; // 🔥 número real, no string
+      scores[r.label] = r.score;
     });
 
-    return res.status(200).json(limpio);
+    return res.status(200).json(scores);
+
   } catch (error) {
     console.error("Error HuggingFace:", error);
     return res.status(500).json({ error: "Error verificando imagen" });
