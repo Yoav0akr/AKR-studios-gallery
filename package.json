@@ -8,13 +8,14 @@
   "keywords": [],
   "author": "yoav0akr/yoav/yakr/AKRstudios",
   "license": "ISC",
-  "description": "",
+  "description": "Una galeria random",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.8.0",
     "formidable": "^3.5.4",
+    "jigsawstack": "^0.4.2",
     "mongoose": "^8.19.2",
-    "node-fetch": "^3.3.2",
+    "nsfwjs": "^4.2.1",
     "sharp": "^0.34.5",
     "streamifier": "^0.1.1"
   }

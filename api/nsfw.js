@@ -1,4 +1,15 @@
-// api/nsfw.js
+import * as nsfwjs from 'nsfwjs';
+import * as tf from '@tensorflow/tfjs-node';
+
+let nsfwModel = null;
+
+async function loadModel() {
+  if (!nsfwModel) {
+    nsfwModel = await nsfwjs.load(tf); // 👈 importante pasar tf
+  }
+  return nsfwModel;
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Método no permitido" });
@@ -10,27 +21,31 @@ export default async function handler(req, res) {
   }
 
   try {
-    const response = await fetch("https://api.api4ai.cloud/nsfw/v1/results", {
-      method: "POST",
-      headers: {
-        "X-API-KEY": process.env.API4AI_KEY, // 👈 header correcto
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ url: imageUrl }),
+    const model = await loadModel();
+
+    // Descargar la imagen
+    const response = await fetch(imageUrl);
+    const buffer = await response.arrayBuffer();
+
+    // Decodificar en tensor
+    const imageTensor = tf.node.decodeImage(Buffer.from(buffer), 3);
+
+    // Clasificar
+    const predictions = await model.classify(imageTensor);
+
+    // Liberar memoria
+    imageTensor.dispose();
+
+    // Transformar salida
+    const scores = {};
+    predictions.forEach(p => {
+      scores[p.className.toLowerCase()] = p.probability;
     });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      return res.status(response.status).json({ error: data });
-    }
-
-    // La API devuelve resultados dentro de results[0].entities[0].classes
-    const scores = data.results?.[0]?.entities?.[0]?.classes || {};
 
     return res.status(200).json({
       url: imageUrl,
       nsfwNUMS: scores,
+      predidciones: predictions // 👈 opcional: lista completa con className y probability
     });
   } catch (error) {
     console.error("Error en nsfw:", error);
