@@ -79,11 +79,11 @@ if (visualizador) {
         formData.append("file", archivoSeleccionado);
 
         console.log("📤 Subiendo archivo a Cloudinary...");
-        const res = await fetch("/api/upload", { 
-          method: "POST", 
-          body: formData 
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData
         });
-        
+
         const data = await res.json();
         console.log("📥 Respuesta de /api/upload:", data);
 
@@ -97,19 +97,14 @@ if (visualizador) {
         cloudinaryURL = data.url;
         console.log("✔ Subido a Cloudinary:", cloudinaryURL);
 
-        // 🔹 Análisis NSFW (Backend)
-        console.log("🔍 Iniciando análisis NSFW en backend...");
-        const nsfwResult = await analizarNSFWBackend(cloudinaryURL);
-        console.log("📊 Resultado NSFW:", nsfwResult);
-        
-        const porn = nsfwResult.porn || 0;
-        const sexy = nsfwResult.sexy || 0;
-        const neutral = nsfwResult.neutral || 0;
-        console.log(`📈 Detalles: porn=${porn.toFixed(3)}, sexy=${sexy.toFixed(3)}, neutral=${neutral.toFixed(3)}`);
+
+        // Ahora puedes extraer variables en una sola línea
+        scores = await nsfwFun(cloudinaryURL);
+        const { nsfw = 0, sfw = 0 } = scores;
 
         // 🔹 Lógica de validación NSFW
-        if (neutral >= 0.4 && porn <= 0.3) {
-          console.log("✅ Imagen ACEPTADA (neutral y sin contenido explícito)");
+        if (sfw >= 0.4 && nsfw <= 0.3) {
+          console.log("✅ Imagen ACEPTADA (sfw predominante)");
           try {
             EntradaDesc.value = await DETECT_Desk(cloudinaryURL);
             console.log("✅ Descripción completada");
@@ -118,14 +113,10 @@ if (visualizador) {
             EntradaDesc.value = "Descripción no disponible";
           }
           alert("✅ Imagen validada correctamente. Puedes guardarla.");
-        } else if (porn >= 0.6) {
-          alert(`❌ Contenido inapropiado detectado (NSFW: ${Math.round(porn * 100)}%)\n\nLa imagen será rechazada.`);
+        } else if (nsfw >= 0.6) {
+          alert(`❌ Contenido inapropiado detectado (NSFW: ${(nsfw * 100).toFixed(1)}%)\n\nLa imagen será rechazada.`);
           cloudinaryURL = null;
-          console.warn("🚫 Imagen RECHAZADA por NSFW (porn >= 0.6)");
-        } else if (sexy >= 0.7 && porn < 0.6) {
-          alert(`⚠️ Contenido muy sugerente detectado (Sexy: ${Math.round(sexy * 100)}%)\n\nLa imagen será rechazada.`);
-          cloudinaryURL = null;
-          console.warn("⚠️ Imagen RECHAZADA por SEXY (sexy >= 0.7)");
+          console.warn("🚫 Imagen RECHAZADA por NSFW (nsfw >= 0.6)");
         } else {
           console.warn("⚠️ Imagen MARCADA para revisión manual (valores intermedios)");
           alert("⚠️ Imagen marcada para revisión manual por los moderadores.");
@@ -142,46 +133,6 @@ if (visualizador) {
       }
     };
   });
-}
-
-// ==============================
-// --- ANÁLISIS NSFW (Backend) ---
-// ==============================
-async function analizarNSFWBackend(imageURL) {
-  try {
-    console.log("📝 Pidiendo análisis NSFW al backend para:", imageURL);
-    const res = await fetch("/api/nsfw", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imageURL }),
-    });
-
-    console.log(`📥 Status del servidor: ${res.status}`);
-
-    if (!res.ok) {
-      throw new Error(`HTTP Error ${res.status}: ${res.statusText}`);
-    }
-
-    const data = await res.json();
-    console.log("📥 Respuesta de /api/nsfw:", data);
-
-    if (data.error) {
-      throw new Error(`API Error: ${data.error}`);
-    }
-
-    // Asegurar que tiene las propiedades esperadas
-    return {
-      porn: data.porn || 0,
-      sexy: data.sexy || 0,
-      neutral: data.neutral || 0,
-      drawing: data.drawing || 0,
-      hentai: data.hentai || 0
-    };
-
-  } catch (err) {
-    console.error("❌ Error en analizarNSFWBackend():", err.message);
-    throw err;
-  }
 }
 
 // ==============================
@@ -215,7 +166,7 @@ async function DETECT_Desk(URL_Image) {
 
     // Manejar diferentes formatos de respuesta
     let finCaption = "Descripción no disponible";
-    
+
     if (analyzeData.output?.captions && Array.isArray(analyzeData.output.captions)) {
       finCaption = analyzeData.output.captions
         .map(item => item.caption || item.text || "")
@@ -234,6 +185,31 @@ async function DETECT_Desk(URL_Image) {
     console.error("❌ Error en DETECT_Desk():", err.message);
     throw err;
   }
+}
+
+//fincones nsfw
+
+async function nsfwFun(URLimg) {
+  try {
+    if (!URLimg) {
+      throw new Error("imagen no encontrada");
+      console.log("imagen no encontrada");
+    };
+
+    const res = await fetch("/api/nsfw", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageURL: URLimg }),
+    });
+
+    const ses = await res.json();
+
+    return ses;
+
+  } catch (error) {
+    console.error("fallo en funcion de analisis")
+  }
+
 }
 
 // ==============================
