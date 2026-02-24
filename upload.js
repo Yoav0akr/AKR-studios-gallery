@@ -83,6 +83,7 @@ if (visualizador) {
 
         const scores = await nsfwImage(imgPreview);
         const { porn = 0, sexy = 0, neutral = 0 } = scores;
+        console.log(scores);
 
         if (neutral >= 0.4 && porn <= 0.3) {
           // Imagen aceptada → sugerimos descripción
