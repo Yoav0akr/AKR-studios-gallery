@@ -103,23 +103,23 @@ if (visualizador) {
         const { nsfw = 0, sfw = 0 } = scores;
 
         // 🔹 Lógica de validación NSFW
-        if (sfw >= 0.4 && nsfw <= 0.3) {
+        if ( nsfw <= 0.3) {
           console.log("✅ Imagen ACEPTADA (sfw predominante)");
           try {
             EntradaDesc.value = await DETECT_Desk(cloudinaryURL);
             console.log("✅ Descripción completada");
           } catch (descErr) {
             console.warn("⚠️ Error obteniendo descripción automática:", descErr);
-            EntradaDesc.value = "Descripción no disponible";
+            EntradaDesc.value = "Auto descripcion no disponible, ingrese una";
           }
           alert("✅ Imagen validada correctamente. Puedes guardarla.");
-        } else if (nsfw >= 0.6) {
+        } else if (nsfw >= 0.7) {
           alert(`❌ Contenido inapropiado detectado (NSFW: ${(nsfw * 100).toFixed(1)}%)\n\nLa imagen será rechazada.`);
           cloudinaryURL = null;
           console.warn("🚫 Imagen RECHAZADA por NSFW (nsfw >= 0.6)");
         } else {
-          console.warn("⚠️ Imagen MARCADA para revisión manual (valores intermedios)");
-          alert("⚠️ Imagen marcada para revisión manual por los moderadores.");
+          console.warn("⚠️ Imagen MARCADA para revisión manual (valores intermedios)"+ scores);
+          alert("⚠️ Imagen marcada para revisión manual por los moderadores  .");
           cloudinaryURL = null;
         }
 
