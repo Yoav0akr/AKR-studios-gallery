@@ -14,8 +14,13 @@ const visualizador = document.querySelector(".visualizador");
 const usuario = localStorage.getItem("admin") || "";
 const email_user = localStorage.getItem("email") || "";
 
-EntradaPor.value = usuario.trim() || "";
-EntradaPor.disabled = usuario.trim() !== "";
+if (usuario.trim() !== "") {
+  EntradaPor.value = usuario.trim();
+  EntradaPor.disabled = true;
+} else {
+  EntradaPor.value = "";
+  EntradaPor.disabled = false;
+}
 
 // ==============================
 // --- VARIABLES GLOBALES ---
@@ -39,7 +44,6 @@ if (visualizador) {
 
       archivoSeleccionado = file;
 
-      // Validación de tamaño
       const maxBytes = 20 * 1024 * 1024; // 20MB
       if (file.size > maxBytes) {
         alert(`❌ Archivo demasiado grande (${(file.size / 1024 / 1024).toFixed(2)}MB). Máximo: 20MB`);
@@ -48,31 +52,57 @@ if (visualizador) {
       }
 
       // Preview local
-      mostrarPreview(file);
+      const localURL = URL.createObjectURL(file);
+      visualizador.style.backgroundImage = `url(${localURL})`;
+      visualizador.style.backgroundSize = "cover";
+      visualizador.style.backgroundPosition = "center";
+      visualizador.style.backgroundRepeat = "no-repeat";
+      visualizador.querySelectorAll("p, span, i").forEach(el => el.style.display = "none");
 
-      // Subida automática a Cloudinary
+      // 🔹 Subida automática a Cloudinary
       mostrarSpinner();
       try {
-        cloudinaryURL = await subirACloudinary(file);
+        const formData = new FormData();
+        formData.append("file", archivoSeleccionado);
+
+        const res = await fetch("/api/upload", { method: "POST", body: formData });
+        const data = await res.json();
+
+        if (!data.url) {
+          alert("❌ Error subiendo a Cloudinary: " + (data.error || "desconocido"));
+          return;
+        }
+
+        cloudinaryURL = data.url;
         console.log("✔ Subido a Cloudinary:", cloudinaryURL);
 
-        // --- Análisis NSFW en frontend ---
-        const scores = await analizarNSFW(cloudinaryURL);
+        //analisis nsfw
+        const imgPreview = new Image();
+        imgPreview.src = cloudinaryURL;
+        await imgPreview.decode();
+
+        const scores = await nsfwImage(imgPreview);
         const { porn = 0, sexy = 0, neutral = 0 } = scores;
 
         if (neutral >= 0.4 && porn <= 0.3) {
+          // Imagen aceptada → sugerimos descripción
           EntradaDesc.value = await DETECT_Desk(cloudinaryURL);
           console.log("Imagen aceptada:", scores);
         } else if (porn >= 0.6) {
-          alert(`❌ Contenido inapropiado (NSFW: ${Math.round(porn * 100)}%)`);
+          alert(`❌ Contenido inapropiado (NSFW: ${Math.round(porn * 100)}%) → redirigiendo al inicio`);
           cloudinaryURL = null;
+          // window.location.href = "./index.html";
         } else if (sexy >= 0.7 && porn < 0.6) {
-          alert(`⚠ Contenido muy sugerente (Sexy: ${Math.round(sexy * 100)}%)`);
+          alert(`⚠ Contenido muy sugerente (Sexy: ${Math.round(sexy * 100)}%) → redirigiendo al inicio`);
           cloudinaryURL = null;
+          // window.location.href = "./index.html";
         } else {
+          // Caso intermedio → revisión manual
           alert("⚠ Imagen marcada para revisión manual.");
           cloudinaryURL = null;
         }
+
+
 
       } catch (err) {
         console.error("Error en subida/análisis:", err);
@@ -83,56 +113,6 @@ if (visualizador) {
     };
   });
 }
-
-// ==============================
-// --- FUNCIONES AUXILIARES ---
-// ==============================
-function mostrarPreview(file) {
-  const localURL = URL.createObjectURL(file);
-  visualizador.style.backgroundImage = `url(${localURL})`;
-  visualizador.style.backgroundSize = "cover";
-  visualizador.style.backgroundPosition = "center";
-  visualizador.style.backgroundRepeat = "no-repeat";
-  visualizador.querySelectorAll("p, span, i").forEach(el => el.style.display = "none");
-}
-
-async function subirACloudinary(file) {
-  const formData = new FormData();
-  formData.append("file", file);
-  const res = await fetch("/api/upload", { method: "POST", body: formData });
-  const data = await res.json();
-  if (!data.url) throw new Error(data.error || "Error desconocido en Cloudinary");
-  return data.url;
-}
-
-// --- NSFW frontend ---
-import { nsfwImage } from './nsfw.js';
-
-async function analizarNSFW(url) {
-  const imgPreview = new Image();
-  imgPreview.src = url;
-  await imgPreview.decode();
-  return await nsfwImage(imgPreview);
-}
-
-// --- IA para descripciones ---
-async function DETECT_Desk(URL_Image) {
-  const analyzeRes = await fetch("/api/analyze", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ URL: URL_Image }),
-  });
-  const analyzeData = await analyzeRes.json();
-
-  if (analyzeData.error) {
-    console.error("Error en análisis:", analyzeData.error);
-    alert("❌ No se pudo analizar la imagen.");
-    return "";
-  } else {
-    return analyzeData.output.captions.map(item => item.caption).join(" ");
-  }
-}
-
 // ==============================
 // --- GUARDAR EN MONGO ---
 // ==============================
@@ -146,7 +126,14 @@ async function guardarEnMongo() {
   if (!nombre) return alert("❌ Debes poner un nombre.");
   if (!cloudinaryURL) return alert("❌ Primero sube un archivo.");
 
-  const data = { nombre, ub: cloudinaryURL, por, categ, mimidesk: desk, email: email_user || "null" };
+  const data = {
+    nombre,
+    ub: cloudinaryURL,
+    por,
+    categ,
+    mimidesk: desk,
+    email: email_user || "null",
+  };
 
   try {
     const res = await fetch("/api/db", {
@@ -156,7 +143,12 @@ async function guardarEnMongo() {
     });
 
     const resData = await res.json();
-    if (!res.ok) throw new Error(resData.error || "Error desconocido");
+
+    if (!res.ok) {
+      console.error(resData);
+      alert("❌ Error guardando en la base de datos: " + (resData.error || "desconocido"));
+      return;
+    }
 
     alert("✅ Imagen guardada correctamente");
     window.location.href = "./index.html";
@@ -167,15 +159,73 @@ async function guardarEnMongo() {
 }
 
 // ==============================
+// --- analisis con ia
+// ==============================
+
+// fara nsfw:
+// --- NSFW frontend ---
+let nsfwModel = null;
+
+async function nsfwImage(imgElement) {
+  if (!nsfwModel) {
+    nsfwModel = await nsfwjs.load(); // usa tfjs del navegador
+  }
+  const predictions = await nsfwModel.classify(imgElement);
+
+  const scores = {};
+  predictions.forEach(p => {
+    scores[p.className.toLowerCase()] = p.probability;
+  });
+
+  return scores;
+}
+
+
+
+//para sujerir descripciones
+
+async function DETECT_Desk(URL_Image) {
+  const analyzeRes = await fetch("/api/analyze", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ URL: URL_Image }),
+  });
+  const analyzeData = await analyzeRes.json();
+
+  if (analyzeData.error) {
+    console.error("Error en análisis:", analyzeData.error);
+    alert("❌ No se pudo analizar la imagen.");
+  } else {
+    const finCaption = analyzeData.output.captions.map(item => item.caption).join(" ");
+    //retornamos la respuesta:
+    return finCaption
+  }
+}
+
+
+
+
+
+// ==============================
 // --- BOTÓN DE GUARDAR MANUAL ---
 // ==============================
 EntradaGuardar.addEventListener("click", async (e) => {
   e.preventDefault();
+
   if (!archivoSeleccionado) return alert("❌ Selecciona un archivo primero.");
-  if (cloudinaryURL) {
-    guardarEnMongo();
-  } else {
-    alert("Imagen inapropiada detectada");
+  try {
+
+    if (cloudinaryURL) {
+      guardarEnMongo();
+    } else {
+      alert("imagen inapropiada detectada")
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("⚠ Error de conexión con el servidor.");
+  } finally {
+    ocultarSpinner();
   }
 });
 
@@ -192,7 +242,13 @@ if (logo && navs) {
   });
 }
 
-// --- Spinner ---
+//espinner de carga
 const spinner = document.getElementById("spinner");
-function mostrarSpinner() { spinner.classList.remove("no-ver"); }
-function ocultarSpinner() { spinner.classList.add("no-ver"); }
+
+function mostrarSpinner() {
+  spinner.classList.remove("no-ver");
+}
+
+function ocultarSpinner() {
+  spinner.classList.add("no-ver");
+}
