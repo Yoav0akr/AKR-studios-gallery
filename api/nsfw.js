@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/Falconsai/nsfw_image_detection",
+      "https://router.huggingface.co/hf-inference/models/Falconsai/nsfw_image_detection",
       {
         method: "POST",
         headers: {
@@ -23,12 +23,12 @@ export default async function handler(req, res) {
 
     const result = await response.json();
 
-    // 🔥 Si HF responde error (modelo cargando, etc)
     if (!Array.isArray(result)) {
-      console.error("Respuesta inesperada de HF:", result);
-      return res.status(500).json({
-        error: "Modelo no disponible",
-        raw: result
+      console.warn("HF respondió algo inesperado:", result);
+      return res.status(200).json({
+        nsfw: 0.5,
+        sfw: 0.5,
+        warning: "Modelo no disponible"
       });
     }
 
@@ -40,7 +40,11 @@ export default async function handler(req, res) {
     return res.status(200).json(scores);
 
   } catch (error) {
-    console.error("Error HuggingFace:", error);
-    return res.status(500).json({ error: "Error verificando imagen" });
+    console.error("Error HF:", error);
+    return res.status(200).json({
+      nsfw: 0.5,
+      sfw: 0.5,
+      warning: "Error en análisis"
+    });
   }
 }
