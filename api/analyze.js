@@ -4,7 +4,7 @@ export default async function handler(req, res) {
 
   try {
     const response = await fetch(
-      "https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-base",
+      "https://router.huggingface.co/hf-inference/models/Salesforce/blip-image-captioning-base",
       {
         method: "POST",
         headers: {
@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({ inputs: URL }),
       }
     );
-
+8
     const data = await response.json();
 
     const caption = Array.isArray(data) && data[0]?.generated_text

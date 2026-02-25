@@ -54,8 +54,12 @@ if (visualizador) {
     input.onchange = async () => {
       const file = input.files[0];
       if (!file) return;
-
+      
       archivoSeleccionado = file;
+      if (visualizador.classList.contains("reject")){
+        visualizador.classList.remove("reject");
+      }
+      
 
       const maxBytes = 20 * 1024 * 1024; // 20MB
       if (file.size > maxBytes) {
@@ -63,7 +67,7 @@ if (visualizador) {
         archivoSeleccionado = null;
         return;
       }
-
+      
       // Preview local
       const localURL = URL.createObjectURL(file);
       visualizador.style.backgroundImage = `url(${localURL})`;
@@ -114,9 +118,10 @@ if (visualizador) {
           }
           alert("✅ Imagen validada correctamente. Puedes guardarla.");
         } else if (nsfw >= 0.7) {
-          alert(`❌ Contenido inapropiado detectado (NSFW: ${(nsfw * 100).toFixed(1)}%)\n\nLa imagen será rechazada.`);
+          alert(`❌ Contenido inapropiado detectado (NSFW: ${(nsfw * 100).toFixed(1)}%|${(sfw * 100).toFixed(1)} )\n\nLa imagen será rechazada.`);
+          visualizador.classList.add("reject");
           cloudinaryURL = null;
-          console.warn("🚫 Imagen RECHAZADA por NSFW (nsfw >= 0.6)");
+          console.warn("🚫 Imagen RECHAZADA por NSFW (nsfw = "+nsfw+")");
         } else {
           console.warn("⚠️ Imagen MARCADA para revisión manual (valores intermedios)"+ scores);
           alert("⚠️ Imagen marcada para revisión manual por los moderadores  .");
