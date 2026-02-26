@@ -59,25 +59,53 @@ export default async function handler(req, res) {
     }
 
     // ======================
-    // GET — obtener todas con paginación
+    // GET — obtener documentos con modos y paginación
     // ======================
     if (req.method === "GET") {
       const page = Number(req.query.page) || 1;
       const limit = Number(req.query.limit) || 20;
       const skip = (page - 1) * limit;
 
-      // Contar total de documentos
-      const totalDocs = await Imagen.countDocuments();
+      const { mode, userId, categoria } = req.query;
+      let filtro = {};
 
-      // Traer documentos paginados, orden descendente por _id (más recientes primero)
-      const data = await Imagen.find().sort({ _id: -1 }).skip(skip).limit(limit);
+      // --- MODO HOME ---
+      if (mode === "home") {
+        filtro = {}; // todos los documentos
+      }
+
+      // --- MODO USER ---
+      else if (mode === "user") {
+        if (!userId) {
+          return res.status(400).json({ error: "Falta userId" });
+        }
+        filtro = { por: userId };
+      }
+
+      // --- MODO SEARCH ---
+      else if (mode === "search") {
+        if (!categoria) {
+          return res.status(400).json({ error: "Falta categoria" });
+        }
+        filtro = { categ: categoria };
+      }
+
+      // Contar total de documentos según filtro
+      const totalDocs = await Imagen.countDocuments(filtro);
+
+      // Traer documentos paginados según filtro
+      const data = await Imagen.find(filtro)
+        .sort({ _id: -1 })
+        .skip(skip)
+        .limit(limit);
 
       return res.status(200).json({
+        mode: mode || "home",
         page,
         limit,
         totalDocs,
         totalPages: Math.ceil(totalDocs / limit),
-        data
+        data,
       });
     }
 

@@ -3,7 +3,6 @@
 // ==============================
 const titular = document.getElementById("titular");
 const btnPANadmins = document.getElementById("btnLogAdmins");
-const btnLog = document.getElementById("btnLogAdmins");
 const fotos = document.querySelector("#imagenes-contenedor");
 const cats = document.getElementsByName("cats")[0];
 const buscador = document.querySelector("#buscador");
@@ -40,13 +39,27 @@ let globalArchivos = [];
 let currentPage = 1;
 let totalPages = 1;
 const LIMIT = 20;
+let currentMode = "home"; // por defecto
+let currentCategoria = "";
+let currentTexto = "";
 
 // ==============================
 //  API
 // ==============================
 async function cargarDesdeMongo(page = 1) {
   try {
-    const res = await fetch(`/api/db?page=${page}&limit=${LIMIT}`);
+    const params = new URLSearchParams({
+      mode: currentMode,
+      page,
+      limit: LIMIT,
+    });
+
+    if (currentMode === "search") {
+      if (currentCategoria) params.append("categoria", currentCategoria);
+      if (currentTexto) params.append("texto", currentTexto);
+    }
+
+    const res = await fetch(`/api/db?${params.toString()}`);
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
 
@@ -120,9 +133,10 @@ async function download(archivo) {
 }
 
 // ==============================
-//  CATEGORÍAS (FLATMAP + ASCII)
+//  CATEGORÍAS (desde backend)
 // ==============================
 function renderCategorias(archivos) {
+  cats.innerHTML = ""; // limpiar
   const categorias = [
     ...new Set(
       archivos
@@ -130,7 +144,7 @@ function renderCategorias(archivos) {
         .map(c => c.toLowerCase().trim())
         .filter(Boolean)
     )
-  ].sort(); // ASCII
+  ].sort();
 
   categorias.forEach(cat => {
     const op = document.createElement("option");
@@ -141,46 +155,23 @@ function renderCategorias(archivos) {
 }
 
 // ==============================
-//  FILTRADO
+//  EVENTOS DE BÚSQUEDA
 // ==============================
-function filtrarYMostrar() {
-  const texto = buscador.value.toLowerCase().trim();
-  const tipo = cats.value;
+buscador.addEventListener("input", async () => {
+  currentMode = "search";
+  currentTexto = buscador.value.trim().toLowerCase();
+  await init(1);
+});
 
-  let filtrados = globalArchivos;
-
-  if (tipo === "nombre") {
-    filtrados = filtrados.filter(a =>
-      a.nombre.toLowerCase().includes(texto)
-    );
-  } else if (tipo === "por") {
-    filtrados = filtrados.filter(a =>
-      a.por.toLowerCase().includes(texto)
-    );
-  } else {
-    filtrados = filtrados.filter(a =>
-      (a.categ || [])
-        .map(c => c.toLowerCase())
-        .includes(tipo)
-    );
-  }
-
-  if (filtrados.length === 0) {
-    div_mesages.classList.remove("no-ver");
-    div_mesages.textContent = "NO HAY RESULTADOS";
-  } else {
-    div_mesages.classList.add("no-ver");
-  }
-
-  cargarimagenes(filtrados);
-}
+cats.addEventListener("change", async () => {
+  currentMode = "search";
+  currentCategoria = cats.value;
+  await init(1);
+});
 
 // ==============================
-//  EVENTOS
+//  PAGINACIÓN
 // ==============================
-buscador.addEventListener("input", filtrarYMostrar);
-cats.addEventListener("change", filtrarYMostrar);
-
 btnPrev.addEventListener("click", async () => {
   if (currentPage > 1) {
     await init(currentPage - 1);
