@@ -724,6 +724,8 @@ max-width: 1rem;
         flex-direction: column;
         text-align: center;
         max-width: 100%;
+        height: 10px;
+        border-radius: 0.6rem;
 
     }
 
@@ -794,7 +796,6 @@ max-width: 1rem;
 
 .no-ver {
     /* display: none; */
-    border: 2px solid#00ff59;
     display: none;
 
 }
