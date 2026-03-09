@@ -139,7 +139,7 @@ async function download(archivo) {
 function renderCategorias(archivos) {
   cats.innerHTML = ""; // limpiar;
 
-  categorias.forEach(archivos=> {
+  archivos.forEach(cat => {
     const op = document.createElement("option");
     op.value = cat;
     op.textContent = cat;
