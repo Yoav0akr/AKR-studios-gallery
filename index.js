@@ -42,6 +42,7 @@ const LIMIT = 20;
 let currentMode = "home"; // por defecto
 let currentCategoria = "";
 let currentTexto = "";
+let catsGetted = ""
 
 // ==============================
 //  API
@@ -189,7 +190,8 @@ btnNext.addEventListener("click", async () => {
 // ==============================
 async function init(page = 1) {
   await cargarDesdeMongo(page);
-  renderCategorias(globalArchivos);
+  catsGetted = GET_categs()
+  renderCategorias(catsGetted);
   cargarimagenes(globalArchivos);
   paginaActual.textContent = `Página ${currentPage} de ${totalPages}`;
 }
@@ -205,6 +207,28 @@ logo.addEventListener("click", () => {
   navs.classList.toggle("navhiden");
   if (navigator.vibrate) navigator.vibrate(200);
 });
+
+// ==============================
+//  funciones tipo llamada api
+// ==============================
+
+//llamar categorias desde api/db
+
+async function GET_categs() {
+  try {
+    const params = new URLSearchParams({
+      mode: "cats",
+    });
+    const res = await fetch(`/api/db?${params.toString()}`);
+    if (!res.ok) throw new Error(res.status);
+    const catsRes = res.cats;
+    return catsRes
+  } catch (err) {
+    console.error("Error Mongo:", err);
+    return [];
+  }
+}
+
 
 // ==============================
 //  START
