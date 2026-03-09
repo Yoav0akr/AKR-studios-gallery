@@ -182,7 +182,7 @@ btnNext.addEventListener("click", async () => {
 // ==============================
 async function init(page = 1) {
   await cargarDesdeMongo(page);
-  catsGetted = GET_categs()
+  catsGetted = await GET_categs()
   renderCategorias(catsGetted);
   cargarimagenes(globalArchivos);
   paginaActual.textContent = `Página ${currentPage} de ${totalPages}`;
@@ -205,7 +205,6 @@ logo.addEventListener("click", () => {
 // ==============================
 
 //llamar categorias desde api/db
-
 async function GET_categs() {
   try {
     const params = new URLSearchParams({
@@ -213,8 +212,10 @@ async function GET_categs() {
     });
     const res = await fetch(`/api/db?${params.toString()}`);
     if (!res.ok) throw new Error(res.status);
-    const catsRes = res.cats;
-    return catsRes
+
+    const data = await res.json();   // <- parseamos la respuesta
+    const catsRes = data.cats || []; // <- asumimos que backend devuelve { cats: [...] }
+    return catsRes;
   } catch (err) {
     console.error("Error Mongo:", err);
     return [];
