@@ -4,7 +4,7 @@
 const titular = document.getElementById("titular");
 const btnPANadmins = document.getElementById("btnLogAdmins");
 const fotos = document.querySelector("#imagenes-contenedor");
-const cats = document.getElementsByName("cats")[0];
+const cats = document.getElementsByName("cats");
 const buscador = document.querySelector("#buscador");
 const div_mesages = document.querySelector(".mensage");
 const btnPrev = document.getElementById("prev");
@@ -134,7 +134,7 @@ async function download(archivo) {
 }
 
 // ==============================
-//  CATEGORÍAS (desde backend)
+//  CATEGORÍAS lod
 // ==============================
 function renderCategorias(archivos) {
   cats.innerHTML = ""; // limpiar;
@@ -182,8 +182,7 @@ btnNext.addEventListener("click", async () => {
 // ==============================
 async function init(page = 1) {
   await cargarDesdeMongo(page);
-  catsGetted = await GET_categs()
-  renderCategorias(catsGetted);
+  renderCategorias(await GET_categs());
   cargarimagenes(globalArchivos);
   paginaActual.textContent = `Página ${currentPage} de ${totalPages}`;
 }
