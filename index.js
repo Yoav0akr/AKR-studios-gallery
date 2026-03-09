@@ -144,6 +144,7 @@ function renderCategorias(archivos) {
     op.value = cat;
     op.textContent = cat;
     cats.appendChild(op);
+    console.log(cat);
   });
 }
 
