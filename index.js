@@ -55,7 +55,7 @@ async function cargarDesdeMongo(page = 1) {
       limit: LIMIT,
     });
 
-    if (currentMode === "search") {
+    if (currentMode === "searchName"||"searchCat") {
       if (currentCategoria) params.append("categoria", currentCategoria);
       if (currentTexto) params.append("texto", currentTexto);
     }
@@ -151,13 +151,13 @@ function renderCategorias(archivos) {
 //  EVENTOS DE BÚSQUEDA
 // ==============================
 buscador.addEventListener("input", async () => {
-  currentMode = "search";
+  currentMode = "searchName";
   currentTexto = buscador.value.trim().toLowerCase();
   await init(1);
 });
 
 cats.addEventListener("change", async () => {
-  currentMode = "search";
+  currentMode = "searchCat";
   currentCategoria = cats.value;
   await init(1);
 });
