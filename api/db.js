@@ -62,52 +62,69 @@ export default async function handler(req, res) {
     // GET — obtener documentos con modos y paginación
     // ======================
     if (req.method === "GET") {
-      const page = Number(req.query.page) || 1;
-      const limit = Number(req.query.limit) || 20;
-      const skip = (page - 1) * limit;
+  const mode = (req.query.mode || "").toLowerCase();
+  const { userId, categoria, nombre } = req.query;
 
-      const { mode, userId, categoria } = req.query;
-      let filtro = {};
+  // --- Paginación ---
+  const page = Number(req.query.page) || 1;
+  const limit = Number(req.query.limit) || 20;
+  const skip = (page - 1) * limit;
 
-      // --- MODO HOME ---
-      if (mode === "home") {
-        filtro = {}; // todos los documentos
+  let filtro = {};
+
+  switch (mode) {
+    case "cats":
+      // Solo devolver categorías distintas
+      const categorias = await Imagen.distinct("categ");
+      return res.json({ cats: categorias });
+
+    case "home":
+      filtro = {};
+      break;
+
+    case "user":
+      if (!userId) {
+        return res.status(400).json({ error: "Falta userId" });
       }
+      filtro = { por: userId };
+      break;
 
-      // --- MODO USER ---
-      else if (mode === "user") {
-        if (!userId) {
-          return res.status(400).json({ error: "Falta userId" });
-        }
-        filtro = { por: userId };
+    case "searchcat":
+      if (!categoria) {
+        return res.status(400).json({ error: "Falta categoria" });
       }
+      filtro = { categ: categoria };
+      break;
 
-      // --- MODO SEARCH ---
-      else if (mode === "search") {
-        if (!categoria) {
-          return res.status(400).json({ error: "Falta categoria" });
-        }
-        filtro = { categ: categoria };
+    case "searchname":
+      if (!nombre) {
+        return res.status(400).json({ error: "Falta nombre" });
       }
+      filtro = { nombre: nombre };
+      break;
 
-      // Contar total de documentos según filtro
-      const totalDocs = await Imagen.countDocuments(filtro);
+    default:
+      filtro = {};
+  }
 
-      // Traer documentos paginados según filtro
-      const data = await Imagen.find(filtro)
-        .sort({ _id: -1 })
-        .skip(skip)
-        .limit(limit);
+  // Contar total de documentos según filtro
+  const totalDocs = await Imagen.countDocuments(filtro);
 
-      return res.status(200).json({
-        mode: mode || "home",
-        page,
-        limit,
-        totalDocs,
-        totalPages: Math.ceil(totalDocs / limit),
-        data,
-      });
-    }
+  // Traer documentos paginados según filtro
+  const data = await Imagen.find(filtro)
+    .sort({ _id: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  return res.status(200).json({
+    mode: mode || "home",
+    page,
+    limit,
+    totalDocs,
+    totalPages: Math.ceil(totalDocs / limit),
+    data,
+  });
+}
 
     // ======================
     // POST — agregar nueva imagen
