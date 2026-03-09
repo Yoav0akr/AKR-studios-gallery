@@ -313,7 +313,6 @@ max-width: 1rem;
     display: flex;
     justify-content: space-between;
     padding: 0.5rem;
-    margin: 3rem;
     gap: 1rem;
     border: 3px solid var(--accent-1);
     background-color: #1d1330;
