@@ -54,12 +54,12 @@ if (visualizador) {
     input.onchange = async () => {
       const file = input.files[0];
       if (!file) return;
-      
+
       archivoSeleccionado = file;
-      if (visualizador.classList.contains("reject")){
+      if (visualizador.classList.contains("reject")) {
         visualizador.classList.remove("reject");
       }
-      
+
 
       const maxBytes = 20 * 1024 * 1024; // 20MB
       if (file.size > maxBytes) {
@@ -67,7 +67,7 @@ if (visualizador) {
         archivoSeleccionado = null;
         return;
       }
-      
+
       // Preview local
       const localURL = URL.createObjectURL(file);
       visualizador.style.backgroundImage = `url(${localURL})`;
@@ -107,10 +107,11 @@ if (visualizador) {
         const { nsfw = 0, sfw = 0 } = scores;
 
         // 🔹 Lógica de validación NSFW
-        if ( nsfw <= 0.3) {
+        if (nsfw <= 0.3) {
           console.log("✅ Imagen ACEPTADA (sfw predominante)");
           try {
             EntradaDesc.value = await DETECT_Desk(cloudinaryURL);
+            EntradaCategs.value = await CategsIa(cloudinaryURL);
             console.log("✅ Descripción completada");
           } catch (descErr) {
             console.warn("⚠️ Error obteniendo descripción automática:", descErr);
@@ -121,9 +122,9 @@ if (visualizador) {
           alert(`❌ Contenido inapropiado detectado (NSFW: ${(nsfw * 100).toFixed(1)}%|${(sfw * 100).toFixed(1)} )\n\nLa imagen será rechazada.`);
           visualizador.classList.add("reject");
           cloudinaryURL = null;
-          console.warn("🚫 Imagen RECHAZADA por NSFW (nsfw = "+nsfw+")");
+          console.warn("🚫 Imagen RECHAZADA por NSFW (nsfw = " + nsfw + ")");
         } else {
-          console.warn("⚠️ Imagen MARCADA para revisión manual (valores intermedios)"+ scores);
+          console.warn("⚠️ Imagen MARCADA para revisión manual (valores intermedios)" + scores);
           alert("⚠️ Imagen marcada para revisión manual por los moderadores  .");
           cloudinaryURL = null;
         }
@@ -141,8 +142,51 @@ if (visualizador) {
 }
 
 // ==============================
-// --- DESCRIPCIÓN CON IA ---
+// --- IA ---
 // ==============================
+
+
+//categorias
+async function CategsIa(URL_Image) {
+  try {
+    if (!URL_Image) {
+      throw new Error("URL_Image no está definida");
+    }
+
+    console.log("📝 Pidiendo categs a Hugging Face...");
+    const analyzeRes = await fetch("/api/categs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageUrl: URL_Image }),
+    });
+
+    console.log(`📥 Status del servidor: ${analyzeRes.status}`);
+
+    if (!analyzeRes.ok) {
+      throw new Error(`HTTP Error ${analyzeRes.status}: ${analyzeRes.statusText}`);
+    }
+
+    const analyzeData = await analyzeRes.json();
+    console.log("📥 Respuesta de /api/categs", analyzeData);
+
+    if (analyzeData.error) {
+      throw new Error(`API Error: ${analyzeData.error}`);
+    }
+
+    // Aquí ya esperamos un array de categorías
+    const categs = Array.isArray(analyzeData.categorias)
+      ? analyzeData.categorias
+      : ["sin_categorias"];
+
+    console.log("✅ Categorías obtenidas:", categs);
+    return categs;
+  } catch (err) {
+    console.error("❌ Error en CategsIa():", err.message);
+    throw err;
+  }
+};
+
+//descripciones
 async function DETECT_Desk(URL_Image) {
   try {
     if (!URL_Image) {
@@ -294,3 +338,19 @@ if (EntradaGuardar) {
     }
   });
 }
+
+EntradaNombre.addEventListener('input',()=>{
+EntradaNombre.value = EntradaNombre.value.slice(0, 30);
+});
+
+// ==============================
+//  NAVBAR
+// ==============================
+const navs = document.querySelector(".nav");
+const logo = document.querySelector(".logo");
+
+logo.addEventListener("click", () => {
+  logo.classList.toggle("rotado");
+  navs.classList.toggle("navhiden");
+  if (navigator.vibrate) navigator.vibrate(200);
+});
