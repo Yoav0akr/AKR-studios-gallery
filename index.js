@@ -137,17 +137,9 @@ async function download(archivo) {
 //  CATEGORÍAS (desde backend)
 // ==============================
 function renderCategorias(archivos) {
-  cats.innerHTML = ""; // limpiar
-  const categorias = [
-    ...new Set(
-      archivos
-        .flatMap(a => a.categ || [])
-        .map(c => c.toLowerCase().trim())
-        .filter(Boolean)
-    )
-  ].sort();
+  cats.innerHTML = ""; // limpiar;
 
-  categorias.forEach(cat => {
+  categorias.forEach(archivos=> {
     const op = document.createElement("option");
     op.value = cat;
     op.textContent = cat;
