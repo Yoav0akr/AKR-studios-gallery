@@ -175,8 +175,8 @@ if (visualizador) {
 
           const data = await res.json();
 
-          EntradaDesc.value = data.descripcion;
-          EntradaCategs.value = data.categorias.join(" ");
+          EntradaDesc.value = data.descripcion || "";
+          EntradaCategs.value = (data.categorias || []).join(", ");
 
           console.log("✅ IA completada");
 
