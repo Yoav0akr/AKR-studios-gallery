@@ -107,7 +107,9 @@ if (visualizador) {
         const { nsfw = 0, sfw = 1 } = scores;
 
         // 🔹 Lógica de validación NSFW/olimpia
-        if ( await facesFun(cloudinaryURL)) {
+        const facesAllowed = await facesFun(cloudinaryURL);
+
+        if (facesAllowed) {
 
           if (nsfw <= 0.3) {
             console.log("✅ Imagen ACEPTADA (sfw predominante)");
@@ -131,9 +133,10 @@ if (visualizador) {
             cloudinaryURL = null;
           }
         } else {
-          alert("esta iamen tienen una cara humana, asegurate de que tienes los derechos de la imagen")
+          visualizador.classList.add("reject");
+          alert("❌ Esta imagen contiene una cara humana. Verifica los derechos de uso.");
+          cloudinaryURL = null;
         }
-
       } catch (err) {
         console.error("❌ Error CRÍTICO en subida/análisis:", err.message);
         console.error("Stack trace:", err.stack);
@@ -243,27 +246,38 @@ async function DETECT_Desk(URL_Image) {
 
 //fincones nsfw
 
-async function nsfwFun(URLimg) {
+async function facesFun(URLimg) {
   try {
-    if (!URLimg) {
-      throw new Error("imagen no encontrada");
-      console.log("imagen no encontrada");
-    };
 
-    const res = await fetch("/api/nsfw", {
+    if (!URLimg) {
+      console.warn("⚠️ facesFun recibió URL inválida:", URLimg);
+      return true; // no bloquear por fallo
+    }
+
+    const res = await fetch("/api/faces", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ imageURL: URLimg }),
     });
 
+    if (!res.ok) {
+      console.warn("⚠️ Error HTTP en faces:", res.status);
+      return true;
+    }
+
     const ses = await res.json();
 
-    return ses;
+    console.log("👤 Resultado faces:", ses);
+
+    return Boolean(ses.allowed);
 
   } catch (error) {
-    console.error("fallo en funcion de analisis")
-  }
 
+    console.error("❌ fallo en función de análisis de rostros", error);
+
+    return true;
+
+  }
 }
 
 //funciones para olimpia:
