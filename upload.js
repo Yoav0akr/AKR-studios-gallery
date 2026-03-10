@@ -130,6 +130,7 @@ if (visualizador) {
           } else {
             console.warn("⚠️ Imagen MARCADA para revisión manual (valores intermedios)" + scores);
             alert("⚠️ Imagen marcada para revisión manual por los moderadores  .");
+            visualizador.classList.add("reject");
             cloudinaryURL = null;
           }
         } else {
@@ -137,6 +138,7 @@ if (visualizador) {
           alert("❌ Esta imagen contiene una cara humana. Verifica los derechos de uso.");
           cloudinaryURL = null;
         }
+
       } catch (err) {
         console.error("❌ Error CRÍTICO en subida/análisis:", err.message);
         console.error("Stack trace:", err.stack);
@@ -246,6 +248,30 @@ async function DETECT_Desk(URL_Image) {
 
 //fincones nsfw
 
+async function nsfwFun(URLimg) {
+  try {
+    if (!URLimg) {
+      throw new Error("imagen no encontrada");
+      console.log("imagen no encontrada");
+    };
+
+    const res = await fetch("/api/nsfw", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageURL: URLimg }),
+    });
+
+    const ses = await res.json();
+
+    return ses;
+
+  } catch (error) {
+    console.error("fallo en funcion de analisis")
+  }
+
+}
+
+//funciones para olimpia:
 async function facesFun(URLimg) {
   try {
 
@@ -277,31 +303,6 @@ async function facesFun(URLimg) {
 
     return true;
 
-  }
-}
-
-//funciones para olimpia:
-async function facesFun(URLimg) {
-  try {
-    if (!URLimg) {
-      throw new Error("imagen no encontrada");
-    }
-
-    const res = await fetch("/api/faces", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imageURL: URLimg }),
-    });
-
-    const ses = await res.json();
-
-    // Devuelve directamente true/false según el campo "allowed"
-    return Boolean(ses.allowed);
-
-  } catch (error) {
-    console.error("fallo en función de análisis de rostros", error);
-    // En caso de error, devolvemos true para no bloquear por fallo técnico
-    return true;
   }
 }
 
