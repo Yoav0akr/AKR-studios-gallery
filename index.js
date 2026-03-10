@@ -84,6 +84,7 @@ function cargarimagenes(lista) {
   if (lista.length === 0) {
     show.classList.remove("no-ver");
     show.textContent = "NO HAY IMÁGENES DISPONIBLES";
+    show.classList.add("mensage")
     return;
   }
 

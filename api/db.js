@@ -143,15 +143,15 @@ export default async function handler(req, res) {
         const nuevoID = ultimo ? ultimo.id + 1 : 1;
 
         const data = {
-          id: nuevoID,
-          nombre: body.nombre,
-          ub: body.ub,
-          public_id: body.public_id,
-          por: body.por || "Desconocido",
-          categ: Array.isArray(body.categ) ? body.categ : [body.categ],
-          mimidesk: body.mimidesk || "",
-          imgID: body.imgID || "",
-          email: body.email || "",
+          id: nuevoID,//id de la imagen
+          nombre: body.nombre,//nombre de la iamgen
+          ub: body.ub,//url de la imagen
+          public_id: body.public_id,//su id publico
+          por: body.por || "Desconocido",//quein lo sube
+          categ: Array.isArray(body.categ) ? body.categ : [body.categ],//categorias
+          mimidesk: body.mimidesk || "",//la descripcin de la imagen
+          imgID: body.imgID || "",//imagen id
+          email: body.email || "",//email de quien lo sube(esta en el local storage)
         };
 
         const nueva = await Imagen.create(data);
