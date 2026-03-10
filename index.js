@@ -163,8 +163,11 @@ buscador.addEventListener("input", async () => {
 });
 
 cats.addEventListener("change", async () => {
-  if (cats.value="all"){
-    location.reload;
+  if (cats.value==="all"){
+     currentMode = "home";
+     currentCategoria = "";
+     await init(1);
+
   }else{
     currentMode = "searchcat";
     currentCategoria = cats.value;
