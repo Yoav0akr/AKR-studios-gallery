@@ -157,13 +157,13 @@ function renderCategorias(archivos) {
 //  EVENTOS DE BÚSQUEDA
 // ==============================
 buscador.addEventListener("input", async () => {
-  currentMode = "searchName";
+  currentMode = "searchname";
   currentTexto = buscador.value.trim().toLowerCase();
   await init(1);
 });
 
 cats.addEventListener("change", async () => {
-  currentMode = "searchCat";
+  currentMode = "searchcat";
   currentCategoria = cats.value;
   await init(1);
 });
