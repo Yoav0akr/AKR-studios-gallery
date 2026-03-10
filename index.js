@@ -163,9 +163,14 @@ buscador.addEventListener("input", async () => {
 });
 
 cats.addEventListener("change", async () => {
-  currentMode = "searchcat";
-  currentCategoria = cats.value;
-  await init(1);
+  if (cats.value="all"){
+    location.reload;
+  }else{
+    currentMode = "searchcat";
+    currentCategoria = cats.value;
+    await init(1);
+  }
+    
 });
 
 // ==============================
