@@ -80,20 +80,22 @@ export default async function handler(req, res) {
     }
 
     // ---------- PUT → DAR / QUITAR ADMIN ----------
-    if (req.method === "PUT") {
-      const { _id, adminpass } = body;
-      if (!_id || adminpass === undefined) return res.status(400).json({ success: false, message: "Faltan datos" });
+if (req.method === "PUT") {
+  const { _id, adminpass } = body;
+  if (!_id || adminpass === undefined) {
+    return res.status(400).json({ success: false, message: "Faltan datos" });
+  }
 
-      // Convertimos a string por compatibilidad
-      const actualizado = await Admin.findByIdAndUpdate(
-        _id,
-        { adminpass: String(adminpass) },
-        { new: true }
-      );
+  // Convertimos siempre a string
+  const actualizado = await Admin.findByIdAndUpdate(
+    _id,
+    { adminpass: String(adminpass) },
+    { new: true }
+  );
 
-      if (!actualizado) return res.status(404).json({ success: false, message: "Admin no encontrado" });
-      return res.status(200).json({ success: true, admin: actualizado.admin, email: actualizado.email, adminpass: actualizado.adminpass });
-    }
+  if (!actualizado) return res.status(404).json({ success: false, message: "Admin no encontrado" });
+  return res.status(200).json({ success: true, admin: actualizado.admin, email: actualizado.email, adminpass: actualizado.adminpass });
+}
 
     // ---------- DELETE → BORRAR ADMIN ----------
     if (req.method === "DELETE") {

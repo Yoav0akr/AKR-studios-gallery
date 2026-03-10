@@ -199,25 +199,22 @@ async function cargarAdmins() {
         }
 
         if (btn.classList.contains("get-up") || btn.classList.contains("get-down")) {
-          try {
-            const nuevoValor = btn.classList.contains("get-up"); // true si es dar admin, false si quitar
-            const res = await fetch("/api/personas", {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ _id: id, adminpass: nuevoValor }) // usamos _id
-            });
+          const nuevoValor = btn.classList.contains("get-up"); // boolean
+          console.log("PUT admin:", { _id: id, adminpass: nuevoValor }); // depuración
 
-            const data = res.headers.get("content-type")?.includes("application/json")
-              ? await res.json()
-              : { success: res.ok };
+          const res = await fetch("/api/personas", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ _id: id, adminpass: nuevoValor }) // backend lo convertirá a string
+          });
 
-            if (!res.ok || !data.success) throw new Error(data.message || "Error cambiando admin");
-            alert(nuevoValor ? "Permisos de admin otorgados correctamente" : "Permisos de admin removidos correctamente");
-            cargarAdmins(); // recarga la lista
-          } catch (err) {
-            console.error(err);
-            alert("No se pudo cambiar permisos de admin.");
-          }
+          const data = res.headers.get("content-type")?.includes("application/json")
+            ? await res.json()
+            : { success: res.ok };
+
+          if (!res.ok || !data.success) throw new Error(data.message || "Error cambiando admin");
+          alert(nuevoValor ? "Permisos de admin otorgados" : "Permisos de admin removidos");
+          cargarAdmins(); // recarga la lista
         }
 
       };
