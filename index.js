@@ -163,10 +163,10 @@ buscador.addEventListener("input", async () => {
 });
 
 cats.addEventListener("change", async () => {
+  console.warn("se diaparo");
   if (cats.value==="all"){
-     currentMode = "home";
-     currentCategoria = "";
-     await init(1);
+console.warn("se diaparo1");
+    // location.reload();
 
   }else{
     currentMode = "searchcat";
