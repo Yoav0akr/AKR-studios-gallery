@@ -12,13 +12,10 @@ if (!adminpass) {
 // ===============================
 const botonPB = document.getElementById("panel_de_borrado");
 const botonPersonas = document.getElementById("panel_de_admins");
-
 const fotos = document.getElementById("imagenes-contenedor");
 const personas = document.querySelector(".lista-personas");
-const buscador = document.getElementById("buscador");
-const cats = document.getElementById("cats");
-const show = document.getElementById("show");
 const paginacion = document.getElementById("paginacion");
+const show = document.getElementById("show");
 
 // ===============================
 // FUNCIONES GENERALES
@@ -62,19 +59,16 @@ const limit = 12;
 let totalPages = 1;
 
 // ===============================
-// PANEL DE BORRADO - IMÁGENES
+// CARGAR IMÁGENES
 // ===============================
 async function cargarImagenesPaginadas(page = 1) {
   currentPage = page;
-
   try {
     const res = await fetch(`/api/db?page=${page}&limit=${limit}`);
     if (!res.ok) throw new Error("Error cargando imágenes");
     const data = await res.json();
-
     const archivos = data.data || [];
     totalPages = data.totalPages || 1;
-
     fotos.innerHTML = "";
 
     if (!archivos.length) {
@@ -82,9 +76,8 @@ async function cargarImagenesPaginadas(page = 1) {
       show.innerText = "NO HAY IMÁGENES DISPONIBLES";
       paginacion.innerHTML = "";
       return;
-    } else {
-      show.classList.add("no-ver");
     }
+    show.classList.add("no-ver");
 
     archivos.forEach(a => {
       const div = document.createElement("div");
@@ -106,6 +99,7 @@ async function cargarImagenesPaginadas(page = 1) {
 
     vincularBotonesEliminar();
     renderizarPaginacion();
+
   } catch (err) {
     console.error(err);
     fotos.innerHTML = "<p>Error cargando imágenes.</p>";
@@ -144,14 +138,13 @@ function renderizarPaginacion() {
 }
 
 // ===============================
-// PANEL ADMIN - USUARIOS
+// CARGAR ADMINS
 // ===============================
 async function cargarAdmins() {
   try {
     const res = await fetch("/api/personas");
     if (!res.ok) throw new Error("Error cargando admins");
     const admins = await res.json();
-
     personas.innerHTML = "";
     if (!admins.length) {
       personas.innerHTML = "<p>No hay administradores registrados.</p>";
@@ -173,53 +166,76 @@ async function cargarAdmins() {
       personas.appendChild(div);
     });
 
-    // Vincular botones de forma robusta
-    document.querySelectorAll(".eliminar, .get-up, .get-down").forEach(btn => {
+    // ELIMINAR
+    document.querySelectorAll(".eliminar").forEach(btn => {
       btn.onclick = async e => {
         const id = e.currentTarget.dataset.id;
-
-        if (btn.classList.contains("eliminar")) {
-          if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
-          try {
-            const res = await fetch("/api/personas", {
-              method: "DELETE",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ id })
-            });
-            const data = res.headers.get("content-type")?.includes("application/json")
-              ? await res.json()
-              : { success: res.ok };
-            if (!res.ok || !data.success) throw new Error(data.message || "Error eliminando usuario");
-            alert("Usuario eliminado correctamente");
-            cargarAdmins();
-          } catch (err) {
-            console.error(err);
-            alert("No se pudo eliminar el usuario.");
-          }
-        }
-
-        if (btn.classList.contains("get-up") || btn.classList.contains("get-down")) {
-          const nuevoValor = btn.classList.contains("get-up"); // true o false
-          const payload = { _id: id, adminpass: String(nuevoValor) }; // convertir a string "true"/"false"
-          console.log("PUT admin payload:", payload);
-
+        if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
+        try {
           const res = await fetch("/api/personas", {
-            method: "PUT",
+            method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ id })
           });
-
           const data = res.headers.get("content-type")?.includes("application/json")
             ? await res.json()
             : { success: res.ok };
-
-          if (!res.ok || !data.success) throw new Error(data.message || "Error cambiando admin");
-          alert(nuevoValor ? "Permisos de admin otorgados" : "Permisos de admin removidos");
-          cargarAdmins(); // recarga la lista
+          if (!res.ok || !data.success) throw new Error(data.message || "Error eliminando usuario");
+          alert("Usuario eliminado correctamente");
+          cargarAdmins();
+        } catch (err) {
+          console.error(err);
+          alert("No se pudo eliminar el usuario.");
         }
-
       };
     });
+
+    // DAR ADMIN
+    document.querySelectorAll(".get-up").forEach(btn => {
+      btn.onclick = async e => {
+        const id = e.currentTarget.dataset.id;
+        try {
+          const res = await fetch("/api/personas", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, adminpass: true })
+          });
+          const data = res.headers.get("content-type")?.includes("application/json")
+            ? await res.json()
+            : { success: res.ok };
+          if (!res.ok || !data.success) throw new Error(data.message || "Error cambiando admin");
+          alert("Permisos de admin otorgados");
+          cargarAdmins();
+        } catch (err) {
+          console.error(err);
+          alert("No se pudo cambiar permisos de admin.");
+        }
+      };
+    });
+
+    // QUITAR ADMIN
+    document.querySelectorAll(".get-down").forEach(btn => {
+      btn.onclick = async e => {
+        const id = e.currentTarget.dataset.id;
+        try {
+          const res = await fetch("/api/personas", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id, adminpass: false })
+          });
+          const data = res.headers.get("content-type")?.includes("application/json")
+            ? await res.json()
+            : { success: res.ok };
+          if (!res.ok || !data.success) throw new Error(data.message || "Error cambiando admin");
+          alert("Permisos de admin removidos");
+          cargarAdmins();
+        } catch (err) {
+          console.error(err);
+          alert("No se pudo cambiar permisos de admin.");
+        }
+      };
+    });
+
   } catch (err) {
     console.error(err);
     personas.innerHTML = "<p>Error cargando administradores.</p>";
