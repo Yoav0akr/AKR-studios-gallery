@@ -62,73 +62,78 @@ export default async function handler(req, res) {
     // GET — obtener documentos con modos y paginación
     // ======================
     if (req.method === "GET") {
-  const mode = (req.query.mode || "").toLowerCase();
-  const { userId, categoria, nombre } = req.query;
+      const mode = (req.query.mode || "").toLowerCase();
+      const { userId, categoria, nombre } = req.query;
 
-  // --- Paginación ---
-  const page = Number(req.query.page) || 1;
-  const limit = Number(req.query.limit) || 20;
-  const skip = (page - 1) * limit;
+      // --- Paginación ---
+      const page = Number(req.query.page) || 1;
+      const limit = Number(req.query.limit) || 20;
+      const skip = (page - 1) * limit;
 
-  let filtro = {};
+      let filtro = {};
 
-  switch (mode) {
-    case "cats":
-      // Solo devolver categorías distintas
-      const categorias = await Imagen.distinct("categ");
-      return res.json({ cats: categorias });
+      switch (mode) {
+        case "cats":
+          // Solo devolver categorías distintas
+          const categorias = await Imagen.distinct("categ");
+          return res.json({ cats: categorias });
 
-    case "home":
-      filtro = {};
-      break;
+        case "home":
+          filtro = {};
+          console.log("busqueda por general(osea que se busca solo para cada init)")
+          break;
 
-    case "user":
-      if (!userId) {
-        return res.status(400).json({ error: "Falta userId" });
+        case "user":
+          if (!userId) {
+            return res.status(400).json({ error: "Falta userId" });
+          }
+          filtro = { por: userId };
+          console.log("busqueda por usuario");
+          break;
+          
+          case "searchcat":
+            if (!categoria) {
+              return res.status(400).json({ error: "Falta categoria" });
+            }
+            if (categoria === "all") {
+              filtro = {};
+            }else{
+              filtro = { categ: categoria };
+            }
+            
+            console.log("busqueda por categiria");
+            break;
+            
+            case "searchname":
+              if (!nombre) {
+                return res.status(400).json({ error: "Falta nombre" });
+              }
+              filtro = { nombre: nombre };
+              console.log("busqueda por nombre");
+          break;
+
+        default:
+          filtro = {};
       }
-      filtro = { por: userId };
-      break;
 
-    case "searchcat":
-      if (!categoria) {
-        return res.status(400).json({ error: "Falta categoria" });
-      }
-      if (categoria ==="all"){
-        filtro= null
-      }else{
-        filtro = { categ: categoria };
-      }
-      break;
+      // Contar total de documentos según filtro
+      const totalDocs = await Imagen.countDocuments(filtro);
 
-    case "searchname":
-      if (!nombre) {
-        return res.status(400).json({ error: "Falta nombre" });
-      }
-      filtro = { nombre: nombre };
-      break;
+      // Traer documentos paginados según filtro
+      const data = await Imagen.find(filtro)
+        .sort({ _id: -1 })
+        .skip(skip)
+        .limit(limit);
 
-    default:
-      filtro = {};
-  }
-
-  // Contar total de documentos según filtro
-  const totalDocs = await Imagen.countDocuments(filtro);
-
-  // Traer documentos paginados según filtro
-  const data = await Imagen.find(filtro)
-    .sort({ _id: -1 })
-    .skip(skip)
-    .limit(limit);
-
-  return res.status(200).json({
-    mode: mode || "home",
-    page,
-    limit,
-    totalDocs,
-    totalPages: Math.ceil(totalDocs / limit),
-    data,
-  });
-}
+      return res.status(200).json({
+        mode: mode || "home",
+        page,
+        limit,
+        totalDocs,
+        totalPages: Math.ceil(totalDocs / limit),
+        data,
+      });
+    }
 
     // ======================
     // POST — agregar nueva imagen
