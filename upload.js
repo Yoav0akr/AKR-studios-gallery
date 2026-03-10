@@ -322,6 +322,11 @@ async function guardarEnMongo() {
     alert("❌ No se pudo guardar.");
   }
 }
+
+const manchego= document.getElementById("manchego");
+manchego.addEventListener("click",()=>{
+guardarEnMongo();
+});
 // ==============================
 //  NAVBAR
 // ==============================
