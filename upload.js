@@ -167,14 +167,16 @@ if (visualizador) {
         // IA (PARALELO)
         // ======================
         try {
+          const res = await fetch("/api/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ imageURL: cloudinaryURL }),
+          });
 
-          const [desc, categs] = await Promise.all([
-            DETECT_Desk(cloudinaryURL),
-            CategsIa(cloudinaryURL)
-          ]);
+          const data = await res.json();
 
-        EntradaDesc.value = desc;
-          EntradaCategs.value = categs;
+          EntradaDesc.value = data.descripcion;
+          EntradaCategs.value = data.categorias.join(" ");
 
           console.log("✅ IA completada");
 
@@ -208,71 +210,6 @@ if (visualizador) {
 }
 
 
-// ==============================
-// --- categs ---
-// ==============================
-async function CategsIa(URLimg) {
-
-  try {
-
-    if (!URLimg) {
-      console.warn("⚠️ imagen no encontrada");
-      throw new Error("imagen no encontrada");
-    }
-
-    const res = await fetch("/api/categs", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imageUrl: URLimg }), // ✔ corregido
-    });
-
-    const data = await res.json();
-
-    if (!data.categorias) return "";
-
-    return data.categorias.join(" "); // ✔ texto usable
-
-  } catch (error) {
-
-    console.error("❌ fallo en análisis de categorías", error);
-
-    return "";
-
-  }
-
-}
-
-// ==============================
-// --- descripciones---
-// ==============================
-async function DETECT_Desk(URLimg) {
-
-  try {
-
-    if (!URLimg) {
-      console.warn("⚠️ imagen no encontrada");
-      throw new Error("imagen no encontrada");
-    }
-
-    const res = await fetch("/api/analyze", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ imageURL: URLimg }),
-    });
-
-    const data = await res.json();
-
-    return data?.output?.text || "";
-
-  } catch (error) {
-
-    console.error("❌ fallo en análisis de descripcion");
-
-    return "";
-
-  }
-
-}
 // ==============================
 // --- NSFW ---
 // ==============================

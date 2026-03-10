@@ -1,15 +1,15 @@
 export default async function handler(req, res) {
 
- const { imageURL } = req.body;
+  const { imageURL } = req.body;
 
   if (!imageURL) {
-    return res.status(400).json({ error: "Debes enviar la propiedad URL" });
+    return res.status(400).json({ error: "Falta imageURL" });
   }
 
   try {
 
     const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/nlpconnect/vit-gpt2-image-captioning",
+      "https://router.huggingface.co/hf-inference/models/Salesforce/blip-image-captioning-base",
       {
         method: "POST",
         headers: {
@@ -20,32 +20,32 @@ export default async function handler(req, res) {
       }
     );
 
-    if (!response.ok) {
-      const text = await response.text();
-      console.error("HF error:", text);
-
-      return res.status(200).json({
-        output: { text: "Descripción automática no disponible" }
-      });
-    }
-
     const data = await response.json();
 
     const caption =
       Array.isArray(data) && data[0]?.generated_text
         ? data[0].generated_text
-        : "Descripción no disponible";
+        : "descripcion no disponible";
 
-    return res.status(200).json({
-      output: { text: caption }
+    // generar categorías simples
+    const categorias = caption
+      .toLowerCase()
+      .replace(/[^\w\s]/g, "")
+      .split(" ")
+      .filter(w => w.length > 3)
+      .slice(0, 5);
+
+    res.status(200).json({
+      descripcion: caption,
+      categorias
     });
 
   } catch (error) {
 
-    console.error("Analyze error:", error);
+    console.error(error);
 
-    return res.status(500).json({
-      error: error.message
+    res.status(500).json({
+      error: "Error analizando imagen"
     });
 
   }
