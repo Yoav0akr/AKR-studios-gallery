@@ -106,27 +106,32 @@ if (visualizador) {
         const scores = await nsfwFun(cloudinaryURL);
         const { nsfw = 0, sfw = 0 } = scores;
 
-        // 🔹 Lógica de validación NSFW
-        if (nsfw <= 0.3) {
-          console.log("✅ Imagen ACEPTADA (sfw predominante)");
-          try {
-            EntradaDesc.value = await DETECT_Desk(cloudinaryURL);
-            EntradaCategs.value = await CategsIa(cloudinaryURL);
-            console.log("✅ Descripción completada");
-          } catch (descErr) {
-            console.warn("⚠️ Error obteniendo descripción automática:", descErr);
-            EntradaDesc.value = "Auto descripcion no disponible, ingrese una";
+        // 🔹 Lógica de validación NSFW/olimpia
+        if (facesFun(cloudinaryURL)) {
+
+          if (nsfw <= 0.3) {
+            console.log("✅ Imagen ACEPTADA (sfw predominante)");
+            try {
+              EntradaDesc.value = await DETECT_Desk(cloudinaryURL);
+              EntradaCategs.value = await CategsIa(cloudinaryURL);
+              console.log("✅ Descripción completada");
+            } catch (descErr) {
+              console.warn("⚠️ Error obteniendo descripción automática:", descErr);
+              EntradaDesc.value = "Auto descripcion no disponible, ingrese una";
+            }
+            alert("✅ Imagen validada correctamente. Puedes guardarla.");
+          } else if (nsfw >= 0.7) {
+            alert(`❌ Contenido inapropiado detectado (NSFW: ${(nsfw * 100).toFixed(1)}%|${(sfw * 100).toFixed(1)} )\n\nLa imagen será rechazada.`);
+            visualizador.classList.add("reject");
+            cloudinaryURL = null;
+            console.warn("🚫 Imagen RECHAZADA por NSFW (nsfw = " + nsfw + ")");
+          } else {
+            console.warn("⚠️ Imagen MARCADA para revisión manual (valores intermedios)" + scores);
+            alert("⚠️ Imagen marcada para revisión manual por los moderadores  .");
+            cloudinaryURL = null;
           }
-          alert("✅ Imagen validada correctamente. Puedes guardarla.");
-        } else if (nsfw >= 0.7) {
-          alert(`❌ Contenido inapropiado detectado (NSFW: ${(nsfw * 100).toFixed(1)}%|${(sfw * 100).toFixed(1)} )\n\nLa imagen será rechazada.`);
-          visualizador.classList.add("reject");
-          cloudinaryURL = null;
-          console.warn("🚫 Imagen RECHAZADA por NSFW (nsfw = " + nsfw + ")");
         } else {
-          console.warn("⚠️ Imagen MARCADA para revisión manual (valores intermedios)" + scores);
-          alert("⚠️ Imagen marcada para revisión manual por los moderadores  .");
-          cloudinaryURL = null;
+          alert("esta iamen tienen una cara humana, asegurate de que tienes los derechos de la imagen")
         }
 
       } catch (err) {
@@ -261,6 +266,31 @@ async function nsfwFun(URLimg) {
 
 }
 
+//funciones para olimpia:
+async function facesFun(URLimg) {
+  try {
+    if (!URLimg) {
+      throw new Error("imagen no encontrada");
+    }
+
+    const res = await fetch("/api/faces", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageURL: URLimg }),
+    });
+
+    const ses = await res.json();
+
+    // Devuelve directamente true/false según el campo "allowed"
+    return Boolean(ses.allowed);
+
+  } catch (error) {
+    console.error("fallo en función de análisis de rostros", error);
+    // En caso de error, devolvemos true para no bloquear por fallo técnico
+    return true;
+  }
+}
+
 // ==============================
 // --- GUARDAR EN MONGO ---
 // ==============================
@@ -339,8 +369,8 @@ if (EntradaGuardar) {
   });
 }
 
-EntradaNombre.addEventListener('input',()=>{
-EntradaNombre.value = EntradaNombre.value.slice(0, 30);
+EntradaNombre.addEventListener('input', () => {
+  EntradaNombre.value = EntradaNombre.value.slice(0, 30);
 });
 
 // ==============================
