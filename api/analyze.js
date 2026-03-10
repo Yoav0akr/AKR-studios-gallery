@@ -14,7 +14,6 @@ export default async function handler(req, res) {
         body: JSON.stringify({ inputs: URL }),
       }
     );
-8
     const data = await response.json();
 
     const caption = Array.isArray(data) && data[0]?.generated_text
