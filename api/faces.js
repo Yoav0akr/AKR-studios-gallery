@@ -1,63 +1,51 @@
 export default async function handler(req, res) {
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Método no permitido" });
-  }
+  const { URL } = req.body;
 
-  const { imageURL } = req.body;
-
-  if (!imageURL) {
-    return res.status(400).json({ error: "Falta imageURL" });
+  if (!URL) {
+    return res.status(400).json({ error: "Debes enviar la propiedad URL" });
   }
 
   try {
 
     const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/arnabdhar/YOLOv8-Face-Detection",
+      "https://router.huggingface.co/hf-inference/models/nlpconnect/vit-gpt2-image-captioning",
       {
         method: "POST",
         headers: {
           Authorization: `Bearer ${process.env.HF_API_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ inputs: imageURL }),
+        body: JSON.stringify({ inputs: URL }),
       }
     );
 
-    const result = await response.json();
+    if (!response.ok) {
+      const text = await response.text();
+      console.error("HF error:", text);
 
-    if (result.error) {
-      console.warn("HF error:", result.error);
       return res.status(200).json({
-        faceDetected: false,
-        allowed: true,
-        warning: result.error
+        output: { text: "Descripción automática no disponible" }
       });
     }
 
-    if (!Array.isArray(result)) {
-      console.warn("Respuesta inesperada:", result);
-      return res.status(200).json({
-        faceDetected: false,
-        allowed: true
-      });
-    }
+    const data = await response.json();
 
-    const faceDetected = result.length > 0;
+    const caption =
+      Array.isArray(data) && data[0]?.generated_text
+        ? data[0].generated_text
+        : "Descripción no disponible";
 
     return res.status(200).json({
-      faceDetected,
-      allowed: !faceDetected
+      output: { text: caption }
     });
 
   } catch (error) {
 
-    console.error("Error HF:", error);
+    console.error("Analyze error:", error);
 
-    return res.status(200).json({
-      faceDetected: false,
-      allowed: true,
-      warning: "Error en análisis"
+    return res.status(500).json({
+      error: error.message
     });
 
   }

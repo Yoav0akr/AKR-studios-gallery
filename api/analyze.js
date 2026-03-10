@@ -1,27 +1,76 @@
 export default async function handler(req, res) {
-  const { URL } = req.body;
-  if (!URL) return res.status(400).json({ error: "Debes enviar la propiedad URL" });
+
+  // Solo permitir POST
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Método no permitido" });
+  }
+
+  const { imageURL } = req.body;
+
+  if (!imageURL) {
+    return res.status(400).json({ error: "Falta imageURL" });
+  }
 
   try {
+
     const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/Salesforce/blip-image-captioning-base",
+      "https://router.huggingface.co/hf-inference/models/facebook/detr-resnet-50",
       {
         method: "POST",
         headers: {
           Authorization: `Bearer ${process.env.HF_API_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ inputs: URL }),
+        body: JSON.stringify({ inputs: imageURL }),
       }
     );
-    const data = await response.json();
 
-    const caption = Array.isArray(data) && data[0]?.generated_text
-      ? data[0].generated_text
-      : "Descripción no disponible";
+    // Si HuggingFace responde error HTTP
+    if (!response.ok) {
 
-    return res.status(200).json({ output: { text: caption } });
+      const text = await response.text();
+      console.warn("HF HTTP error:", text);
+
+      return res.status(200).json({
+        faceDetected: false,
+        allowed: true,
+        warning: "HF request failed"
+      });
+
+    }
+
+    const result = await response.json();
+
+    // Si la respuesta no es un array
+    if (!Array.isArray(result)) {
+
+      console.warn("Respuesta inesperada:", result);
+
+      return res.status(200).json({
+        faceDetected: false,
+        allowed: true
+      });
+
+    }
+
+    // Detectar si hay personas
+    const personDetected = result.some(obj => obj.label === "person");
+
+    return res.status(200).json({
+      faceDetected: personDetected,
+      allowed: !personDetected
+    });
+
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+
+    console.error("Error HF:", error);
+
+    return res.status(200).json({
+      faceDetected: false,
+      allowed: true,
+      warning: "Error en análisis"
+    });
+
   }
+
 }
