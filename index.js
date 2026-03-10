@@ -162,6 +162,14 @@ buscador.addEventListener("input", async () => {
   await init(1);
 });
 
+cats.addEventListener("click", async () => {
+  if (cats.value === "all") {
+    currentMode = "home";
+    currentCategoria = "";
+    await init(1);
+  }
+});
+
 cats.addEventListener("change", async () => {
   console.warn("se diaparo");
   if (cats.value==="all"){
