@@ -275,3 +275,14 @@ async function facesFun(URLimg) {
   }
 
 }
+// ==============================
+//  NAVBAR
+// ==============================
+const navs = document.querySelector(".nav");
+const logo = document.querySelector(".logo");
+
+logo.addEventListener("click", () => {
+  logo.classList.toggle("rotado");
+  navs.classList.toggle("navhiden");
+  if (navigator.vibrate) navigator.vibrate(200);
+});
