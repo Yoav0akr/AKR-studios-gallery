@@ -207,6 +207,71 @@ if (visualizador) {
   });
 }
 
+
+// ==============================
+// --- categs ---
+// ==============================
+async function CategsIa(URLimg) {
+
+  try {
+
+    if (!URLimg) {
+      console.warn("⚠️ imagen no encontrada");
+      throw new Error("imagen no encontrada");
+    }
+
+    const res = await fetch("/api/categs", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageUrl: URLimg }), // ✔ corregido
+    });
+
+    const data = await res.json();
+
+    if (!data.categorias) return "";
+
+    return data.categorias.join(" "); // ✔ texto usable
+
+  } catch (error) {
+
+    console.error("❌ fallo en análisis de categorías", error);
+
+    return "";
+
+  }
+
+}
+
+// ==============================
+// --- descripciones---
+// ==============================
+async function  DETECT_Desk(URLimg) {
+
+  try {
+
+    if (!URLimg) {
+      console.warn("⚠️ imagen no encontrada");
+      throw new Error("imagen no encontrada");
+    }
+
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageURL: URLimg }),
+    });
+
+    return await res.json();
+
+  } catch (error) {
+
+    console.error("❌ fallo en análisis de descripcion");
+
+    return {};
+
+  }
+
+}
+
 // ==============================
 // --- NSFW ---
 // ==============================

@@ -1,51 +1,45 @@
 export default async function handler(req, res) {
 
-  const { URL } = req.body;
+  const { imageURL } = req.body;
 
-  if (!URL) {
-    return res.status(400).json({ error: "Debes enviar la propiedad URL" });
+  if (!imageURL) {
+    return res.status(400).json({ error: "Falta imageURL" });
   }
 
   try {
 
     const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/nlpconnect/vit-gpt2-image-captioning",
+      "https://router.huggingface.co/hf-inference/models/arnabdhar/YOLOv8-Face-Detection",
       {
         method: "POST",
         headers: {
           Authorization: `Bearer ${process.env.HF_API_KEY}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ inputs: URL }),
+        body: JSON.stringify({
+          inputs: imageURL
+        }),
       }
     );
 
-    if (!response.ok) {
-      const text = await response.text();
-      console.error("HF error:", text);
-
-      return res.status(200).json({
-        output: { text: "Descripción automática no disponible" }
-      });
-    }
-
     const data = await response.json();
 
-    const caption =
-      Array.isArray(data) && data[0]?.generated_text
-        ? data[0].generated_text
-        : "Descripción no disponible";
+    console.log("HF faces:", data);
+
+    const faceDetected = Array.isArray(data) && data.length > 0;
 
     return res.status(200).json({
-      output: { text: caption }
+      faceDetected,
+      allowed: !faceDetected
     });
 
   } catch (error) {
 
-    console.error("Analyze error:", error);
+    console.error("Face detection error:", error);
 
-    return res.status(500).json({
-      error: error.message
+    return res.status(200).json({
+      faceDetected: false,
+      allowed: true
     });
 
   }

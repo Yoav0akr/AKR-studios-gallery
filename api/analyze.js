@@ -1,20 +1,15 @@
 export default async function handler(req, res) {
 
-  // Solo permitir POST
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Método no permitido" });
-  }
-
-  const { imageURL } = req.body;
+ const { imageURL } = req.body;
 
   if (!imageURL) {
-    return res.status(400).json({ error: "Falta imageURL" });
+    return res.status(400).json({ error: "Debes enviar la propiedad URL" });
   }
 
   try {
 
     const response = await fetch(
-      "https://router.huggingface.co/hf-inference/models/facebook/detr-resnet-50",
+      "https://router.huggingface.co/hf-inference/models/nlpconnect/vit-gpt2-image-captioning",
       {
         method: "POST",
         headers: {
@@ -25,50 +20,32 @@ export default async function handler(req, res) {
       }
     );
 
-    // Si HuggingFace responde error HTTP
     if (!response.ok) {
-
       const text = await response.text();
-      console.warn("HF HTTP error:", text);
+      console.error("HF error:", text);
 
       return res.status(200).json({
-        faceDetected: false,
-        allowed: true,
-        warning: "HF request failed"
+        output: { text: "Descripción automática no disponible" }
       });
-
     }
 
-    const result = await response.json();
+    const data = await response.json();
 
-    // Si la respuesta no es un array
-    if (!Array.isArray(result)) {
-
-      console.warn("Respuesta inesperada:", result);
-
-      return res.status(200).json({
-        faceDetected: false,
-        allowed: true
-      });
-
-    }
-
-    // Detectar si hay personas
-    const personDetected = result.some(obj => obj.label === "person");
+    const caption =
+      Array.isArray(data) && data[0]?.generated_text
+        ? data[0].generated_text
+        : "Descripción no disponible";
 
     return res.status(200).json({
-      faceDetected: personDetected,
-      allowed: !personDetected
+      output: { text: caption }
     });
 
   } catch (error) {
 
-    console.error("Error HF:", error);
+    console.error("Analyze error:", error);
 
-    return res.status(200).json({
-      faceDetected: false,
-      allowed: true,
-      warning: "Error en análisis"
+    return res.status(500).json({
+      error: error.message
     });
 
   }

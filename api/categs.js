@@ -24,7 +24,7 @@ export default async function handler(req, res) {
 
     const result = await response.json();
 
-    const labels = result.map(r =>
+    const labels = result.slice(0,3).map(r =>
       r.label.replace(/\s+/g, "_").toLowerCase()
     );
 
