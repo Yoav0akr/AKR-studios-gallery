@@ -199,13 +199,14 @@ async function cargarAdmins() {
         }
 
         if (btn.classList.contains("get-up") || btn.classList.contains("get-down")) {
-          const nuevoValor = btn.classList.contains("get-up"); // boolean
-          console.log("PUT admin:", { _id: id, adminpass: nuevoValor }); // depuración
+          const nuevoValor = btn.classList.contains("get-up"); // true o false
+          const payload = { _id: id, adminpass: String(nuevoValor) }; // convertir a string "true"/"false"
+          console.log("PUT admin payload:", payload);
 
           const res = await fetch("/api/personas", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ _id: id, adminpass: nuevoValor }) // backend lo convertirá a string
+            body: JSON.stringify(payload)
           });
 
           const data = res.headers.get("content-type")?.includes("application/json")

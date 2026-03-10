@@ -81,22 +81,18 @@ export default async function handler(req, res) {
     }
 
     // ---------------- PUT → Actualizar admin ----------------
-    if (req.method === "PUT") {
-      if (!body.id) return res.status(400).json({ success: false, error: "Falta ID" });
+if (req.method === "PUT") {
+  const { id, adminpass, admin, password } = body;
+  if (!id) return res.status(400).json({ success: false, error: "Falta ID" });
 
-      const updates = {};
-      if (body.admin) updates.admin = body.admin;
-      if (body.password) updates.password = await bcrypt.hash(body.password, 10);
+  const updates = {};
+  if (adminpass !== undefined) updates.adminpass = String(adminpass); // Convertir a string
+  if (admin) updates.admin = admin;
+  if (password) updates.password = await bcrypt.hash(password, 10);
 
-      const actualizado = await Admin.findByIdAndUpdate(body.id, updates, { new: true });
-
-      return res.status(200).json({
-        success: true,
-        message: "Admin actualizado",
-        admin: actualizado,
-      });
-    }
-
+  const actualizado = await Admin.findByIdAndUpdate(id, updates, { new: true });
+  return res.status(200).json({ success: true, message: "Admin actualizado", admin: actualizado });
+}
     // ---------------- DELETE → Borrar admin ----------------
     if (req.method === "DELETE") {
       if (!body.id) return res.status(400).json({ success: false, error: "Falta ID" });
