@@ -55,7 +55,7 @@ async function cargarDesdeMongo(page = 1) {
       limit: LIMIT,
     });
 
-    if (currentMode === "searchName"||"searchCat") {
+    if (currentMode === "searchName" || currentMode === "searchCat") {
       if (currentCategoria) params.append("categoria", currentCategoria);
       if (currentTexto) params.append("texto", currentTexto);
     }
@@ -137,17 +137,22 @@ async function download(archivo) {
 //  CATEGORÍAS lod
 // ==============================
 function renderCategorias(archivos) {
-  cats.innerHTML = ""; // limpiar;
+  cats.innerHTML = ""; // limpiar
 
   archivos.forEach(cat => {
     const op = document.createElement("option");
-    op.value = cat;
-    op.textContent = cat;
+
+    if (cat === "") {
+      op.value = "all";
+      op.textContent = "Todas las categorías";
+    } else {
+      op.value = cat;
+      op.textContent = cat;
+    }
+
     cats.appendChild(op);
-    console.log(cat);
   });
 }
-
 // ==============================
 //  EVENTOS DE BÚSQUEDA
 // ==============================

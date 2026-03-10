@@ -93,7 +93,11 @@ export default async function handler(req, res) {
       if (!categoria) {
         return res.status(400).json({ error: "Falta categoria" });
       }
-      filtro = { categ: categoria };
+      if (categoria ==="all"){
+        filtro= {}
+      }else{
+        filtro = { categ: categoria };
+      }
       break;
 
     case "searchname":
