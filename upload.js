@@ -278,6 +278,50 @@ async function facesFun(URLimg) {
   }
 
 }
+//------------------------------
+//guardar enmongo
+//------------------------------
+async function guardarEnMongo() {
+  const nombre = EntradaNombre.value.trim();
+  const por = EntradaPor.value.trim() || "Desconocido";
+  const texto = EntradaCategs.value.toLowerCase().trim();
+  const categ = texto ? texto.split(/\s+/) : [];
+  const desk = EntradaDesc.value.trim();
+
+  if (!nombre) return alert("❌ Debes poner un nombre.");
+  if (!cloudinaryURL) return alert("❌ Primero sube un archivo.");
+
+  const data = {
+    nombre,
+    ub: cloudinaryURL,
+    por,
+    categ,
+    mimidesk: desk,
+    email: email_user || "null",
+  };
+
+  try {
+    const res = await fetch("/api/db", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+
+    const resData = await res.json();
+
+    if (!res.ok) {
+      console.error(resData);
+      alert("❌ Error guardando en la base de datos: " + (resData.error || "desconocido"));
+      return;
+    }
+
+    alert("✅ Imagen guardada correctamente");
+    window.location.href = "./index.html";
+  } catch (err) {
+    console.error("Error al guardar en Mongo:", err);
+    alert("❌ No se pudo guardar.");
+  }
+}
 // ==============================
 //  NAVBAR
 // ==============================
