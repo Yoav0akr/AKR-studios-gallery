@@ -55,10 +55,10 @@ async function cargarDesdeMongo(page = 1) {
       limit: LIMIT,
     });
 
-    if (currentMode === "searchName" || currentMode === "searchCat") {
-      if (currentCategoria) params.append("categoria", currentCategoria);
-      if (currentTexto) params.append("texto", currentTexto);
-    }
+ if (currentMode === "searchname" || currentMode === "searchcat") {
+  if (currentCategoria !== "") params.append("categoria", currentCategoria);
+  if (currentTexto !== "") params.append("nombre", currentTexto); // ojo: backend espera "nombre", no "texto"
+}
 
     const res = await fetch(`/api/db?${params.toString()}`);
     if (!res.ok) throw new Error(res.status);
