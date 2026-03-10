@@ -173,7 +173,7 @@ if (visualizador) {
             CategsIa(cloudinaryURL)
           ]);
 
-          EntradaDesc.value = desc;
+        EntradaDesc.value = desc;
           EntradaCategs.value = categs;
 
           console.log("✅ IA completada");
@@ -245,7 +245,7 @@ async function CategsIa(URLimg) {
 // ==============================
 // --- descripciones---
 // ==============================
-async function  DETECT_Desk(URLimg) {
+async function DETECT_Desk(URLimg) {
 
   try {
 
@@ -260,18 +260,19 @@ async function  DETECT_Desk(URLimg) {
       body: JSON.stringify({ imageURL: URLimg }),
     });
 
-    return await res.json();
+    const data = await res.json();
+
+    return data?.output?.text || "";
 
   } catch (error) {
 
     console.error("❌ fallo en análisis de descripcion");
 
-    return {};
+    return "";
 
   }
 
 }
-
 // ==============================
 // --- NSFW ---
 // ==============================
