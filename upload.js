@@ -104,7 +104,7 @@ if (visualizador) {
 
         // Ahora puedes extraer variables en una sola línea
         const scores = await nsfwFun(cloudinaryURL);
-        const { nsfw = 0, sfw = 0 } = scores;
+        const { nsfw = 0, sfw = 1 } = scores;
 
         // 🔹 Lógica de validación NSFW/olimpia
         if ( await facesFun(cloudinaryURL)) {
