@@ -107,7 +107,7 @@ if (visualizador) {
         const { nsfw = 0, sfw = 0 } = scores;
 
         // 🔹 Lógica de validación NSFW/olimpia
-        if (facesFun(cloudinaryURL)) {
+        if ( await facesFun(cloudinaryURL)) {
 
           if (nsfw <= 0.3) {
             console.log("✅ Imagen ACEPTADA (sfw predominante)");
