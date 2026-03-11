@@ -1,5 +1,9 @@
 // ===============================
 // VERIFICAR PERMISOS
+
+const { data } = require("@tensorflow/tfjs");
+const { reset } = require("colors");
+
 // ===============================
 const adminpass = localStorage.getItem("adminpass") === "true";
 if (!adminpass) {
@@ -136,25 +140,17 @@ function renderizarPaginacion() {
     paginacion.appendChild(btn);
   }
 }
-
-// ===============================
+//^^^^de aqui a abajo es lo importante^^^^^^^^
+// // ===============================
 // CARGAR ADMINS
 // ===============================
-async function cargarAdmins() {
-  try {
-    const res = await fetch("/api/personas");
-    if (!res.ok) throw new Error("Error cargando admins");
-    const admins = await res.json();
-    personas.innerHTML = "";
-    if (!admins.length) {
-      personas.innerHTML = "<p>No hay administradores registrados.</p>";
-      return;
-    }
+async function cargarAdmins(data) {
 
-    admins.forEach(admin => {
-      const div = document.createElement("div");
-      div.classList.add("persona");
-      div.innerHTML = `
+
+  data.forEach(admin => {
+    const div = document.createElement("div");
+    div.classList.add("persona");
+    div.innerHTML = `
         <h3>Nombre del usuario: ${admin.admin}</h3>
         <p>Admin: ${admin.adminpass}</p>
         <div class="jaiba">
@@ -163,89 +159,164 @@ async function cargarAdmins() {
           <button class="get-down" data-id="${admin._id}">Quitar admin</button>
         </div>
       `;
-      personas.appendChild(div);
-    });
-
-    // ELIMINAR
-    document.querySelectorAll(".eliminar").forEach(btn => {
-      btn.onclick = async e => {
-        const id = e.currentTarget.dataset.id;
-        if (!confirm("¿Seguro que deseas eliminar este usuario?")) return;
-        try {
-          const res = await fetch("/api/personas", {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id })
-          });
-          const data = res.headers.get("content-type")?.includes("application/json")
-            ? await res.json()
-            : { success: res.ok };
-          if (!res.ok || !data.success) throw new Error(data.message || "Error eliminando usuario");
-          alert("Usuario eliminado correctamente");
-          cargarAdmins();
-        } catch (err) {
-          console.error(err);
-          alert("No se pudo eliminar el usuario.");
-        }
-      };
-    });
-
-    // DAR ADMIN
-    document.querySelectorAll(".get-up").forEach(btn => {
-      btn.onclick = async e => {
-        const id = e.currentTarget.dataset.id;
-        try {
-          const res = await fetch("/api/personas", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id, adminpass: true })
-          });
-          const data = res.headers.get("content-type")?.includes("application/json")
-            ? await res.json()
-            : { success: res.ok };
-          if (!res.ok || !data.success) throw new Error(data.message || "Error cambiando admin");
-          alert("Permisos de admin otorgados");
-          cargarAdmins();
-        } catch (err) {
-          console.error(err);
-          alert("No se pudo cambiar permisos de admin.");
-        }
-      };
-    });
-
-    // QUITAR ADMIN
-    document.querySelectorAll(".get-down").forEach(btn => {
-      btn.onclick = async e => {
-        const id = e.currentTarget.dataset.id;
-        try {
-          const res = await fetch("/api/personas", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id, adminpass: false })
-          });
-          const data = res.headers.get("content-type")?.includes("application/json")
-            ? await res.json()
-            : { success: res.ok };
-          if (!res.ok || !data.success) throw new Error(data.message || "Error cambiando admin");
-          alert("Permisos de admin removidos");
-          cargarAdmins();
-        } catch (err) {
-          console.error(err);
-          alert("No se pudo cambiar permisos de admin.");
-        }
-      };
-    });
-
-  } catch (err) {
-    console.error(err);
-    personas.innerHTML = "<p>Error cargando administradores.</p>";
-  }
+    personas.appendChild(div);
+  });
 }
-
 // ===============================
 // INICIALIZACIÓN
 // ===============================
 (async function init() {
   await cargarImagenesPaginadas(1);
-  await cargarAdmins();
-})();
+  const admins = await querys("GET"); // esperar a que querys devuelva los datos
+  if (admins) { // opcional, por si hubo error
+    await cargarAdmins(admins);
+    await vincularbotonesADMINS();
+  }
+});
+
+
+function vincularbotonesADMINS() {
+  const eliminarADMIN = document.querySelectorAll(".eliminar");
+  const get_upADMIN = document.querySelectorAll(".get-up");
+  const get_downADMIN = document.querySelectorAll(".get-down");
+
+  // 🔴 Eliminar usuario
+  eliminarADMIN.forEach(button => {
+    button.onclick = async e => {
+      const btn = e.currentTarget;
+      const id_borrar = btn.dataset.id;
+      if (!confirm("¿Eliminar este usuario?")) return;
+      btn.disabled = true;
+      btn.textContent = "Eliminando...";
+      try {
+        const res = await query1("DELETE", id_borrar);
+        if (res) {
+          alert("Usuario eliminado");
+          personas.innerHTML = "";
+          const admins = await query1("GET");
+          if (admins) cargarAdmins(admins);
+          vincularbotonesADMINS();
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error al eliminar usuario");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "ELIMINAR";
+      }
+    };
+  });
+
+  // 🟢 Dar admin
+  get_upADMIN.forEach(button => {
+    button.onclick = async e => {
+      const btn = e.currentTarget;
+      const id = btn.dataset.id;
+      btn.disabled = true;
+      btn.textContent = "Otorgando...";
+      try {
+        const res = await query2("PUT", { adminpass: true }, id);
+        if (res) {
+          alert("Admin otorgado");
+          personas.innerHTML = "";
+          const admins = await query1("GET");
+          if (admins) cargarAdmins(admins);
+          vincularbotonesADMINS();
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error al otorgar admin");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Dar admin";
+      }
+    };
+  });
+
+  // 🔵 Quitar admin
+  get_downADMIN.forEach(button => {
+    button.onclick = async e => {
+      const btn = e.currentTarget;
+      const id = btn.dataset.id;
+      btn.disabled = true;
+      btn.textContent = "Revocando...";
+      try {
+        const res = await query2("PUT", { adminpass: false }, id);
+        if (res) {
+          alert("Admin revocado");
+          personas.innerHTML = "";
+          const admins = await query1("GET");
+          if (admins) cargarAdmins(admins);
+          vincularbotonesADMINS();
+        }
+      } catch (err) {
+        console.error(err);
+        alert("Error al revocar admin");
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Quitar admin";
+      }
+    };
+  });
+};//finale de la funcion de veinculacion
+
+
+
+
+
+
+
+//funcion para hacer queris (para no tener que hacer una query a cada rato)
+async function query1(metodo, id = null) {
+  const allowedMethods = ["GET", "DELETE"];
+  if (!allowedMethods.includes(metodo)) {
+    alert("Método no permitido en query1");
+    return null;
+  }
+
+  let url = "/api/personas";
+  if (id) url += `/${id}`;
+
+  const options = { method: metodo };
+
+  try {
+    const res = await fetch(url, options);
+    if (!res.ok) {
+      alert(`Error en query1: ${res.status}`);
+      return null;
+    }
+    return await res.json();
+  } catch (err) {
+    alert("Error en query1: " + err.message);
+    return null;
+  }
+}
+
+async function query2(metodo, cuerpo = null, id = null) {
+  const allowedMethods = ["POST", "PUT"];
+  if (!allowedMethods.includes(metodo)) {
+    alert("Método no permitido en query2");
+    return null;
+  }
+
+  let url = "/api/personas";
+  if (id) url += `/${id}`;
+
+  const options = {
+    method: metodo,
+    headers: { "Content-Type": "application/json" },
+    body: cuerpo ? JSON.stringify(cuerpo) : null
+  };
+
+  try {
+    const res = await fetch(url, options);
+    if (!res.ok) {
+      alert(`Error en query2: ${res.status}`);
+      return null;
+    }
+    return await res.json();
+  } catch (err) {
+    alert("Error en query2: " + err.message);
+    return null;
+  }
+}
