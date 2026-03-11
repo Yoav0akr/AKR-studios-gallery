@@ -1,9 +1,5 @@
 // ===============================
 // VERIFICAR PERMISOS
-
-const { data } = require("@tensorflow/tfjs");
-const { reset } = require("colors");
-
 // ===============================
 const adminpass = localStorage.getItem("adminpass") === "true";
 if (!adminpass) {
@@ -215,7 +211,7 @@ function vincularbotonesADMINS() {
       btn.disabled = true;
       btn.textContent = "Otorgando...";
       try {
-        const res = await query2("PUT", { adminpass: true }, id);
+        const res = await query2("PUT", { adminpass: "true"}, id);
         if (res) {
           alert("Admin otorgado");
           personas.innerHTML = "";
@@ -241,7 +237,7 @@ function vincularbotonesADMINS() {
       btn.disabled = true;
       btn.textContent = "Revocando...";
       try {
-        const res = await query2("PUT", { adminpass: false }, id);
+        const res = await query2("PUT", { adminpass: "true" }, id);
         if (res) {
           alert("Admin revocado");
           personas.innerHTML = "";
