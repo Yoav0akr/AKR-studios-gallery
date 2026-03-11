@@ -35,10 +35,11 @@ export default async function handler(req, res) {
     }
 
     // ---------------- GET → Listar admins ----------------
-    if (req.method === "GET") {
-      const admins = await Admin.find().sort({ admin: -1 });
-      return res.status(200).json(admins);
-    }
+if (req.method === "GET") {
+  const admins = await Admin.find().sort({ admin: -1 });
+  return res.status(200).json({ success: true, data: admins });
+}
+
 
     // ---------------- POST → Crear / Login ----------------
     if (req.method === "POST") {
