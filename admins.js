@@ -141,20 +141,23 @@ function renderizarPaginacion() {
 // CARGAR ADMINS
 // ===============================
 async function cargarAdmins(data) {
-
-
+  if (!Array.isArray(data)) {
+    console.error("cargarAdmins esperaba un array, recibió:", data);
+    return;
+  }
+  personas.innerHTML = ""; // limpiar antes de renderizar
   data.forEach(admin => {
     const div = document.createElement("div");
     div.classList.add("persona");
     div.innerHTML = `
-        <h3>Nombre del usuario: ${admin.admin}</h3>
-        <p>Admin: ${admin.adminpass}</p>
-        <div class="jaiba">
-          <button class="eliminar" data-id="${admin._id}">ELIMINAR</button>
-          <button class="get-up" data-id="${admin._id}">Dar admin</button>
-          <button class="get-down" data-id="${admin._id}">Quitar admin</button>
-        </div>
-      `;
+      <h3>Nombre del usuario: ${admin.admin}</h3>
+      <p>Admin: ${admin.adminpass}</p>
+      <div class="jaiba">
+        <button class="eliminar" data-id="${admin._id}">ELIMINAR</button>
+        <button class="get-up" data-id="${admin._id}">Dar admin</button>
+        <button class="get-down" data-id="${admin._id}">Quitar admin</button>
+      </div>
+    `;
     personas.appendChild(div);
   });
 }
@@ -191,7 +194,7 @@ function vincularbotonesADMINS() {
           alert("Usuario eliminado");
           personas.innerHTML = "";
           const admins = await query1("GET");
-          if (admins) cargarAdmins(admins);
+          if (admins.data) cargarAdmins(admins.data);
           vincularbotonesADMINS();
         }
       } catch (err) {
@@ -217,7 +220,7 @@ function vincularbotonesADMINS() {
           alert("Admin otorgado");
           personas.innerHTML = "";
           const admins = await query1("GET");
-          if (admins) cargarAdmins(admins);
+          if (admins.data) cargarAdmins(admins.data);
           vincularbotonesADMINS();
         }
       } catch (err) {
@@ -238,12 +241,12 @@ function vincularbotonesADMINS() {
       btn.disabled = true;
       btn.textContent = "Revocando...";
       try {
-        const res = await query2("PUT", { adminpass: "true" }, id);
+        const res = await query2("PUT", { adminpass: "false" }, id);
         if (res) {
           alert("Admin revocado");
           personas.innerHTML = "";
           const admins = await query1("GET");
-          if (admins) cargarAdmins(admins);
+          if (admins.data) cargarAdmins(admins.data);
           vincularbotonesADMINS();
         }
       } catch (err) {
@@ -256,12 +259,6 @@ function vincularbotonesADMINS() {
     };
   });
 };//finale de la funcion de veinculacion
-
-
-
-
-
-
 
 //funcion para hacer queris (para no tener que hacer una query a cada rato)
 async function query1(metodo, id = null) {
