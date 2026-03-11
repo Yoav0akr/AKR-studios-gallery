@@ -166,7 +166,7 @@ async function cargarAdmins(data) {
 // ===============================
 async function init() {
   await cargarImagenesPaginadas(1);
-  const admins = await querys("GET");
+  const admins = await query1("GET");
   if (admins && admins.data) {
     await cargarAdmins(await admins.data);
     await vincularbotonesADMINS();
