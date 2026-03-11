@@ -164,15 +164,15 @@ async function cargarAdmins(data) {
 // ===============================
 // INICIALIZACIÓN
 // ===============================
-(async function init() {
+async function init() {
   await cargarImagenesPaginadas(1);
-const admins = await querys("GET");
-if (admins && admins.data) {
-  await cargarAdmins(admins.data);
-  await vincularbotonesADMINS();
-}
+  const admins = await querys("GET");
+  if (admins && admins.data) {
+    await cargarAdmins(await admins.data);
+    await vincularbotonesADMINS();
+  }
 
-});
+};
 
 
 function vincularbotonesADMINS() {
@@ -215,7 +215,7 @@ function vincularbotonesADMINS() {
       btn.disabled = true;
       btn.textContent = "Otorgando...";
       try {
-        const res = await query2("PUT", { adminpass: "true"}, id);
+        const res = await query2("PUT", { adminpass: "true" }, id);
         if (res) {
           alert("Admin otorgado");
           personas.innerHTML = "";
@@ -314,3 +314,5 @@ async function query2(metodo, cuerpo = null, id = null) {
     return null;
   }
 }
+
+init();
