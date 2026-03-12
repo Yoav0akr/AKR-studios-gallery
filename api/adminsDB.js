@@ -19,7 +19,7 @@ const ADMINSchema = new mongoose.Schema({
   admin: { type: String, required: true, unique: true, trim: true },
   email: { type: String, required: true, unique: true, lowercase: true, trim: true },
   password: { type: String, required: true },
-  adminpass: { type: B, default: "false" }, // Se mantiene como String
+  adminpass: { type: String, default: "false" }, // Se mantiene como String
 }, { collection: "admins" });
 
 const Admin = mongoose.models.Admin || mongoose.model("Admin", ADMINSchema);
