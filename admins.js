@@ -4,7 +4,7 @@
 const adminpass = localStorage.getItem("adminpass") === "true";
 if (!adminpass) {
   alert("No tienes permisos para acceder a esta página.");
- // window.location.href = "./index.html";
+ window.location.href = "./index.html";
 }
 
 // ===============================
