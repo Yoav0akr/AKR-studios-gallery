@@ -4,7 +4,7 @@
 const adminpass = localStorage.getItem("adminpass") === "true";
 if (!adminpass) {
   alert("No tienes permisos para acceder a esta página.");
-  window.location.href = "./index.html";
+ // window.location.href = "./index.html";
 }
 
 // ===============================
@@ -102,7 +102,7 @@ async function cargarImagenesPaginadas(page = 1) {
 
   } catch (err) {
     console.error(err);
-    fotos.innerHTML = "<p>Error cargando imágenes.</p>";
+    fotos.innerHTML ='<p class="msg">Error cargando imágenes.</p>';
   }
 }
 
