@@ -260,9 +260,9 @@ h1 {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    height: 60%;
     width: 50%;
     margin: none;
+    gap: 5px;
 
 
 }
@@ -287,9 +287,11 @@ h1 {
     justify-content: center;
     border-radius: var(--defborder);
     gap: 0.6rem;
-    max-width: 3rem;
-    height: 100%;
-
+}
+select.menu,
+a.menu,
+input.menu{
+    height:fit-content;
 }
 
 .menu:hover {
