@@ -43,6 +43,36 @@ function ocultarSpinner() {
 }
 
 // ==============================
+// --- VALIDACIÓN GLOBAL ---
+// ==============================
+async function validarImagen(URLimg) {
+  let ses = 0;
+
+  // NSFW
+  const nsfwScores = await nsfwFun(URLimg) || {};
+  const nsfw = nsfwScores.nsfw || 0;
+  ses += nsfw;
+
+  // Rostros
+  const facesAllowed = await facesFun(URLimg);
+  if (!facesAllowed) {
+    ses += 0.5; // penaliza si hay rostro humano
+  }
+
+  console.log("🔎 Score total:", ses);
+
+  if (ses >= 0.7) {
+    alert("❌ Imagen rechazada por contenido inapropiado");
+    visualizador.classList.add("reject");
+    cloudinaryURL = null;
+    return false;
+  }
+
+  console.log("✅ Imagen validada correctamente");
+  return true;
+}
+
+// ==============================
 // --- VISUALIZADOR ---
 // ==============================
 if (visualizador) {
@@ -59,7 +89,6 @@ if (visualizador) {
     input.click();
 
     input.onchange = async () => {
-
       const file = input.files[0];
       if (!file) return;
 
@@ -88,20 +117,12 @@ if (visualizador) {
       mostrarSpinner();
 
       try {
-
-        // ======================
         // SUBIR A CLOUDINARY
-        // ======================
         const formData = new FormData();
         formData.append("file", archivoSeleccionado);
 
         console.log("📤 Subiendo archivo a Cloudinary...");
-
-        const res = await fetch("/api/upload", {
-          method: "POST",
-          body: formData
-        });
-
+        const res = await fetch("/api/upload", { method: "POST", body: formData });
         const data = await res.json();
 
         console.log("📥 Respuesta /api/upload:", data);
@@ -113,174 +134,104 @@ if (visualizador) {
         }
 
         cloudinaryURL = data.url;
-
         console.log("✔ Subido:", cloudinaryURL);
 
-        // ======================
-        // NSFW CHECK
-        // ======================
-        const scores = await nsfwFun(cloudinaryURL) || {};
-        const { nsfw = 0, sfw = 1 } = scores;
+        // VALIDACIÓN GLOBAL
+        const validada = await validarImagen(cloudinaryURL);
+        if (!validada) return;
 
-        console.log("🔎 NSFW:", scores);
-
-        // ======================
-        // FACE CHECK
-        // ======================
-        console.log("🔍 Analizando rostros...");
-
-        const facesAllowed = await facesFun(cloudinaryURL);
-
-        if (!facesAllowed) {
-
-          visualizador.classList.add("reject");
-          alert("❌ Esta imagen contiene una cara humana. Verifica los derechos de uso.");
-          cloudinaryURL = null;
-          return;
-
+        // IA
+        const IA = await analize(cloudinaryURL);
+        if (IA) {
+          EntradaDesc.value = IA.descripcion || "";
+          EntradaCategs.value = (IA.categorias || []).join(", ");
         }
-
-        // ======================
-        // NSFW VALIDACIÓN
-        // ======================
-        if (nsfw >= 0.7) {
-
-          alert(`❌ Contenido inapropiado detectado (${(nsfw * 100).toFixed(1)}%)`);
-          visualizador.classList.add("reject");
-          cloudinaryURL = null;
-          return;
-
-        }
-
-        if (nsfw > 0.3) {
-
-          alert("⚠️ Imagen marcada para revisión manual.");
-          visualizador.classList.add("reject");
-          cloudinaryURL = null;
-          return;
-
-        }
-
-        console.log("✅ Imagen segura");
-
-        // ======================
-        // IA (PARALELO)
-        // ======================
-        try {
-          const res = await fetch("/api/analyze", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ imageURL: cloudinaryURL }),
-          });
-
-          const data = await res.json();
-
-          EntradaDesc.value = data.descripcion || "";
-          EntradaCategs.value = (data.categorias || []).join(", ");
-
-          console.log("✅ IA completada");
-
-        } catch (err) {
-
-          console.warn("⚠️ Error IA:", err);
-
-          EntradaDesc.value = "Auto descripcion no disponible";
-
-        }
+        console.log("✅ IA completada");
 
         alert("✅ Imagen validada correctamente. Puedes guardarla.");
 
       } catch (err) {
-
         console.error("❌ Error crítico:", err);
         alert("⚠️ Error procesando imagen");
-
         cloudinaryURL = null;
-
       } finally {
-
         procesando = false;
         ocultarSpinner();
-
       }
-
     };
-
   });
 }
-
 
 // ==============================
 // --- NSFW ---
 // ==============================
 async function nsfwFun(URLimg) {
-
   try {
-
     if (!URLimg) {
       console.warn("⚠️ imagen no encontrada");
       throw new Error("imagen no encontrada");
     }
-
     const res = await fetch("/api/nsfw", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ imageURL: URLimg }),
     });
-
     return await res.json();
-
   } catch (error) {
-
     console.error("❌ fallo en análisis NSFW");
-
     return {};
-
   }
-
 }
 
 // ==============================
 // --- FACE CHECK ---
 // ==============================
 async function facesFun(URLimg) {
-
   try {
-
     if (!URLimg) {
       console.warn("⚠️ facesFun URL inválida");
-      return true;
+      return false; // mejor rechazar
     }
-
     const res = await fetch("/api/faces", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ imageURL: URLimg }),
     });
-
     if (!res.ok) {
       console.warn("⚠️ HTTP faces:", res.status);
-      return true;
+      return false;
     }
-
     const data = await res.json();
-
     console.log("👤 Faces result:", data);
-
-    return Boolean(data.allowed);
-
+    return !!data.allowed;
   } catch (error) {
-
     console.error("❌ Error faces:", error);
-
-    return true;
-
+    return false;
   }
-
 }
-//------------------------------
-//guardar enmongo
-//------------------------------
+
+// ==============================
+// --- ANALIZE ---
+// ==============================
+async function analize(URLimg) {
+  try {
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ imageURL: URLimg }),
+    });
+    const data = await res.json();
+    if (data) return data;
+  } catch (err) {
+    console.warn("⚠️ Error IA:", err);
+    EntradaDesc.value = "Auto descripción no disponible";
+    return null;
+  }
+}
+
+// ==============================
+// --- GUARDAR EN MONGO ---
+// ==============================
 async function guardarEnMongo() {
   const nombre = EntradaNombre.value.trim();
   const por = EntradaPor.value.trim() || "Desconocido";
@@ -306,7 +257,6 @@ async function guardarEnMongo() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-
     const resData = await res.json();
 
     if (!res.ok) {
@@ -323,12 +273,13 @@ async function guardarEnMongo() {
   }
 }
 
-const manchego= document.getElementById("manchego");
-manchego.addEventListener("click",()=>{
-guardarEnMongo();
+const manchego = document.getElementById("manchego");
+manchego.addEventListener("click", () => {
+  guardarEnMongo();
 });
+
 // ==============================
-//  NAVBAR
+// --- NAVBAR ---
 // ==============================
 const navs = document.querySelector(".nav");
 const logo = document.querySelector(".logo");
