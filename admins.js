@@ -269,9 +269,12 @@ async function query1(metodo, id = null) {
   }
 
   let url = "/api/personas";
-  if (id) url += `/${id}`;
-
   const options = { method: metodo };
+
+  if (metodo === "DELETE" && id) {
+    options.headers = { "Content-Type": "application/json" };
+    options.body = JSON.stringify({ id });
+  }
 
   try {
     const res = await fetch(url, options);
