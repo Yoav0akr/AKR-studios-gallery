@@ -74,7 +74,7 @@ async function cargarImagenesPaginadas(page = 1) {
     if (!archivos.length) {
       show.classList.remove("no-ver");
       show.innerText = "NO HAY IMÁGENES DISPONIBLES";
-      paginacion.innerHTML = "";
+      paginacion.innerHTML = '<div id="paginacion"></div>';
       return;
     }
     show.classList.add("no-ver");
