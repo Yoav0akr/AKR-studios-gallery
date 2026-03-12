@@ -32,7 +32,7 @@ const archivos = [
         ]
     }
 ];
-
+// CENTER MASS
 export { archivos };
 
 

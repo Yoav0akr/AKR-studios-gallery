@@ -332,6 +332,9 @@ max-width: 1rem;
     background-color: #222;
     color: #fff;
 }
+#paginacion{
+    grid-column: span 3;
+}
 
 .cosa .solis {
     align-self: center;
