@@ -23,6 +23,7 @@ const show = document.getElementById("show");
 function hideAll() {
   fotos.classList.add("no-ver");
   personas.classList.add("no-ver");
+  paginacion.classList.add('no-ver');
 }
 
 // ===============================
@@ -69,7 +70,7 @@ async function cargarImagenesPaginadas(page = 1) {
     const data = await res.json();
     const archivos = data.data || [];
     totalPages = data.totalPages || 1;
-    fotos.innerHTML = '<div id="paginacion"></div>';
+    fotos.innerHTML = '';
 
     if (!archivos.length) {
       show.classList.remove("no-ver");
@@ -98,6 +99,7 @@ async function cargarImagenesPaginadas(page = 1) {
     });
 
     vincularBotonesEliminar();
+    paginacion.classList.remove("no-ver")
     renderizarPaginacion();
 
   } catch (err) {
