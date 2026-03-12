@@ -333,7 +333,7 @@ max-width: 1rem;
     color: #fff;
 }
 #paginacion{
-    grid-column: span 3;
+    grid-column: span 5;
 }
 
 .cosa .solis {
