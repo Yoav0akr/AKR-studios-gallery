@@ -145,13 +145,14 @@ button:hover {
 /*        NAVBAR         */
 /* ===================== */
 .nav {
-    display: flex;
+    display:flex;
+
     background: var(--bg-2);
     justify-content: space-between;
     align-items: center;
     height: 3em;
     padding: 1rem;
-    margin-top: -1em;
+    margin-top: 0;
     z-index: 9099999;
     transform: translateY(0.4rem)
 }
@@ -286,6 +287,7 @@ h1 {
     border: none;
     justify-content: center;
     border-radius: var(--defborder);
+    gap: 0.6rem;
 }
 
 .menu:hover {
@@ -546,6 +548,7 @@ max-width: 1rem;
     font-size: 3em;
     color: var(--accent-1);
     margin: 0;
+    
 }
 
 
