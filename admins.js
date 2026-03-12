@@ -69,12 +69,12 @@ async function cargarImagenesPaginadas(page = 1) {
     const data = await res.json();
     const archivos = data.data || [];
     totalPages = data.totalPages || 1;
-    fotos.innerHTML = "";
+    fotos.innerHTML = '<div id="paginacion"></div>';
 
     if (!archivos.length) {
       show.classList.remove("no-ver");
       show.innerText = "NO HAY IMÁGENES DISPONIBLES";
-      paginacion.innerHTML = '<div id="paginacion"></div>';
+      paginacion.innerHTML = '';
       return;
     }
     show.classList.add("no-ver");
