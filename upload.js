@@ -46,36 +46,48 @@ function ocultarSpinner() {
 // --- VALIDACIÓN GLOBAL ---
 // ==============================
 async function validarImagen(URLimg) {
+  try {
 
-  const res = await fetch("/api/moderate", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ imageURL: URLimg })
-  });
+    const res = await fetch("/api/moderate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ imageURL: URLimg })
+    });
 
-  const data = await res.json();
+    const data = await res.json();
 
-  console.log("🧠 Moderation:", data);
+    console.log("🧠 Moderation:", data);
 
-  if (!data.allowed) {
+    if (!data.allowed) {
 
-    if (data.realPerson) {
-      alert("❌ No se permiten personas reales");
+      if (data.realPerson) {
+        alert("❌ No se permiten personas reales");
+      }
+
+      if (data.nsfw > 0.6) {
+        alert("❌ Imagen NSFW detectada");
+      }
+
+      visualizador.classList.add("reject");
+      cloudinaryURL = null;
+
+      return false;
     }
 
-    if (data.nsfw > 0.6) {
-      alert("❌ Imagen NSFW detectada");
-    }
+    EntradaDesc.value = data.descripcion || "";
+    EntradaCategs.value = (data.categorias || []).join(", ");
 
+    return true;
+
+  } catch (err) {
+    console.error("⚠️ Error en moderación:", err);
+    alert("⚠️ No se pudo analizar la imagen");
+
+    cloudinaryURL = null;
     return false;
   }
-
-  EntradaDesc.value = data.descripcion || "";
-  EntradaCategs.value = (data.categorias || []).join(", ");
-
-  return true;
 }
 
 // ==============================
@@ -174,8 +186,7 @@ async function guardarEnMongo() {
   const desk = EntradaDesc.value.trim();
 
   if (!nombre) return alert("❌ Debes poner un nombre.");
-  if (!cloudinaryURL) return alert("❌ Primero sube un archivo.");
-  if (cloudinaryURL===null) return alert("❌ Primero sube un archivo apropiado.");
+  if (cloudinaryURL === null) return alert("❌ Primero sube un archivo apropiado.");
 
   const data = {
     nombre,

@@ -349,7 +349,7 @@ input.menu{
 .queso {
     display: flex;
     flex-direction: column;
-    padding: 1rem;
+    padding: 2em;
     border: 3px solid var(--accent-1);
     border-radius: 1em;
 }
@@ -708,9 +708,9 @@ input.menu{
     }
 
     .visualizador {
-        width: 40vw;
+        width: 40%;
         aspect-ratio: 1 / 1;
-        height: auto;
+        height: 40%;
         justify-self: center;
     }
 
@@ -769,7 +769,7 @@ input.menu{
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-
+height: auto;
 }
 
 /* Para imágenes y videos dentro del visualizador */
