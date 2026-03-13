@@ -5,7 +5,7 @@ const admin = localStorage.getItem("admin");
 const adminpass = localStorage.getItem("adminpass");
 
 if (!admin) {
-  //window.location.href = "../existente.html";
+  window.location.href = "../existente.html";
 }
 
 // ==============================
