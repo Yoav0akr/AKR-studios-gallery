@@ -14,6 +14,10 @@ export default async function handler(req, res) {
 
         console.log("🔎 Moderating:", imageURL);
 
+        // =========================
+        // DESCARGAR IMAGEN
+        // =========================
+
         const imgRes = await fetch(imageURL);
 
         if (!imgRes.ok) {
@@ -23,13 +27,18 @@ export default async function handler(req, res) {
         const arrayBuffer = await imgRes.arrayBuffer();
         const buffer = new Uint8Array(arrayBuffer);
 
-        const headers = {
+        const headersBinary = {
             Authorization: `Bearer ${process.env.HF_API_KEY}`,
             "Content-Type": "application/octet-stream"
         };
 
+        const headersJSON = {
+            Authorization: `Bearer ${process.env.HF_API_KEY}`,
+            "Content-Type": "application/json"
+        };
+
         // =========================
-        // FUNCIÓN CON RETRY
+        // FUNCION CON RETRY
         // =========================
 
         async function queryHF(url, retries = 2) {
@@ -38,7 +47,7 @@ export default async function handler(req, res) {
 
                 const r = await fetch(url, {
                     method: "POST",
-                    headers,
+                    headers: headersBinary,
                     body: buffer
                 });
 
@@ -47,9 +56,11 @@ export default async function handler(req, res) {
                 if (!data?.error) return data;
 
                 if (data.error.includes("loading") && i < retries) {
+
                     console.log("⏳ Model loading, retry...");
                     await new Promise(r => setTimeout(r, 3000));
                     continue;
+
                 }
 
                 console.warn("HF error:", data.error);
@@ -68,40 +79,47 @@ export default async function handler(req, res) {
         const [
             nsfwData,
             faceData,
-            clipData,
-            capData
+            captionData,
+            clipData
         ] = await Promise.all([
 
-            queryHF("https://router.huggingface.co/hf-inference/models/Falconsai/nsfw_image_detection"),
+            queryHF(
+                "https://router.huggingface.co/hf-inference/models/Falconsai/nsfw_image_detection"
+            ),
 
-            queryHF("https://router.huggingface.co/hf-inference/models/arnabdhar/YOLOv8-Face-Detection"),
+            queryHF(
+                "https://router.huggingface.co/hf-inference/models/arnabdhar/YOLOv8-Face-Detection"
+            ),
+
+            queryHF(
+                "https://router.huggingface.co/hf-inference/models/Salesforce/blip-image-captioning-base"
+            ),
 
             fetch(
                 "https://router.huggingface.co/hf-inference/models/openai/clip-vit-base-patch32",
                 {
                     method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${process.env.HF_API_KEY}`,
-                        "Content-Type": "application/json"
-                    },
+                    headers: headersJSON,
                     body: JSON.stringify({
                         inputs: imageURL,
                         parameters: {
                             candidate_labels: [
-                                "photo of a person",
-                                "real human face",
+                                "photo",
+                                "real person",
                                 "anime character",
-                                "cartoon character",
+                                "cartoon",
                                 "digital illustration",
                                 "furry character",
-                                "animal character"
+                                "animal",
+                                "landscape",
+                                "city",
+                                "vehicle",
+                                "technology"
                             ]
                         }
                     })
                 }
-            ).then(r => r.json()),
-
-            queryHF("https://router.huggingface.co/hf-inference/models/Salesforce/blip-image-captioning-base")
+            ).then(r => r.json())
 
         ]);
 
@@ -113,8 +131,8 @@ export default async function handler(req, res) {
 
         if (Array.isArray(nsfwData)) {
 
-            const nsfw = nsfwData.find(x =>
-                x.label?.toLowerCase() === "nsfw"
+            const nsfw = nsfwData.find(
+                x => x.label?.toLowerCase() === "nsfw"
             );
 
             nsfwScore = nsfw?.score || 0;
@@ -122,56 +140,52 @@ export default async function handler(req, res) {
         }
 
         // =========================
-        // FACE DETECTION
+        // DETECCION DE CARAS
         // =========================
 
         const faceDetected =
             Array.isArray(faceData) && faceData.length > 0;
 
-
         // =========================
-        // FOTO REAL DETECTION
+        // CLIP ANALISIS
         // =========================
 
         let realPhotoScore = 0;
+        let clipCategorias = [];
 
         if (Array.isArray(clipData)) {
 
+            clipCategorias = clipData
+                .filter(x => x.score > 0.25)
+                .map(x => x.label);
+
             const real = clipData.find(x =>
-                x.label?.toLowerCase().includes("photo") ||
-                x.label?.toLowerCase().includes("real")
+                x.label.toLowerCase().includes("photo") ||
+                x.label.toLowerCase().includes("real")
             );
 
             realPhotoScore = real?.score || 0;
 
-        }
+        } else if (clipData?.error) {
 
-        // =========================
-        // CATEGORIAS
-        // =========================
-
-        let categorias = [];
-
-        if (Array.isArray(clipData)) {
-
-            categorias = clipData
-                .slice(0, 5)
-                .map(x => x.label);
+            console.warn("CLIP error:", clipData.error);
 
         }
 
         // =========================
-        // DESCRIPCION
+        // DESCRIPCION AUTOMATICA
         // =========================
 
         let descripcion = "";
 
-        if (Array.isArray(capData)) {
-
-            descripcion = capData[0]?.generated_text || "";
-
+        if (Array.isArray(captionData)) {
+            descripcion = captionData[0]?.generated_text || "";
         }
-//traduccion de la descropcion======
+
+        // =========================
+        // TRADUCCION
+        // =========================
+
         let descripcionES = descripcion;
 
         if (descripcion) {
@@ -180,10 +194,7 @@ export default async function handler(req, res) {
                 "https://router.huggingface.co/hf-inference/models/Helsinki-NLP/opus-mt-en-es",
                 {
                     method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${process.env.HF_API_KEY}`,
-                        "Content-Type": "application/json"
-                    },
+                    headers: headersJSON,
                     body: JSON.stringify({
                         inputs: descripcion
                     })
@@ -192,8 +203,10 @@ export default async function handler(req, res) {
 
             const transData = await transRes.json();
 
-            if (Array.isArray(transData)) {
-                descripcionES = transData[0]?.translation_text || descripcion;
+            if (Array.isArray(transData) && transData[0]?.translation_text) {
+                descripcionES = transData[0].translation_text;
+            } else if (transData?.error) {
+                console.warn("Translator error:", transData.error);
             }
 
         }
@@ -201,6 +214,8 @@ export default async function handler(req, res) {
         // =========================
         // CATEGORIAS DESDE TEXTO
         // =========================
+
+        let categorias = [];
 
         if (descripcion) {
 
@@ -226,19 +241,36 @@ export default async function handler(req, res) {
                 "technology"
             ];
 
-            categorias = posibles.filter(tag => text.includes(tag));
+            categorias = posibles.filter(tag =>
+                text.includes(tag)
+            );
 
         }
 
+        // combinar con categorias CLIP
+
+        categorias = [...new Set([
+            ...categorias,
+            ...clipCategorias
+        ])];
+
         // =========================
-        // RESULTADO
+        // DETECCION PERSONA REAL
         // =========================
 
         const realPersonDetected =
-            faceDetected && realPhotoScore > 0.6;
+            faceDetected && realPhotoScore > 0.7;
+
+        // =========================
+        // PERMITIR O BLOQUEAR
+        // =========================
 
         const allowed =
-            nsfwScore < 0.6 && !realPersonDetected; F
+            nsfwScore < 0.6 && !realPersonDetected;
+
+        // =========================
+        // RESPUESTA
+        // =========================
 
         return res.status(200).json({
 
@@ -246,7 +278,7 @@ export default async function handler(req, res) {
             nsfw: nsfwScore,
             realPerson: realPersonDetected,
             categorias,
-            descripcion:descripcionES
+            descripcion: descripcionES
 
         });
 
