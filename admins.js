@@ -88,7 +88,6 @@ async function cargarImagenesPaginadas(page = 1) {
           <ul>
             <li>Por: ${a.por}</li>
             <li>Categoría: ${a.categ.join(", ")}</li>
-            <li>id: ${a._id}</li>
           </ul>
           <h3 class="producto-titulo">${a.nombre}</h3>
           <button class="eliminarBtn" data-id="${a._id}">ELIMINAR</button>

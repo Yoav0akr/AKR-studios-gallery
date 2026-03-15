@@ -274,7 +274,7 @@ h1 {
 .resaltar {
     color: var(--accent-1);
     font-weight: bold;
-    border: 3px solid var(--danger) important;
+    border: 3px solid var(--danger) !important;
     border-radius: var(--defborder);
 }
 
@@ -303,6 +303,17 @@ input.menu{
 /* ===================== */
 .panel h2 {
     text-align: center;
+}
+
+.visualizador{
+background:#76b82a;
+cursor:pointer;
+transition:0.2s;
+}
+
+.visualizador:hover{
+transform:scale(1.02);
+filter:brightness(1.1);
 }
 
 .aciones_admin {
@@ -590,7 +601,7 @@ input.menu{
     width: 40px;
     height: 40px;
     animation: spin 1s linear infinite;
-    background-image: "./socurses/AKR Gallery.png";
+    background-image: url("./socurses/AKR Gallery.png");
     margin: 20px auto;
 }
 
@@ -614,6 +625,7 @@ input.menu{
         gap: 0.3rem;
         margin: 1rem 0;
     }
+
 
     .pagination button {
         padding: 0.4rem 0.8rem;
@@ -812,4 +824,10 @@ height: auto;
 
 .reject {
     border: 3px dashed #ff0000
+}
+.grid2ancho{
+    grid-column: 1/-1;
+}
+.reglas{
+    align-items: center;
 }
