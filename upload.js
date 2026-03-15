@@ -63,7 +63,7 @@ async function validarImagen(URLimg) {
     if (!data.allowed) {
 
       if (data.realPerson) {
-        alert("❌ No se permiten personas reales, lee las relgas");
+        alert("❌ No se permiten personas reales, .............???????///////lee las relgas");
       }
 
       if (data.nsfw > 0.6) {
@@ -186,6 +186,9 @@ async function guardarEnMongo() {
   const desk = EntradaDesc.value.trim();
 
   if (!nombre) return alert("❌ Debes poner un nombre.");
+  if (!por) return alert("❌ Debes poner un quien lo sube.");
+  if (!texto) return alert("❌ Debes poner las categorias de la imagen.");
+  if (!desk&& nombre.leng>10) return alert("❌ Debes poner una buena descripcion.");
   if (cloudinaryURL === null) return alert("❌ Primero sube un archivo apropiado.");
 
   const data = {
