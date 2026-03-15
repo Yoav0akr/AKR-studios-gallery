@@ -156,8 +156,12 @@ export default async function handler(req, res) {
         if (Array.isArray(clipData)) {
 
             clipCategorias = clipData
-                .filter(x => x.score > 0.25)
-                .map(x => x.label);
+                .filter(x => x.score > 0.35)
+                .map(x => x.label)
+                .filter(x =>
+                    !x.includes("photo") &&
+                    !x.includes("real")
+                );
 
             const real = clipData.find(x =>
                 x.label.toLowerCase().includes("photo") ||
@@ -187,28 +191,32 @@ export default async function handler(req, res) {
         // =========================
 
         let descripcionES = descripcion;
+        try {
 
-        if (descripcion) {
+            if (descripcion) {
 
-            const transRes = await fetch(
-                "https://router.huggingface.co/hf-inference/models/Helsinki-NLP/opus-mt-en-es",
-                {
-                    method: "POST",
-                    headers: headersJSON,
-                    body: JSON.stringify({
-                        inputs: descripcion
-                    })
+                const transRes = await fetch(
+                    "https://router.huggingface.co/hf-inference/models/Helsinki-NLP/opus-mt-en-es",
+                    {
+                        method: "POST",
+                        headers: headersJSON,
+                        body: JSON.stringify({
+                            inputs: descripcion
+                        })
+                    }
+                );
+
+                const transData = await transRes.json();
+
+                if (Array.isArray(transData) && transData[0]?.translation_text) {
+                    descripcionES = transData[0].translation_text;
+                } else if (transData?.error) {
+                    console.warn("Translator error:", transData.error);
                 }
-            );
 
-            const transData = await transRes.json();
-
-            if (Array.isArray(transData) && transData[0]?.translation_text) {
-                descripcionES = transData[0].translation_text;
-            } else if (transData?.error) {
-                console.warn("Translator error:", transData.error);
             }
-
+        } catch (e) {
+            console.warn("fallo en traduccion")
         }
 
         // =========================
@@ -252,7 +260,7 @@ export default async function handler(req, res) {
         categorias = [...new Set([
             ...categorias,
             ...clipCategorias
-        ])];
+        ])].slice(0, 6);
 
         // =========================
         // DETECCION PERSONA REAL
@@ -271,6 +279,14 @@ export default async function handler(req, res) {
         // =========================
         // RESPUESTA
         // =========================
+        console.log({
+            nsfwScore,
+            faceDetected,
+            realPhotoScore,
+            realPersonDetected,
+            categorias,
+            descripcion: descripcionES
+        });
 
         return res.status(200).json({
 
