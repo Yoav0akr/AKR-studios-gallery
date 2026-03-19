@@ -146,7 +146,7 @@ button:hover {
 /*        NAVBAR         */
 /* ===================== */
 .nav {
-    display:flex;
+    display: flex;
 
     background: var(--bg-2);
     justify-content: space-between;
@@ -289,15 +289,17 @@ h1 {
     border-radius: var(--defborder);
     gap: 0.6rem;
 }
+
 select.menu,
 a.menu,
-input.menu{
-    height:fit-content;
+input.menu {
+    height: fit-content;
 }
 
 .menu:hover {
     background-color: #021b8c;
 }
+
 /* ===================== */
 /*        BLOQUES        */
 /* ===================== */
@@ -305,21 +307,21 @@ input.menu{
     text-align: center;
 }
 
-.visualizador{
-background:#76b82a;
-cursor:pointer;
-transition:0.2s;
+.visualizador {
+    background: #76b82a;
+    cursor: pointer;
+    transition: 0.2s;
 }
 
-.visualizador:hover{
-transform:scale(1.02);
-filter:brightness(1.1);
+.visualizador:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
 }
 
 .aciones_admin {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    
+
     justify-items: center;
 
     padding: 0.5rem;
@@ -331,7 +333,7 @@ filter:brightness(1.1);
 .cosa {
     display: block;
     flex-direction: column;
-    
+
     font-size: 2rem;
     border-radius: var(--defborder);
     border: 3px solid var(--accent-2);
@@ -339,7 +341,8 @@ filter:brightness(1.1);
     background-color: #222;
     color: #fff;
 }
-#paginacion{
+
+#paginacion {
     grid-column: span 5;
 }
 
@@ -553,7 +556,7 @@ filter:brightness(1.1);
     font-size: 3em;
     color: var(--accent-1);
     margin: 0;
-    
+
 }
 
 
@@ -651,10 +654,10 @@ filter:brightness(1.1);
     .nav {
         justify-content: normal;
         position: fixed;
-        
+
         flex-direction: column;
         min-height: 100%;
-        height:3.5rem ;
+        height: 3.5rem;
         max-width: 4rem;
         padding: 0.5em;
         gap: 1rem;
@@ -662,7 +665,8 @@ filter:brightness(1.1);
         overflow-y: hidden;
         transition: 0.5s ease-in-out;
         margin-left: -0.5rem;
-    
+        margin-top: -1rem;
+
     }
 
     .navhiden {
@@ -674,16 +678,17 @@ filter:brightness(1.1);
         display: none;
     }
 
-    
+
     .logo {
         align-self: center;
-    
         min-height: 3rem;
         transition: transform 0.5s ease-in-out;
+        background-image: url(./AKRlogo2.png);
+        transform: rotate(90deg);
     }
 
     .rotado {
-        transform: rotate(-90deg);
+        transform: rotate(180deg);
         max-width: 3rem;
         max-height: 3rem;
     }
@@ -698,10 +703,10 @@ filter:brightness(1.1);
         margin-bottom: 0.6rem;
     }
 
-input.menu{
-    width: 100%;
-}
-    
+    input.menu {
+        width: 100%;
+    }
+
 
     .imagenes-contenedor {
         grid-template-columns: repeat(2, minmax(150px, 1fr));
@@ -745,7 +750,7 @@ input.menu{
         width: auto;
         flex-direction: column;
         text-align: center;
-        max-width:100%;
+        max-width: 100%;
         height: 10px;
         border-radius: 0.6rem;
 
@@ -781,7 +786,7 @@ input.menu{
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-height: auto;
+    height: auto;
 }
 
 /* Para imágenes y videos dentro del visualizador */
@@ -825,9 +830,11 @@ height: auto;
 .reject {
     border: 3px dashed #ff0000
 }
-.grid2ancho{
+
+.grid2ancho {
     grid-column: 1/-1;
 }
-.reglas{
+
+.reglas {
     align-items: center;
 }
