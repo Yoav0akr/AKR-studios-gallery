@@ -223,7 +223,8 @@ realPhotoScore > 0.75;
 // ======================
 
 const allowed =
-nsfwScore < 0.6 && !realPersonDetected;
+nsfwScore > 0.6 && !realPersonDetected;
+
 
 // ======================
 // RESPUESTA
