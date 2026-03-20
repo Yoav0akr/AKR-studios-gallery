@@ -873,8 +873,8 @@ input.menu {
 }
 .novedad{
     grid-column: span 2;
+    height: min-content;
 }
 .novedad .la-imagen{
-    aspect-ratio: 2/1;
-    top:-2rem;
+    aspect-ratio: 2/1
 }
