@@ -111,7 +111,7 @@ function cargarimagenes(lista) {
 
     div.className = "imagen";
     div.innerHTML = `
-  < h3 class="producto-titulo" > ${item.nombre}</h3 >
+  <h3 class="producto-titulo" >${item.nombre}</h3 >
       <img class="la-imagen" src="${item.ub}" alt="${item.nombre}" />
       <div class="detalles">
         <ul>
