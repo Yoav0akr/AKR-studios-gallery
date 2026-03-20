@@ -872,9 +872,9 @@ input.menu {
     align-items: center;
 }
 .novedad{
-    grid-column: span 2;
+    grid-column: 1/-1;
     height: min-content;
 }
 .novedad .la-imagen{
-    aspect-ratio: 2/1
+    aspect-ratio: 5/1;
 }
