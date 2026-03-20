@@ -90,7 +90,7 @@ function cargarimagenes(lista) {
 
   show.classList.add("no-ver");
   fotos.innerHTML = `      <div class="imagen novedad">
-        <img class="la-imagen" style="position: relative;" src="./socurses/3d/sin_nombre.png" alt="${item.nombre}" />
+        <img class="la-imagen" style="position: relative;" src="./socurses/3d/sin_nombre.png" />
         <div style="
         position: absolute;
         display: flex;
