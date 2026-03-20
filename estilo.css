@@ -123,10 +123,12 @@ button {
 }
 
 button:hover {
-    background-color: #4e22a7;
+    transform: scale(1.05);
+    background-color: #226da7;
 }
 
 .producto-titulo {
+    display: flex;
     white-space: wrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -136,6 +138,7 @@ button:hover {
     text-transform: uppercase;
     background: #5f5f68;
     width: 100%;
+    height: 1rem;
     color: #eeff00;
     font-weight: bold;
     font-size: 15px;
@@ -479,7 +482,7 @@ input.menu {
     padding: 0em;
     max-width: 100%;
     box-sizing: border-box;
-    grid-template-columns: repeat(5, minmax(150px, 1fr));
+    grid-template-columns: repeat(5, minmax(2px, 1fr));
     margin-top: 2rem;
 }
 
@@ -606,6 +609,11 @@ input.menu {
     animation: spin 1s linear infinite;
     background-image: url("./socurses/AKR Gallery.png");
     margin: 20px auto;
+}
+
+.detalles{
+    overflow-x:hidden;
+    max-height: min-content;
 }
 
 @keyframes spin {
@@ -770,6 +778,31 @@ input.menu {
         width: auto;
     }
 
+    .imagen {
+        height: min-content;
+        position: relative;
+    }
+    .la-imagen{
+        display: block;
+    }
+
+    .detalles {
+        position: absolute;
+        background-color: #1515158d;
+        border: 2px solid var(--accent-1);
+        border-radius: var(--defborder);
+        margin: 0.3rem;
+        margin-top: 1.3rem;
+        top: 0;
+        left: 0;
+        aspect-ratio:1/1;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    .detalles:hover{
+        opacity: 1;
+    }
+
 }
 
 /* ===================== */
@@ -837,4 +870,11 @@ input.menu {
 
 .reglas {
     align-items: center;
+}
+.novedad{
+    grid-column: span 2;
+}
+.novedad .la-imagen{
+    aspect-ratio: 2/1;
+    top:-2rem;
 }

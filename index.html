@@ -11,14 +11,14 @@
 
 <body>
   <!-- NAVBAR -->
-  <div id ="nav" class="nav navhiden">
+  <div id="nav" class="nav navhiden">
     <div class="logo rotado">
       <h1>GALERÍA</h1>
       <h2 class="no-ver" id="titular"></h2>
     </div>
 
     <div class="ses">
-      <a class="menu"  href="upload.html">SUBIR FOTO</a>
+      <a class="menu" href="upload.html">SUBIR FOTO</a>
       <a class="menu" href="./nuevo.html">CUENTAS</a>
       <select id="cats" name="cats" class="menu">
         <option value="nombre">name</option>
@@ -41,22 +41,20 @@
 
     <!-- Contenedor de imágenes -->
     <div class="imagenes-contenedor" id="imagenes-contenedor">
-
     </div>
-
-
 
     <!-- PAGINACIÓN -->
     <div class="pagination">
-      <button id="prev"onclick="location.href='#nav'">Anterior</button>
+      <button id="prev" onclick="location.href='#nav'">Anterior</button>
       <span id="paginaActual">Página 1 de 1</span>
       <button id="next" onclick="location.href='#nav'">Siguiente</button>
     </div>
   </section>
 
   <!-- FOOTER -->
-  <footer
-    style="align-items: center; text-align: center; padding: 10px; background-color: #f1f1f1; margin-top: 20px; color: #555;">
+  <footer style=" display:flex;
+    flex-direction: column;
+    align-items: center; text-align: center; padding: 10px; background-color: #f1f1f1; margin-top: 20px; color: #555;">
     Las imágenes de aquí no son responsabilidad de AKRstudios. <br>
     <img src="./socurses/AKR Gallery.png" alt="Logo"
       style="width: 8rem; height: auto; vertical-align: middle; margin-left: 5px;">

@@ -55,10 +55,10 @@ async function cargarDesdeMongo(page = 1) {
       limit: LIMIT,
     });
 
- if (currentMode === "searchname" || currentMode === "searchcat") {
-  if (currentCategoria !== "") params.append("categoria", currentCategoria);
-  if (currentTexto !== "") params.append("nombre", currentTexto); // ojo: backend espera "nombre", no "texto"
-}
+    if (currentMode === "searchname" || currentMode === "searchcat") {
+      if (currentCategoria !== "") params.append("categoria", currentCategoria);
+      if (currentTexto !== "") params.append("nombre", currentTexto); // ojo: backend espera "nombre", no "texto"
+    }
 
     const res = await fetch(`/api/db?${params.toString()}`);
     if (!res.ok) throw new Error(res.status);
@@ -89,14 +89,29 @@ function cargarimagenes(lista) {
   }
 
   show.classList.add("no-ver");
+  fotos.innerHTML = `      <div class="imagen novedad">
+        <img class="la-imagen" style="position: relative;" src="./socurses/3d/sin_nombre.png" alt="${item.nombre}" />
+        <div style="
+        position: absolute;
+        display: flex;
+        flex-direction: column;
+        align-self: center;
+        justify-self: center;
+        width: 90%;
+      
+        ">
+          <p style="font-size: small; text-align: center;">Esta pagina sera directamente una pagina nsfw</p>
 
+          <a href="https://youtu.be/D06Yxj4dBCk?si=QJBGAGXLONl-qZ9l">no me gusta</a>
+        </div>
+      </div>`;
   lista.forEach(item => {
     const div = document.createElement("div");
     const descripcion = item.mimidesk || "Sin descripción";
 
     div.className = "imagen";
     div.innerHTML = `
-      <h3 class="producto-titulo">${item.nombre}</h3>
+  < h3 class="producto-titulo" > ${item.nombre}</h3 >
       <img class="la-imagen" src="${item.ub}" alt="${item.nombre}" />
       <div class="detalles">
         <ul>
@@ -108,7 +123,7 @@ function cargarimagenes(lista) {
       <div class="desc-soli">
         <button class="descargarBtn">Descargar</button>
       </div>
-    `;
+`;
 
     div.querySelector(".descargarBtn")
       .addEventListener("click", () => download(item));
@@ -173,16 +188,16 @@ cats.addEventListener("click", async () => {
 
 cats.addEventListener("change", async () => {
   console.warn("se diaparo");
-  if (cats.value==="all"){
-console.warn("se diaparo1");
+  if (cats.value === "all") {
+    console.warn("se diaparo1");
     // location.reload();
 
-  }else{
+  } else {
     currentMode = "searchcat";
     currentCategoria = cats.value;
     await init(1);
   }
-    
+
 });
 
 // ==============================
@@ -207,7 +222,7 @@ async function init(page = 1) {
   await cargarDesdeMongo(page);
   renderCategorias(await GET_categs());
   cargarimagenes(globalArchivos);
-  paginaActual.textContent = `Página ${currentPage} de ${totalPages}`;
+  paginaActual.textContent = `Página ${currentPage} de ${totalPages} `;
 }
 
 // ==============================
@@ -232,7 +247,7 @@ async function GET_categs() {
     const params = new URLSearchParams({
       mode: "cats",
     });
-    const res = await fetch(`/api/db?${params.toString()}`);
+    const res = await fetch(`/ api / db ? ${params.toString()} `);
     if (!res.ok) throw new Error(res.status);
 
     const data = await res.json();   // <- parseamos la respuesta
