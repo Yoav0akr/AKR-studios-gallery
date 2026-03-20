@@ -100,9 +100,9 @@ function cargarimagenes(lista) {
         width: 90%;
       
         ">
-          <p style="font-size: small; text-align: center;">Esta pagina sera directamente una pagina nsfw</p>
+          <p   style="font-size: 3vw; text-align: center;">Esta pagina sera directamente una pagina nsfw</p>
 
-          <a href="https://youtu.be/D06Yxj4dBCk?si=QJBGAGXLONl-qZ9l">no me gusta</a>
+          <a  class= "menu" href="https://youtu.be/D06Yxj4dBCk?si=QJBGAGXLONl-qZ9l">no me gusta</a>
         </div>
       </div>`;
   lista.forEach(item => {
