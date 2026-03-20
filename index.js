@@ -247,7 +247,7 @@ async function GET_categs() {
     const params = new URLSearchParams({
       mode: "cats",
     });
-    const res = await fetch(`/api/db ? ${params.toString()} `);
+    const res = await fetch(`/api/db?${params.toString()}`);
     if (!res.ok) throw new Error(res.status);
 
     const data = await res.json();   // <- parseamos la respuesta
