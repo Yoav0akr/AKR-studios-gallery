@@ -784,6 +784,7 @@ input.menu {
     }
     .la-imagen{
         display: block;
+        padding: 0;
     }
 
     .detalles {
@@ -877,4 +878,5 @@ input.menu {
 }
 .novedad .la-imagen{
     aspect-ratio: 5/1;
+    height: 160px;
 }
