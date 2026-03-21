@@ -93,11 +93,9 @@ function cargarimagenes(lista) {
         <img class="la-imagen" style="position: relative;" src="./novedad(1).png" />
         <div style="
         position: absolute;
-        display: flex;
         flex-direction: column;
         align-self: center;
         justify-self: center;
-        width: 90%;
       
         ">
           <p   style="font-size: 3vw; text-align: center;">Esta pagina sera directamente una pagina nsfw</p>
@@ -130,8 +128,6 @@ function cargarimagenes(lista) {
 
     fotos.appendChild(div);
   });
-
-  ScrollReveal().reveal(".imagen", { delay: 200, reset: true });
 }
 
 // ==============================
