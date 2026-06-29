@@ -487,11 +487,15 @@ input.menu {
 }
 
 .imagen {
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-2);
-    border-radius: var(--defborder);
-    padding: 0.2rem;
+  background: #fff;              /* fondo blanco clásico de polaroid */
+  border: 1px solid #ccc;        /* borde suave */
+  border-radius: 0.3rem;         /* esquinas ligeramente redondeadas */
+  padding: 0.5rem;               /* espacio alrededor de la foto */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* sombra para dar volumen */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 220px;              /* tamaño típico polaroid */
 }
 
 .la-imagen {
