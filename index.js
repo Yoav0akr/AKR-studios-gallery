@@ -98,9 +98,9 @@ function cargarimagenes(lista) {
         justify-self: center;
       
         ">
-          <p   style="font-size: 3vw; text-align: center; color: #ffffff;   font-weight: 16vw;">Esta pagina sera directamente una pagina nsfw</p>
+          <p   style="font-size: 3vw; text-align: center; mix-blend-mode: difference; color: #ffffff;   font-weight: 16vw;">Esta pagina es una pagina para todo publico</p>
 
-          <a  class= "menu" href="https://youtu.be/D06Yxj4dBCk?si=QJBGAGXLONl-qZ9l">no me gusta</a>
+          <a  class= "menu" href="https://youtu.be/D06Yxj4dBCk?si=QJBGAGXLONl-qZ9l">No me gusta</a>
         </div>
       </div>`;
   lista.forEach(item => {

@@ -66,13 +66,12 @@ async function validarImagen(URLimg) {
         alert("❌ No se permiten personas reales, lee las relgas");
       }
 
-      if (data.nsfw < 0.6) {
-        alert("❌ Imagen no NSFW detectada, lee las relgas ");
-        EntradaCategs.value += "NSFW";
+      if (data.nsfw > 0.6) {
+        alert("❌ Imagen NSFW detectada, lee las relgas ")
+        visualizador.classList.add("reject");
+        cloudinaryURL = null;
       }
 
-      visualizador.classList.add("reject");
-      cloudinaryURL = null;
 
       return false;
     }
