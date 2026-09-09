@@ -60,7 +60,7 @@ async function cargarDesdeMongo(page = 1) {
       if (currentTexto !== "") params.append("nombre", currentTexto); // ojo: backend espera "nombre", no "texto"
     }
 
-    const res = await fetch(`/api/db?${params.toString()}`);
+    const res = await fetch(`/api/db?${params.toString()}`||`https://akr-studios-gallery.vercel.app/api/db`);
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
 
@@ -83,7 +83,7 @@ function cargarimagenes(lista) {
 
   if (lista.length === 0) {
     show.classList.remove("no-ver");
-    show.textContent = "NO HAY IMÁGENES DISPONIBLES";
+    show.textContent = "NO HAY IMÁGENES DISPONIBLES, O CONECTATE A INTERNET";
     show.classList.add("mensage")
     return;
   }
@@ -109,12 +109,13 @@ function cargarimagenes(lista) {
 
     div.className = "imagen";
     div.innerHTML = `
-  <h3 class="producto-titulo" >${item.nombre}</h3 >
+
       <img class="la-imagen" src="${item.ub}" alt="${item.nombre}" />
+      <li>  <h3 class="producto-titulo" >${item.nombre}</h3 ></li>
       <div class="detalles">
         <ul>
-          <li>Por: ${item.por}</li>
-          <li>Categoría: ${(item.categ || []).join(", ")}</li>
+        <li>Por: ${item.por}</li>
+        <li>Categoría: ${(item.categ || []).join(", ")}</li>
           <li>${descripcion}</li>
         </ul>
       </div>
@@ -217,7 +218,8 @@ btnNext.addEventListener("click", async () => {
 async function init(page = 1) {
   await cargarDesdeMongo(page);
   renderCategorias(await GET_categs());
-  cargarimagenes(globalArchivos);
+  
+  cargarimagenes( archivos_test);
   paginaActual.textContent = `Página ${currentPage} de ${totalPages} `;
 }
 
@@ -243,7 +245,7 @@ async function GET_categs() {
     const params = new URLSearchParams({
       mode: "cats",
     });
-    const res = await fetch(`/api/db?${params.toString()}`);
+    const res = await fetch(`/api/db?${params.toString()}`||`https://akr-studios-gallery.vercel.app/api/db?${params.toString()}`);
     if (!res.ok) throw new Error(res.status);
 
     const data = await res.json();   // <- parseamos la respuesta
