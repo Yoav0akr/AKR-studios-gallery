@@ -218,8 +218,7 @@ btnNext.addEventListener("click", async () => {
 async function init(page = 1) {
   await cargarDesdeMongo(page);
   renderCategorias(await GET_categs());
-  
-  cargarimagenes( archivos_test);
+  cargarimagenes(globalArchivos);
   paginaActual.textContent = `Página ${currentPage} de ${totalPages} `;
 }
 
