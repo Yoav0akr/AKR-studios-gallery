@@ -277,6 +277,9 @@ input.menu, select.menu { background: #111; color: #fff; }
   font-size: 20px;
   margin: 0;
 }
+.nav h1 {
+    display: none;
+}
 
 .nav .ses {
   display: flex;
@@ -425,6 +428,7 @@ input.menu, select.menu { background: #111; color: #fff; }
 /* El banner sí puede ser más ancho, es el de arriba */
 .novedad .la-imagen {
   aspect-ratio: 16 / 6 !important;
+
 }
 
 /* En PC 4 por fila, pero sin pasarse */
