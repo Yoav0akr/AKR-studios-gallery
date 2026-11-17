@@ -1,13 +1,17 @@
 :root {
-    --defborder: 14px;
+    --defborder: 14px; /* ANTES: 0.01rem, por eso todo era cuadrado */
+
     --bg-1: #1e1e1e;
     --bg-2: #f2f2f2;
     --bg-3: #111111;
     --card: #ffffff;
+
     --text-main: #1a1a1a;
     --text-soft: #555;
+
     --accent-1: #111111;
     --accent-2: #00c8ff;
+
     --danger: #ff4d4d;
     --amarillo: #ffee00;
 }
@@ -24,6 +28,7 @@ body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
+/* QUITÉ EL white-space: nowrap DE AQUÍ, ESE ERA EL ASESINO */
 p {
     margin: 0.5rem 0;
     color: var(--text-soft);
@@ -45,6 +50,247 @@ button {
     width: auto;
 }
 button:hover { transform: scale(1.03); background: #222; }
+
+/* ===================== */
+/*        NAVBAR         */
+/* ===================== */
+.nav {
+    display: flex;
+    background: var(--bg-2);
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.logo {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background-size: cover;
+    background-position: center;
+    background-image: url(./AKRlogo.ico);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+#titular { font-weight: bold; font-size: 15px; }
+
+/* ===================== */
+/*        MENÚ           */
+/* ===================== */
+.menu {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 12px;
+    background: #333;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    gap: 8px;
+    width: 100%;
+}
+input.menu, select.menu { background: #111; color: #fff; }
+
+/* ===================== */
+/*       IMÁGENES        */
+/* ===================== */
+.imagenes-contenedor,
+#imagenes-contenedor,
+.div-solicitudes {
+    display: grid;
+    gap: 12px;
+    padding: 12px;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.imagen {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-2);
+    border-radius: 14px;
+    overflow: hidden;
+    position: relative;
+}
+
+.la-imagen {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    border: none;
+}
+
+/* ANTES TENÍA height: 1rem Y SE CORTABA */
+.producto-titulo {
+    display: block;
+    text-align: center;
+    text-transform: uppercase;
+    background: #333;
+    color: var(--amarillo);
+    font-weight: 900;
+    font-size: 13px;
+    line-height: 1.3;
+    padding: 8px 6px;
+    min-height: 38px;
+}
+
+.detalles {
+    padding: 8px 10px;
+    font-size: 13px;
+    color: #333;
+}
+.detalles ul { margin: 0; }
+.detalles li { margin-bottom: 4px; }
+
+.desc-soli { margin-top: auto; padding: 0 10px 10px; }
+.desc-soli button { width: 100%; }
+
+/* Banner de arriba */
+.novedad { grid-column: 1 / -1; }
+.novedad .la-imagen {
+    aspect-ratio: 16 / 6;
+    height: auto;
+}
+
+/* ===================== */
+/*    PANEL / FORMULARIO */
+/* ===================== */
+.panel, .queso, .cargador {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--bg-2);
+    margin: 12px;
+    padding: 18px;
+    border-radius: 18px;
+    border: none;
+}
+
+.webo, .webo1 {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #111;
+    border: 2px solid #00c8ff;
+    color: #fff;
+}
+.webo1 { background: #fff; color: #111; border-color: #111; }
+
+#mem {
+    width: 100%;
+    max-width: 280px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 12px;
+    align-self: center;
+}
+
+.mensage {
+    width: 100%;
+    padding: 3rem 1rem;
+    text-align: center;
+    font-size: 18px;
+    color: #fff;
+}
+
+/* ===================== */
+/*     PAGINACION        */
+/* ===================== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 18px 0;
+    flex-wrap: wrap;
+}
+.pagination button { min-width: 44px; }
+
+/* ===================== */
+/*     RESPONSIVE PC     */
+/* ===================== */
+@media (min-width: 800px) {
+    .imagenes-contenedor,
+    #imagenes-contenedor {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+    .nav { padding: 12px 24px; }
+}
+
+.no-ver { display: none !important; }
+/* === PUERTA CORREDIZA VERTICAL - TU IDEA ORIGINAL === */
+
+/* LA CAJA - LA PUERTA */
+.nav {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  width: 235px;
+  /* Cuando está cerrada, solo mide lo del logo */
+  height: 68px;
+  overflow: hidden; /* Esto es lo importante: lo que no cabe, no se ve */
+  background: #f2f2f2;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
+  z-index: 9999;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* La animación de estirarse */
+  transition: height 0.35s ease;
+}
+
+/* CUANDO LE PICAS, SE ESTIRA */
+.nav:not(.navhiden) {
+  height: auto;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+/* EL LOGO - ES LA MANIJA DE LA PUERTA */
+.logo {
+  width: 58px;
+  height: 58px;
+  min-height: 58px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #fff url(./AKRlogo2.png) center / 82% no-repeat;
+  border: 3px solid #111;
+  cursor: pointer;
+  transition: transform 0.35s ease;
+}
+
+.logo.rotado {
+  transform: rotate(180deg);
+}
+
+/* EL TÍTULO Y EL MENÚ */
+.nav h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.nav .ses {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.nav .menu {
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+}
+
 
 /* ===================== */
 /*  NAV - PUERTA CORREDIZA */
@@ -190,3 +436,4 @@ button:hover { transform: scale(1.03); background: #222; }
     margin: 0 auto !important;
   }
 }
+
