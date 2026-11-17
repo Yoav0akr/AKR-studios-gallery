@@ -140,3 +140,52 @@ button:hover { transform: scale(1.03); background: #222; }
     padding: 10px 12px;
     background: #333;
     color: #fff
+    /* === ARREGLO GALERÍA - QUE NO SE HAGA GIGANTE === */
+
+.legumbre {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.imagenes-contenedor,
+#imagenes-contenedor {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* La cajita de cada foto */
+.imagen {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+/* LA FOTO EN SÍ - AQUÍ ESTABA EL PEDO */
+.la-imagen {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* El banner sí puede ser más ancho, es el de arriba */
+.novedad .la-imagen {
+  aspect-ratio: 16 / 6 !important;
+}
+
+/* En PC 4 por fila, pero sin pasarse */
+@media (min-width: 800px) {
+  .imagenes-contenedor,
+  #imagenes-contenedor {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    max-width: 1100px !important;
+    margin: 0 auto !important;
+  }
+}
