@@ -1,5 +1,6 @@
 :root {
-    --defborder: 14px; /* ANTES: 0.01rem, por eso todo era cuadrado */
+    --defborder: 14px;
+    /* ANTES: 0.01rem, por eso todo era cuadrado */
 
     --bg-1: #1e1e1e;
     --bg-2: #f2f2f2;
@@ -35,8 +36,14 @@ p {
     line-height: 1.4;
 }
 
-ul { list-style: none; }
-a { color: #00c8ff; text-decoration: none; }
+ul {
+    list-style: none;
+}
+
+a {
+    color: #00c8ff;
+    text-decoration: none;
+}
 
 button {
     font-family: Arial, sans-serif;
@@ -49,7 +56,11 @@ button {
     cursor: pointer;
     width: auto;
 }
-button:hover { transform: scale(1.03); background: #222; }
+
+button:hover {
+    transform: scale(1.03);
+    background: #222;
+}
 
 /* ===================== */
 /*        NAVBAR         */
@@ -76,7 +87,10 @@ button:hover { transform: scale(1.03); background: #222; }
     flex-shrink: 0;
 }
 
-#titular { font-weight: bold; font-size: 15px; }
+#titular {
+    font-weight: bold;
+    font-size: 15px;
+}
 
 /* ===================== */
 /*        MENÚ           */
@@ -93,7 +107,12 @@ button:hover { transform: scale(1.03); background: #222; }
     gap: 8px;
     width: 100%;
 }
-input.menu, select.menu { background: #111; color: #fff; }
+
+input.menu,
+select.menu {
+    background: #111;
+    color: #fff;
+}
 
 /* ===================== */
 /*       IMÁGENES        */
@@ -143,14 +162,29 @@ input.menu, select.menu { background: #111; color: #fff; }
     font-size: 13px;
     color: #333;
 }
-.detalles ul { margin: 0; }
-.detalles li { margin-bottom: 4px; }
 
-.desc-soli { margin-top: auto; padding: 0 10px 10px; }
-.desc-soli button { width: 100%; }
+.detalles ul {
+    margin: 0;
+}
+
+.detalles li {
+    margin-bottom: 4px;
+}
+
+.desc-soli {
+    margin-top: auto;
+    padding: 0 10px 10px;
+}
+
+.desc-soli button {
+    width: 100%;
+}
 
 /* Banner de arriba */
-.novedad { grid-column: 1 / -1; }
+.novedad {
+    grid-column: 1 / -1;
+}
+
 .novedad .la-imagen {
     aspect-ratio: 16 / 6;
     height: auto;
@@ -159,10 +193,12 @@ input.menu, select.menu { background: #111; color: #fff; }
 /* ===================== */
 /*    PANEL / FORMULARIO */
 /* ===================== */
-.panel, .queso, .cargador {
+.panel,
+.queso,
+.cargador {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 1vh;
     background: var(--bg-2);
     margin: 12px;
     padding: 18px;
@@ -170,16 +206,22 @@ input.menu, select.menu { background: #111; color: #fff; }
     border: none;
 }
 
-.webo, .webo1 {
+.webo,
+.webo1 {
     width: 100%;
     font-size: 16px;
-    padding: 12px;
+    padding: 0.75vw;
     border-radius: 10px;
     background: #111;
     border: 2px solid #00c8ff;
     color: #fff;
 }
-.webo1 { background: #fff; color: #111; border-color: #111; }
+
+.webo1 {
+    background: #fff;
+    color: #111;
+    border-color: #111;
+}
 
 #mem {
     width: 100%;
@@ -208,90 +250,102 @@ input.menu, select.menu { background: #111; color: #fff; }
     margin: 18px 0;
     flex-wrap: wrap;
 }
-.pagination button { min-width: 44px; }
+
+.pagination button {
+    min-width: 44px;
+}
 
 /* ===================== */
 /*     RESPONSIVE PC     */
 /* ===================== */
 @media (min-width: 800px) {
+
     .imagenes-contenedor,
     #imagenes-contenedor {
         grid-template-columns: repeat(4, 1fr);
         max-width: 1100px;
         margin: 0 auto;
     }
-    .nav { padding: 12px 24px; }
+
+    .nav {
+        padding: 12px 24px;
+    }
 }
 
-.no-ver { display: none !important; }
+.no-ver {
+    display: none !important;
+}
+
 /* === PUERTA CORREDIZA VERTICAL - TU IDEA ORIGINAL === */
 
 /* LA CAJA - LA PUERTA */
 .nav {
-  position: fixed;
-  top: 14px;
-  left: 14px;
-  width: 235px;
-  /* Cuando está cerrada, solo mide lo del logo */
-  height: 68px;
-  overflow: hidden; /* Esto es lo importante: lo que no cabe, no se ve */
-  background: #f2f2f2;
-  border-radius: 18px;
-  box-shadow: 0 8px 30px rgba(0,0,0,.5);
-  z-index: 9999;
-  padding: 5px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  /* La animación de estirarse */
-  transition: height 0.35s ease;
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    width: 235px;
+    /* Cuando está cerrada, solo mide lo del logo */
+    height: 68px;
+    overflow: hidden;
+    /* Esto es lo importante: lo que no cabe, no se ve */
+    background: #f2f2f2;
+    border-radius: 18px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .5);
+    z-index: 9999;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* La animación de estirarse */
+    transition: height 0.35s ease;
 }
 
 /* CUANDO LE PICAS, SE ESTIRA */
 .nav:not(.navhiden) {
-  height: auto;
-  max-height: 85vh;
-  overflow-y: auto;
-  padding: 12px;
+    height: auto;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 12px;
 }
 
 /* EL LOGO - ES LA MANIJA DE LA PUERTA */
 .logo {
-  width: 58px;
-  height: 58px;
-  min-height: 58px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: #fff url(./AKRlogo2.png) center / 82% no-repeat;
-  border: 3px solid #111;
-  cursor: pointer;
-  transition: transform 0.35s ease;
+    width: 58px;
+    height: 58px;
+    min-height: 58px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #fff url(./AKRlogo2.png) center / 82% no-repeat;
+    border: 3px solid #111;
+    cursor: pointer;
+    transition: transform 0.35s ease;
 }
 
 .logo.rotado {
-  transform: rotate(180deg);
+    transform: rotate(180deg);
 }
 
 /* EL TÍTULO Y EL MENÚ */
 .nav h1 {
-  font-size: 20px;
-  margin: 0;
+    font-size: 20px;
+    margin: 0;
 }
+
 .nav h1 {
     display: none;
 }
 
 .nav .ses {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
 }
 
 .nav .menu {
-  width: 100%;
-  min-height: 44px;
-  margin: 0;
+    width: 100%;
+    min-height: 44px;
+    margin: 0;
 }
 
 
@@ -311,7 +365,7 @@ input.menu, select.menu { background: #111; color: #fff; }
     overflow-y: auto;
     background: var(--bg-2);
     border-radius: 18px;
-    box-shadow: 0 8px 30px rgba(0,0,0,.5);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, .5);
     z-index: 9999;
     padding: 12px;
     display: flex;
@@ -363,7 +417,10 @@ input.menu, select.menu { background: #111; color: #fff; }
     margin: 0;
 }
 
-#titular { font-weight: bold; font-size: 15px; }
+#titular {
+    font-weight: bold;
+    font-size: 15px;
+}
 
 .nav .ses {
     display: flex;
@@ -390,54 +447,115 @@ input.menu, select.menu { background: #111; color: #fff; }
     background: #333;
     color: #fff
 }
+
 /* === ARREGLO GALERÍA - QUE NO SE HAGA GIGANTE === */
 
 .legumbre {
-  width: 100% !important;
-  max-width: 100% !important;
-  overflow: hidden !important;
-  box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
 }
 
 .imagenes-contenedor,
 #imagenes-contenedor {
-  width: 100% !important;
-  max-width: 100% !important;
-  box-sizing: border-box !important;
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 }
 
 /* La cajita de cada foto */
 .imagen {
-  width: 100% !important;
-  max-width: 100% !important;
-  min-width: 0 !important;
-  overflow: hidden !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
 }
 
 /* LA FOTO EN SÍ - AQUÍ ESTABA EL PEDO */
 .la-imagen {
-  width: 100% !important;
-  max-width: 100% !important;
-  height: auto !important;
-  aspect-ratio: 1 / 1 !important;
-  object-fit: cover !important;
-  display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    object-fit: cover !important;
+    display: block !important;
 }
 
 /* El banner sí puede ser más ancho, es el de arriba */
 .novedad .la-imagen {
-  aspect-ratio: 16 / 6 !important;
+    aspect-ratio: 16 / 6 !important;
 
 }
 
 /* En PC 4 por fila, pero sin pasarse */
 @media (min-width: 800px) {
-  .imagenes-contenedor,
-  #imagenes-contenedor {
-    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-    max-width: 1100px !important;
-    margin: 0 auto !important;
-  }
+
+    .imagenes-contenedor,
+    #imagenes-contenedor {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        max-width: 1100px !important;
+        margin: 0 auto !important;
+    }
 }
 
+/* apartado parea el visualisador del upload del upload.html */
+
+.cargador {
+    display: grid;
+    flex-direction: row;
+    max-height: fit-content;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    background-color: #222;
+}
+
+.visualizador {
+    border-radius: var(--defborder);
+  background-color: #0ca0017a;
+    border: 3px solid #0ba001;
+    min-width: 30%;
+    aspect-ratio: 1/1;
+    margin: 12px;
+    align-content: center;
+
+}
+
+.visualizador p{
+display: flex;
+flex-direction: column;
+color:#00c8ff;
+margin: 20px;
+max-height:100%;
+justify-self: center;
+}
+
+.queso {
+    display: flex;
+    border: 3px solid #00c8ff;
+
+}
+
+.cargador .grid2ancho {
+    grid-column: span 2;
+}
+
+.reject{
+    background: #ff00007c;
+    border: 5px dotted #ff0000;
+    border-radius: var(--defborder);
+}
+/* ===================== */
+/*     RESPONSIVE telfono     */
+/* ===================== */
+@media (max-width: 800px) {
+.cargador {
+    grid-template-columns:1fr ;
+
+}
+.cargador .grid2ancho {
+    grid-column: span 1;
+}
+
+}
