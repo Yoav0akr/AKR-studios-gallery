@@ -224,3 +224,90 @@ input.menu, select.menu { background: #111; color: #fff; }
 }
 
 .no-ver { display: none !important; }
+/* === PUERTA CORREDIZA VERTICAL - TU IDEA ORIGINAL === */
+
+/* LA CAJA - LA PUERTA */
+.nav {
+  position: fixed;
+  top: 14px;
+  left: 14px;
+  width: 235px;
+  /* Cuando está cerrada, solo mide lo del logo */
+  height: 68px;
+  overflow: hidden; /* Esto es lo importante: lo que no cabe, no se ve */
+  background: #f2f2f2;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
+  z-index: 9999;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  /* La animación de estirarse */
+  transition: height 0.35s ease;
+}
+
+/* CUANDO LE PICAS, SE ESTIRA */
+.nav:not(.navhiden) {
+  height: auto;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+/* EL LOGO - ES LA MANIJA DE LA PUERTA */
+.logo {
+  width: 58px;
+  height: 58px;
+  min-height: 58px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #fff url(./AKRlogo2.png) center / 82% no-repeat;
+  border: 3px solid #111;
+  cursor: pointer;
+  transition: transform 0.35s ease;
+}
+
+.logo.rotado {
+  transform: rotate(180deg);
+}
+
+/* EL TÍTULO Y EL MENÚ */
+.nav h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.nav .ses {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.nav .menu {
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+}
+
+/* Cuando la puerta está cerrada, el título y el menú no se ven,
+   solo se ve el logo por la ventanita */
+.nav.navhiden h1,
+.nav.navhiden #titular,
+.nav.navhiden .ses {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.nav:not(.navhiden) h1,
+.nav:not(.navhiden) .ses {
+  opacity: 1;
+}
+
+/* En teléfono la puerta es más angosta */
+@media (max-width: 500px) {
+  .nav {
+    width: 220px;
+  }
+}
