@@ -569,10 +569,12 @@ select.menu {
 }
 
 .ACTIONS {
-    display: flex;
-    flex-direction: row;
+     display: flex;
     padding: 5px;
     gap: 2px;
+    flex-direction: row;
+    height: stretch;
+    align-items: flex-end;
 }
 
 
