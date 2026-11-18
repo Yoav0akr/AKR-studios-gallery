@@ -11,16 +11,21 @@ const btnPrev = document.getElementById("prev");
 const btnNext = document.getElementById("next");
 const paginaActual = document.getElementById("paginaActual");
 const show = document.getElementById("show");
+const loggedBUTNS = document.getElementById("loged");
 
 // ==============================
 //  SESIÓN
 // ==============================
+
+function logued_Q(){
 const adminpass = localStorage.getItem("adminpass");
 const nombre_usuario = localStorage.getItem("admin");
 
 if (nombre_usuario) {
   titular.textContent = `Hola ${nombre_usuario}!`;
   titular.classList.remove("no-ver");
+  loggedBUTNS.classList.remove("no-ver");
+  console.log(loggedBUTNS);
 
   if (adminpass === "true") {
     btnPANadmins.classList.remove("no-ver");
@@ -31,6 +36,15 @@ if (nombre_usuario) {
   titular.classList.add("no-ver");
   btnPANadmins.classList.add("no-ver");
 }
+
+};
+
+
+
+
+
+
+
 
 // ==============================
 //  GLOBALES
@@ -60,7 +74,7 @@ async function cargarDesdeMongo(page = 1) {
       if (currentTexto !== "") params.append("nombre", currentTexto); // ojo: backend espera "nombre", no "texto"
     }
 
-    const res = await fetch(`/api/db?${params.toString()}`||`https://akr-studios-gallery.vercel.app/api/db`);
+    const res = await fetch(`/api/db?${params.toString()}` || `https://akr-studios-gallery.vercel.app/api/db`);
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
 
@@ -220,6 +234,7 @@ async function init(page = 1) {
   renderCategorias(await GET_categs());
   cargarimagenes(globalArchivos);
   paginaActual.textContent = `Página ${currentPage} de ${totalPages} `;
+  logued_Q();
 }
 
 // ==============================
@@ -244,7 +259,7 @@ async function GET_categs() {
     const params = new URLSearchParams({
       mode: "cats",
     });
-    const res = await fetch(`/api/db?${params.toString()}`||`https://akr-studios-gallery.vercel.app/api/db?${params.toString()}`);
+    const res = await fetch(`/api/db?${params.toString()}` || `https://akr-studios-gallery.vercel.app/api/db?${params.toString()}`);
     if (!res.ok) throw new Error(res.status);
 
     const data = await res.json();   // <- parseamos la respuesta
