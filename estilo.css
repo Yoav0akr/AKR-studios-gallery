@@ -320,6 +320,10 @@ select.menu {
     cursor: pointer;
     transition: transform 0.35s ease;
 }
+#titular{
+    margin-left: 60px;
+    font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif sans-serif !important;
+}
 
 .logo.rotado {
     transform: rotate(180deg);
