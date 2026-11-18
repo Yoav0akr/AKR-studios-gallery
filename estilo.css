@@ -560,11 +560,19 @@ select.menu {
 .descargarBtn,
 .eliminarBtn {
 
+    display: flex;
+
     margin: 0.2px;
     padding: 2px;
+    width: 50%;
+    flex-direction: row;
 }
-.ACTIONS{
-    max-width: 50%;
+
+.ACTIONS {
+    display: flex;
+    flex-direction: row;
+    padding: 5px;
+    gap: 2px;
 }
 
 
