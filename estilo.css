@@ -547,6 +547,15 @@ justify-self: center;
     border-radius: var(--defborder);
 }
 
+.not{
+    background-color: #ff00007e;
+    border: 3px dotted #ff0000,
+}
+.yes{
+    background-color: #00ff447e;
+    border: 3px dotted #00ff95,
+}
+
 
 /* ===================== */
 /*  PERFIL - SOLO ESTO   */
