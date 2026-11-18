@@ -17,25 +17,25 @@ const loggedBUTNS = document.getElementById("loged");
 //  SESIÓN
 // ==============================
 
-function logued_Q(){
-const adminpass = localStorage.getItem("adminpass");
-const nombre_usuario = localStorage.getItem("admin");
+function logued_Q() {
+  const adminpass = localStorage.getItem("adminpass");
+  const nombre_usuario = localStorage.getItem("admin");
 
-if (nombre_usuario) {
-  titular.textContent = `Hola ${nombre_usuario}!`;
-  titular.classList.remove("no-ver");
-  loggedBUTNS.classList.remove("no-ver");
-  console.log(loggedBUTNS);
+  if (nombre_usuario) {
+    titular.textContent = `Hola ${nombre_usuario}!`;
+    titular.classList.remove("no-ver");
+    loggedBUTNS.classList.remove("no-ver");
+    console.log(loggedBUTNS);
 
-  if (adminpass === "true") {
-    btnPANadmins.classList.remove("no-ver");
+    if (adminpass === "true") {
+      btnPANadmins.classList.remove("no-ver");
+    } else {
+      btnPANadmins.classList.add("no-ver");
+    }
   } else {
+    titular.classList.add("no-ver");
     btnPANadmins.classList.add("no-ver");
   }
-} else {
-  titular.classList.add("no-ver");
-  btnPANadmins.classList.add("no-ver");
-}
 
 };
 
@@ -88,6 +88,23 @@ async function cargarDesdeMongo(page = 1) {
     return [];
   }
 }
+//funcion para tomar videos random:
+function getRandomASMRLink() {
+    const videos = [
+        "https://youtu.be/YpmJlZJX-h8?si=QRFc5cG-lSP02TZN",
+        "https://youtu.be/Wb_U9TaG4og?si=nr8WDRWYtPMoLYOL",
+        "https://youtu.be/TAqQz7TL3-c?si=1OiBRJBJap68zbeX",
+        "https://youtu.be/Ant6POXHapI?si=y3e34aKO05-OzrXK",
+        "https://youtu.be/9bImo955c7E?si=3CTQm2ftMAqNWNPC",
+        "https://youtu.be/Hngyw7p2KFA?si=G28Yfj_f3cFauZ63",
+        "https://youtu.be/Pj0NfyrtmiA?si=4udO-pqqykYRDBkt",
+        "https://www.youtube.com/live/099ZzTj5Jns?si=1NJv41HsshvWSe39",
+        "https://youtu.be/EpIsV4wru1Q?si=DPCqMDUEg2E2BrUs",
+        "https://youtu.be/RINCgYzWCds?si=yM0XOVJN48RHxdXj"
+    ];
+
+    return videos[Math.floor(Math.random() * videos.length)];
+}
 
 // ==============================
 //  RENDER IMÁGENES
@@ -101,6 +118,12 @@ function cargarimagenes(lista) {
     show.classList.add("mensage")
     return;
   }
+ 
+
+
+
+
+
 
   show.classList.add("no-ver");
   fotos.innerHTML = `      <div class="imagen novedad">
@@ -110,11 +133,12 @@ function cargarimagenes(lista) {
         flex-direction: column;
         align-self: center;
         justify-self: center;
+            top: 35%;
       
         ">
           <p   style="font-size: 3vw; text-align: center; mix-blend-mode: difference; color: #ffffff;   font-weight: 16vw;">Esta pagina es una pagina para todo publico</p>
 
-          <a  class= "menu" href="https://youtu.be/D06Yxj4dBCk?si=QJBGAGXLONl-qZ9l">No me gusta</a>
+          <a  class= "menu" href="${getRandomASMRLink()}">No me gusta</a>
         </div>
       </div>`;
   lista.forEach(item => {
