@@ -183,6 +183,7 @@ select.menu {
 /* Banner de arriba */
 .novedad {
     grid-column: 1 / -1;
+    align-items: center;
 }
 
 .novedad .la-imagen {
@@ -589,7 +590,7 @@ select.menu {
 .perfil {
     display: flex;
     flex-direction: row;
-    align-items: flex-start;
+    align-items: center;
     gap: 1rem;
     margin: 1rem auto 0 auto;
     max-width: 700px;
